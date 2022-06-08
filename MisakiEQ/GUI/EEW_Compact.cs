@@ -1,0 +1,171 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace MisakiEQ.GUI
+{
+    public partial class EEW_Compact : Form
+    {
+        public EEW_Compact()
+        {
+            InitializeComponent();
+        }
+        public void SetInfomation(Struct.EEW eew)
+        {
+            Log.Logger.GetInstance().Debug("データの更新中...");
+                SignalCount.Text = $"第 {eew.Serial.Number} 報{(eew.Serial.IsFinal?" (最終報)":"")}";
+            string temp = string.Empty;
+            switch (eew.Serial.Infomation)
+            {
+                case Struct.EEW.InfomationLevel.Default:
+                    temp = "緊急地震速報は発表されていません。";
+                    SignalCount.Text = string.Empty;
+                    TopColor(Color.Teal, Color.White);
+                    break;
+                case Struct.EEW.InfomationLevel.Forecast:
+                    temp = "緊急地震速報(予報)";
+                    TopColor(Color.DarkOrange, Color.White);
+                    break;
+                case Struct.EEW.InfomationLevel.Warning:
+                    temp = "緊急地震速報(警報)";
+                    TopColor(Color.Red,Color.White);
+                    break;
+                case Struct.EEW.InfomationLevel.Cancelled:
+                    temp = "この緊急地震速報はキャンセルされました。";
+                    SignalCount.Text = string.Empty;
+                    TopColor(Color.Gray, Color.White);
+                    break;
+                case Struct.EEW.InfomationLevel.Test:
+                    temp = "これは訓練です。";
+                    TopColor(Color.DarkGreen, Color.White);
+                    break;
+                case Struct.EEW.InfomationLevel.CancelledTest:
+                    temp = "この訓練はキャンセルされました。";
+                    SignalCount.Text = string.Empty;
+                    TopColor(Color.Gray, Color.White);
+                    break;
+                case Struct.EEW.InfomationLevel.Unknown:
+                    temp = "不明な情報です。";
+                    SignalCount.Text = string.Empty;
+                    TopColor(Color.Gray, Color.White);
+                    break;
+            }
+            SignalType.Text = temp;
+            MaxIntensity.Text = Struct.Common.IntToStringShort(eew.EarthQuake.MaxIntensity);
+            SetColor(false, eew.EarthQuake.MaxIntensity);
+            Hypocenter.Text = eew.EarthQuake.Hypocenter;
+            OriginTime.Text=eew.EarthQuake.OriginTime.ToString("yyyy/MM/dd HH:mm:ss");
+            Magnitude.Text = $"M {eew.EarthQuake.Magnitude:0.0}";
+            if (eew.EarthQuake.Depth < 0)
+            {
+                Depth.Text = "不明";
+            }
+            else if(eew.EarthQuake.Depth == 0)
+            {
+                Depth.Text = "ごく浅い";
+            }
+            else
+            {
+                Depth.Text = $"{eew.EarthQuake.Depth} km";
+            }
+            SetColor(true, eew.UserInfo.LocalIntensity);
+            AreaIntensity.Text = Struct.Common.IntToStringShort(eew.UserInfo.LocalIntensity);
+
+
+            Log.Logger.GetInstance().Debug("データの更新完了");
+        }
+        void SetColor(bool IsArea, Struct.Common.Intensity value)
+        {
+            Color bg=Color.Gray;
+            Color fc=Color.White;
+            switch (value)
+            {
+                case Struct.Common.Intensity.Int0:
+                    bg = Color.Gray;
+                    fc = Color.White;
+                    break;
+                case Struct.Common.Intensity.Int1:
+                    bg = Color.Gray;
+                    fc = Color.White;
+                    break;
+                case Struct.Common.Intensity.Int2:
+                    bg = Color.RoyalBlue;
+                    fc = Color.White;
+                    break;
+                case Struct.Common.Intensity.Int3:
+                    bg = Color.SeaGreen;
+                    fc = Color.White;
+                    break;
+                case Struct.Common.Intensity.Int4:
+                    bg = Color.FromArgb(255, 191, 191, 15);
+                    fc = Color.White;
+                    break;
+                case Struct.Common.Intensity.Int5Down:
+                case Struct.Common.Intensity.Int5Up:
+                    bg = Color.OrangeRed;
+                    fc = Color.White;
+                    break;
+                case Struct.Common.Intensity.Int6Down:
+                case Struct.Common.Intensity.Int6Up:
+                    bg = Color.Pink;
+                    fc = Color.Red;
+                    break;
+                case Struct.Common.Intensity.Int7:
+                    bg = Color.Purple;
+                    fc = Color.White;
+                    break;
+            }
+            if (IsArea)
+            {
+                AreaColor(bg, fc);
+            }
+            else
+            {
+                InfoColor(bg, fc);
+            }
+        }
+        void TopColor(Color bg,Color fr)
+        {
+            SignalType.BackColor = bg;
+            SignalCount.BackColor = bg;
+            SignalType.ForeColor = fr;
+            SignalCount.ForeColor = fr;
+        }
+        void InfoColor(Color bg,Color fr)
+        {
+            MaxIntensityLabel.BackColor = bg;
+            MaxIntensity.BackColor = bg;
+            Hypocenter.BackColor = bg;
+            OriginTime.BackColor = bg;
+            Magnitude.BackColor = bg;
+            DepthLabel.BackColor= bg;
+            Depth.BackColor = bg;
+            MaxIntensityLabel.ForeColor= fr;
+            MaxIntensity.ForeColor= fr;
+            Hypocenter.ForeColor= fr;
+            OriginTime.ForeColor= fr;
+            Magnitude.ForeColor= fr;
+            DepthLabel.ForeColor= fr;
+            Depth.ForeColor= fr;
+        }
+        void AreaColor(Color bg,Color fr)
+        {
+            AreaIntensity.BackColor= bg; 
+            AreaIntensityLabel.BackColor= bg;
+            AreaIntensity.ForeColor = fr;
+            AreaIntensityLabel.ForeColor = fr;
+        }
+
+        private void EEW_Compact_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            Hide();
+        }
+    }
+}

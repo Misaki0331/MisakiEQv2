@@ -1,0 +1,582 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Logo.AppIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\logo.AppIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Logo.MainIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Logo.Icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="testForecast" xml:space="preserve">
+    <value>{
+  "ParseStatus": "Success",
+  "Title": {
+    "Code": 37,
+    "String": "緊急地震速報（警報）",
+    "Detail": "マグニチュード、最大予測震度及び主要動到達予測時刻の緊急地震速報（発表パターン3： グリッド サーチ法、EPOS自動処理手法）"
+  },
+  "Source": {
+    "Code": 3,
+    "String": "気象庁本庁"
+  },
+  "Status": {
+    "Code": "00",
+    "String": "通常",
+    "Detail": "通常"
+  },
+  "AnnouncedTime": {
+    "String": "2018/06/18 07:58:49",
+    "UnixTime": 1529276329,
+    "RFC1123": "Sun, 17 Jun 2018 22:58:49 UTC"
+  },
+  "OriginTime": {
+    "String": "2018/06/18 07:58:34",
+    "UnixTime": 1529276314,
+    "RFC1123": "Sun, 17 Jun 2018 22:58:34 UTC"
+  },
+  "EventID": "20180618075838",
+  "Type": {
+    "Code": 0,
+    "String": "発表",
+    "Detail": "発表(警報)"
+  },
+  "Serial": 11,
+  "Hypocenter": {
+    "Code": 520,
+    "Name": "大阪府北部",
+    "isAssumption": false,
+    "Location": {
+      "Lat": 34.8,
+      "Long": 135.6,
+      "Depth": {
+        "Int": 10,
+        "String": "約10km"
+      }
+    },
+    "Magnitude": {
+      "Float": 6.3,
+      "String": "M6.3",
+      "LongString": "M6.3"
+    },
+    "Accuracy": {
+      "Epicenter": {
+        "Code": 6,
+        "String": "防災科研システム(5点以上)〔防災科研 Hi-net データ〕",
+        "Rank2": 4,
+        "String2": "IPF法(5点)"
+      },
+      "Depth": {
+        "Code": 6,
+        "String": "防災科研システム(5点以上)〔防災科研 Hi-net データ〕"
+      },
+      "Magnitude": {
+        "Code": 4,
+        "String": "P相/全相混在"
+      },
+      "NumberOfMagnitudeCalculation": 5
+    },
+    "isSea": false
+  },
+  "MaxIntensity": {
+    "From": "6+",
+    "To": "6+",
+    "String": "6強",
+    "LongString": "6強程度"
+  },
+  "Warn": true,
+  "WarnForecast": {
+    "Hypocenter": {
+      "Code": 9270,
+      "Name": "大阪府"
+    },
+    "District": [
+      "近畿",
+      "三重",
+      "福井",
+      "香川"
+    ],
+    "LocalAreas": [
+      "大阪",
+      "滋賀",
+      "兵庫",
+      "奈良",
+      "京都",
+      "三重",
+      "和歌山",
+      "福井",
+      "香川"
+    ],
+    "Regions": [
+      "大阪府北部",
+      "京都府南部",
+      "滋賀県南部",
+      "兵庫県南東部",
+      "奈良県",
+      "大阪府南部",
+      "三重県中部",
+      "和歌山県北部",
+      "滋賀県北部",
+      "京都府北部",
+      "福井県嶺南",
+      "兵庫県淡路島",
+      "三重県北部",
+      "兵庫県南西部",
+      "香川県東部"
+    ]
+  },
+  "Option": {
+    "Change": {
+      "Code": 0,
+      "String": "ほとんど変化なし",
+      "Reason": {
+        "Code": 0,
+        "String": "不明"
+      }
+    }
+  },
+  "Forecast": [{
+      "Intensity": {
+        "Code": 520,
+        "Name": "大阪府北部",
+        "From": "6強",
+        "To": "6弱",
+        "Description": "震度6弱から震度6強程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": true,
+        "Condition": "既に主要動到達と推測"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 511,
+        "Name": "京都府南部",
+        "From": "6弱",
+        "To": "5強",
+        "Description": "震度5強から震度6弱程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": true,
+        "Condition": "既に主要動到達と推測"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 501,
+        "Name": "滋賀県南部",
+        "From": "6弱",
+        "To": "6弱",
+        "Description": "震度6弱程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": true,
+        "Condition": "既に主要動到達と推測"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 531,
+        "Name": "兵庫県南東部",
+        "From": "6弱",
+        "To": "6弱",
+        "Description": "震度6弱程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": true,
+        "Condition": "既に主要動到達と推測"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 540,
+        "Name": "奈良県",
+        "From": "5強",
+        "To": "5弱",
+        "Description": "震度5弱から震度5強程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": true,
+        "Condition": "既に主要動到達と推測"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 521,
+        "Name": "大阪府南部",
+        "From": "5強",
+        "To": "5強",
+        "Description": "震度5強程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": true,
+        "Condition": "既に主要動到達と推測"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 461,
+        "Name": "三重県中部",
+        "From": "5弱",
+        "To": "4",
+        "Description": "震度4から震度5弱程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:58:51"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 550,
+        "Name": "和歌山県北部",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:58:50"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 500,
+        "Name": "滋賀県北部",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:58:54"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 510,
+        "Name": "京都府北部",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:58:54"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 401,
+        "Name": "福井県嶺南",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:58:56"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 535,
+        "Name": "兵庫県淡路島",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:58:56"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 460,
+        "Name": "三重県北部",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:58:57"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 532,
+        "Name": "兵庫県南西部",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:58:57"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 462,
+        "Name": "三重県南部",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": false,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:59:02"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 432,
+        "Name": "岐阜県美濃中西部",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": false,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:59:04"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 551,
+        "Name": "和歌山県南部",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": false,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:59:06"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 451,
+        "Name": "愛知県西部",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": false,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:59:08"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 610,
+        "Name": "香川県東部",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": true,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:59:09"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 581,
+        "Name": "岡山県南部",
+        "From": "4",
+        "To": "4",
+        "Description": "震度4程度"
+      },
+      "Warn": false,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:59:17"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 530,
+        "Name": "兵庫県北部",
+        "From": "4",
+        "To": "3",
+        "Description": "震度3から震度4程度"
+      },
+      "Warn": false,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:58:59"
+      }
+    },
+    {
+      "Intensity": {
+        "Code": 600,
+        "Name": "徳島県北部",
+        "From": "4",
+        "To": "3",
+        "Description": "震度3から震度4程度"
+      },
+      "Warn": false,
+      "Arrival": {
+        "Flag": false,
+        "Condition": "未到達と推測",
+        "Time": "07:59:06"
+      }
+    }
+  ],
+  "OriginalText": "37 03 00 180618075849 C11 180618075834 ND20180618075838 NCN011 JD////////////// JN/// 520 N348 E1356 010 63 6+ RK66454 RT01/// RC0//// EBI 520 S6+6- ////// 11 511 S6-5+ ////// 11 501 S6-6- ////// 11 531 S6-6- ////// 11 540 S5+5- ////// 11 521 S5+5+ ////// 11 461 S5-04 075851 10 550 S0404 075850 10 500 S0404 075854 10 510 S0404 075854 10 401 S0404 075856 10 535 S0404 075856 10 460 S0404 075857 10 532 S0404 075857 10 462 S0404 075902 00 432 S0404 075904 00 551 S0404 075906 00 451 S0404 075908 00 610 S0404 075909 10 581 S0404 075917 00 530 S0403 075859 00 600 S0403 075906 00 9999="
+}</value>
+  </data>
+</root>
