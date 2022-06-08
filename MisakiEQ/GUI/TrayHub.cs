@@ -97,28 +97,13 @@ namespace MisakiEQ.GUI
         {
             if (e.data == null) return;
             Log.Logger.GetInstance().Debug($"地震情報のイベントが発生: {e.data.Details.OriginTime:d日HH:mm} {Struct.EarthQuake.TypeToString(e.data.Issue.Type)}");
-            //ToDo: 地震情報のイベント処理を入れる
-            /*EEW_Compact.Invoke(() =>
-            {
-                EEW_Compact.SetInfomation(e.eew);
-                EEW_Compact.Show();
-                EEW_Compact.Activate();
-            });*/
             Funcs.Toast.Post(e.data);
         }
         private void EventTsunami(object? sender, Background.API.TsunamiEventArgs e)
         {
             if (e.data == null) return;
-            Log.Logger.GetInstance().Debug($"津波情報のイベントが発生: {e.data.CreatedAt:d日HH:mm} 津波情報件数:{e.data.Areas.Count}件");
-
-            //ToDo: 津波情報のイベント処理を入れる
-            /*EEW_Compact.Invoke(() =>
-            {
-                EEW_Compact.SetInfomation(e.eew);
-                EEW_Compact.Show();
-                EEW_Compact.Activate();
-            });*/
-            //ToastEarthQuake(e.data);
+            Log.Logger.GetInstance().Debug($"津波情報のイベントが発生: {e.data.CreatedAt:d日HH:mm} 津波発表エリア数:{e.data.Areas.Count}件");
+            Funcs.Toast.Post(e.data);
         }
 
         private void TrayIcon_MouseDoubleClick(object sender, MouseEventArgs e)

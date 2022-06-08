@@ -45,6 +45,58 @@ namespace MisakiEQ.Funcs
                     break;
             }
         }
+        public static void Post(Tsunami data)
+        {
+            var attribution = $"津波情報";
+
+            var title = "";
+            var index = "";
+            if (data.Cancelled)
+            {
+                title = "津波予報は解除されました。";
+            }
+            else
+            {
+                
+                int watch=0, warn=0, mwarn=0;
+                for(int i = 0; i < data.Areas.Count; i++)
+                {
+                    switch (data.Areas[i].Grade)
+                    {
+                        case Tsunami.TsunamiGrade.Watch:
+                            watch++;
+                            break;
+                        case Tsunami.TsunamiGrade.Warning:
+                            warn++;
+                            break;
+                        case Tsunami.TsunamiGrade.MajorWarning:
+                            mwarn++;
+                            break;
+                    }
+                }
+                if (mwarn > 0)
+                {
+                    title = "大津波警報が発表された地域があります。";
+                    index = "海岸にお住まいの方は速やかに安全で高い場所に避難してください。\n";
+                }
+                else if (warn > 0)
+                {
+                    title = "津波警報が発表された地域があります。";
+                    index = "海岸にお住まいの方は速やかに安全で高い場所に避難してください。\n";
+                }
+                else if(watch > 0)
+                {
+                    title = "津波注意報が発表された地域があります。";
+                    index = "海岸に近い方は速やかに海から離れてください。\n";
+                }
+                else
+                {
+                    title = "津波予報が発表されました。";
+                }
+                index += "詳細はテレビ放送もしくは気象庁HPをご覧ください。";
+            }
+            Lib.ToastNotification.PostNotification(title:title,index:index,attribution:attribution,customTime:data.CreatedAt);
+        }
 
         private static void PostEEWForecast(EEW data)
         {
