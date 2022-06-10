@@ -19,7 +19,7 @@ namespace MisakiEQ.Log
         const string LOGFILE_NAME = "console";
         const long LOGFILE_MAXSIZE = 1024*256;
         const int LOGFILE_PERIOD = 90;
-
+        const int STACKLEN = 30;
 
         /// <summary>
         /// 出力ログの変更
@@ -175,6 +175,7 @@ namespace MisakiEQ.Log
             }
         }
 
+
         /// <summary>
         /// ログを出力する
         /// </summary>
@@ -200,16 +201,17 @@ namespace MisakiEQ.Log
             if (strMethodName == "") strMethodName = "Undefined";
             int tid = Environment.CurrentManagedThreadId;
             string para = strMethodName;
-            if (para.Length > 50)
+            if (para.Length > STACKLEN)
             {
-                para= para.Substring(para.Length-48, 48);
+                para= para.Substring(para.Length-(STACKLEN - 2), STACKLEN-2);
                 para = ".." + para;
             }
             else
             {
                 para=para.PadLeft(50);
             }
-            Trace.WriteLine($"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [{para}]: {msg}");
+            string trace = msg.Replace("\n", "\n"+"".PadLeft(44+STACKLEN, ' '));
+            Trace.WriteLine($"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [{para}]: {trace}");
             if (IS_LOGFILE)
             {
                 msg = msg.Replace("\n", "\n\t");

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,8 @@ namespace MisakiEQ.GUI
 #pragma warning disable IDE0052 // 読み取られていないプライベート メンバーを削除
         readonly Lib.ConfigController.Controller? controller;
 #pragma warning restore IDE0052 // 読み取られていないプライベート メンバーを削除
+
+        Twitter.Auth? TwitterAuthGUI = null;
         public Config_Menu()
         {
             InitializeComponent();
@@ -57,6 +60,26 @@ namespace MisakiEQ.GUI
         private void TestButton_CheckedChanged(object sender, EventArgs e)
         {
             Background.APIs.GetInstance().EEW.IsTest = TestButton.Checked;
+        }
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            var task=Lib.Twitter.APIs.GetInstance().GetAuthURL();
+            await task;
+            Process.Start(new ProcessStartInfo(task.Result)
+            {
+                UseShellExecute = true
+            });
+            if (TwitterAuthGUI != null && TwitterAuthGUI.Visible) TwitterAuthGUI.Close();
+            TwitterAuthGUI = new();
+            TwitterAuthGUI.ShowDialog();
+
+            TwitterAuthInfo.Text = $"@{Lib.Twitter.APIs.GetInstance().GetUserScreenID()} - {Lib.Twitter.APIs.GetInstance().GetUserName()} " +
+            $"(Follower:{Lib.Twitter.APIs.GetInstance().GetUserFollowers()} Tweet:{Lib.Twitter.APIs.GetInstance().GetUserTweets()})";
+        }
+        private async void button3_Click(object sender, EventArgs e)
+        {
+            var id=await Lib.Twitter.APIs.GetInstance().Tweet(textBox2.Text);
+            Log.Logger.GetInstance().Debug($"Tweet ID : {id}");
         }
     }
 }

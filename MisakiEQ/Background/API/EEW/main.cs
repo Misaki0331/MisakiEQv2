@@ -89,8 +89,15 @@ namespace MisakiEQ.Background.API
                     {
 
                         var task = Lib.WebAPI.GetString("https://api.iedred7584.com/eew/json/",token);
-                        await task;
-                        if (task.IsCompletedSuccessfully)
+                        try
+                        {
+                            await task;
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Warn($"取得時にエラーが発生しました。{ex.Message}");
+                        }
+                        if (task.IsCompletedSuccessfully&&!string.IsNullOrEmpty(task.Result))
                         {
                             json = task.Result;
                             if (IsTest) json = Properties.Resources.testForecast;
@@ -99,22 +106,24 @@ namespace MisakiEQ.Background.API
                                 TempDetect=TSW.ElapsedMilliseconds;
                                 OldTemp = json;
                                 Data = JsonConvert.DeserializeObject<EEW.JSON.Root>(json);
-                                if (IsFirst)
+                                if (Data != null && Data.ParseStatus == "Success")
                                 {
-                                    IsFirst = false;
-                                }
-                                else
-                                {
-                                    IsUpdatedData = true;
-                                    if (UpdateHandler != null)
+                                    if (IsFirst)
                                     {
-                                        var args = new EEWEventArgs(Data, GetData());
-                                        UpdateHandler(this, args);
+                                        IsFirst = false;
+                                    }
+                                    else
+                                    {
+                                        IsUpdatedData = true;
+                                        if (UpdateHandler != null)
+                                        {
+                                            var args = new EEWEventArgs(Data, GetData());
+                                            UpdateHandler(this, args);
+                                        }
                                     }
                                 }
                             }
                         }
-                        else { log.Warn($"取得時にエラーが発生しました。{(task.Exception != null ? task.Exception.Message : "例外はnullで返されました。")}"); }
 
                         long count = 0;
                         if (TempDetect > TSW.ElapsedMilliseconds - Config.DelayDetectCoolDown)

@@ -84,9 +84,16 @@ namespace MisakiEQ.Background.API
                         long count = TSW.ElapsedMilliseconds / Config.Delay;
                         TempDelay = Config.Delay * (count + 1);
                         var task = Lib.WebAPI.GetString($"https://api.p2pquake.net/v2/history?codes=551&codes=552&limit={Config.Limit}",token);
-                        await task;
-                        if (task.IsCompletedSuccessfully)
+                        try
                         {
+                            await task;
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Warn($"取得時にエラーが発生しました。{ex.Message}");
+                        }
+                        if (task.IsCompletedSuccessfully && !string.IsNullOrEmpty(task.Result))
+                        { 
                             json = task.Result;
                             if (OldTemp != json)
                             {
@@ -128,7 +135,6 @@ namespace MisakiEQ.Background.API
                                 }
                             }
                         }
-                        else { log.Warn($"取得時にエラーが発生しました。{(task.Exception != null ? task.Exception.Message : "例外はnullで返されました。")}"); }
                     }
                     await Task.Delay(10, token);
                 }

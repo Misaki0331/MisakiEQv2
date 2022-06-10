@@ -33,6 +33,9 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.button3 = new System.Windows.Forms.Button();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.TestButton = new System.Windows.Forms.CheckBox();
             this.LabelTime = new System.Windows.Forms.Label();
             this.LabelDate = new System.Windows.Forms.Label();
@@ -40,6 +43,7 @@
             this.ButtonApply = new System.Windows.Forms.Button();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOK = new System.Windows.Forms.Button();
+            this.TwitterAuthInfo = new System.Windows.Forms.Label();
             this.SettingTabs.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -77,6 +81,10 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.TwitterAuthInfo);
+            this.tabPage2.Controls.Add(this.button3);
+            this.tabPage2.Controls.Add(this.textBox2);
+            this.tabPage2.Controls.Add(this.button1);
             this.tabPage2.Controls.Add(this.TestButton);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
@@ -85,6 +93,33 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "テスト用";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(213, 94);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(70, 23);
+            this.button3.TabIndex = 10;
+            this.button3.Text = "ツイート";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(6, 94);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(201, 23);
+            this.textBox2.TabIndex = 9;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(6, 36);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(104, 23);
+            this.button1.TabIndex = 6;
+            this.button1.Text = "TwitterAuth";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // TestButton
             // 
@@ -153,6 +188,14 @@
             this.ButtonOK.UseVisualStyleBackColor = true;
             this.ButtonOK.Click += new System.EventHandler(this.ButtonOK_Click);
             // 
+            // TwitterAuthInfo
+            // 
+            this.TwitterAuthInfo.AutoSize = true;
+            this.TwitterAuthInfo.Location = new System.Drawing.Point(116, 40);
+            this.TwitterAuthInfo.Name = "TwitterAuthInfo";
+            this.TwitterAuthInfo.Size = new System.Drawing.Size(0, 15);
+            this.TwitterAuthInfo.TabIndex = 11;
+            // 
             // Config_Menu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -175,6 +218,7 @@
             this.SettingTabs.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -192,5 +236,9 @@
         private Button ButtonOK;
         private GroupBox groupBox1;
         private CheckBox TestButton;
+        private Button button1;
+        private Button button3;
+        private TextBox textBox2;
+        private Label TwitterAuthInfo;
     }
 }

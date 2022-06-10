@@ -61,6 +61,15 @@ namespace MisakiEQ.Properties {
         }
         
         /// <summary>
+        ///   843881865634250752 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string DiscordRPC {
+            get {
+                return ResourceManager.GetString("DiscordRPC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
         public static System.Drawing.Bitmap Logo_AppIcon {
@@ -108,6 +117,16 @@ namespace MisakiEQ.Properties {
         public static string testForecast {
             get {
                 return ResourceManager.GetString("testForecast", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   LsJ5tDiMeLhg0pczmv9SNzUcE
+        ///8S6cTD3ZH6a2kCvmKMIVBdbqhihhl0oFJoF8DKcWFGQYTuxYQx に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TwitterAPI {
+            get {
+                return ResourceManager.GetString("TwitterAPI", resourceCulture);
             }
         }
     }

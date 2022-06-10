@@ -41,98 +41,11 @@ namespace MisakiEQ.Lib
                 }
                 return stream.Result;
             }
-            catch (WebException ex)
-            {
-
-                string State = "";
-                switch (ex.Status)
-                {
-                    case WebExceptionStatus.CacheEntryNotFound:
-                        State = $"{ex.Status} - 指定したキャッシュ エントリが見つかりませんでした。";
-                        break;
-                    case WebExceptionStatus.ConnectFailure:
-                        State = $"{ex.Status} - 接続に失敗しました。ファイアウォールやプロキシがブロックしている可能性があります。";
-                        break;
-                    case WebExceptionStatus.ConnectionClosed:
-                        State = $"{ex.Status} - 接続を終了するのが早すぎました。";
-                        break;
-                    case WebExceptionStatus.KeepAliveFailure:
-                        State = $"{ex.Status} - Keep-alive ヘッダーを指定する要求のための接続が予期せずに閉じられました。";
-                        break;
-                    case WebExceptionStatus.MessageLengthLimitExceeded:
-                        State = $"{ex.Status} - 要求の送信時またはサーバーから応答の受信時に指定された制限を超えるメッセージが受信されました。";
-                        break;
-                    case WebExceptionStatus.NameResolutionFailure:
-                        State = $"{ex.Status} - 名前解決サービスがホスト名を解決できませんでした。";
-                        break;
-                    case WebExceptionStatus.Pending:
-                        State = $"{ex.Status} - 内部非同期要求が保留中です。";
-                        break;
-                    case WebExceptionStatus.PipelineFailure:
-                        State = $"{ex.Status} - 要求がパイプライン処理された要求で、応答の受信前に接続が閉じられました。";
-                        break;
-                    case WebExceptionStatus.ProxyNameResolutionFailure:
-                        State = $"{ex.Status} - ネーム リゾルバー サービスがプロキシ ホスト名を解決できませんでした。";
-                        break;
-                    case WebExceptionStatus.ReceiveFailure:
-                        State = $"{ex.Status} - 完全な応答がリモート サーバーから受信されませんでした。";
-                        break;
-                    case WebExceptionStatus.RequestCanceled:
-                        State = $"{ex.Status} - 要求が取り消されたか、分類できないエラーです。";
-                        break;
-                    case WebExceptionStatus.RequestProhibitedByCachePolicy:
-                        State = $"{ex.Status} - 要求はキャッシュ ポリシーで許可されませんでした。";
-                        break;
-                    case WebExceptionStatus.RequestProhibitedByProxy:
-                        State = $"{ex.Status} - この要求はプロキシで許可されませんでした。";
-                        break;
-                    case WebExceptionStatus.SecureChannelFailure:
-                        State = $"{ex.Status} - SSL を使用して接続を確立する際にエラーが発生しました。";
-                        break;
-                    case WebExceptionStatus.SendFailure:
-                        State = $"{ex.Status} - リモート サーバーに完全な要求を送信できませんでした。";
-                        break;
-                    case WebExceptionStatus.ServerProtocolViolation:
-                        State = $"{ex.Status} - サーバーの応答が有効な HTTP 応答ではありません。";
-                        break;
-                    case WebExceptionStatus.Success:
-                        State = $"{ex.Status} - ステータスは成功していますが、例外エラーが発生しました。";
-                        State += "\n" + ex;
-                        break;
-                    case WebExceptionStatus.Timeout:
-                        State = $"{ex.Status} - 要求のタイムアウト時間中に応答が受信されませんでした。";
-                        break;
-                    case WebExceptionStatus.TrustFailure:
-                        State = $"{ex.Status} - サーバー証明書を検証できませんでした。";
-                        break;
-                    case WebExceptionStatus.ProtocolError:
-                        if (ex.Response == null)
-                        {
-                            State = $"{ex.Status} - プロトコルエラーですが、ヘッダーが空です。";
-                            return string.Empty;
-                        }
-                        HttpWebResponse errres = (HttpWebResponse)ex.Response;
-                        
-                        break;
-                    case WebExceptionStatus.UnknownError:
-                        State = $"{ex.Status} - 不明な種類の例外が発生しました。";
-                        State += $"\n{ex}";
-                        break;
-                    default:
-                        State = $"不明な例外が発生しました。";
-                        State += $"\n{ex}";
-                        break;
-
-                }
-                log.Error(State);
-                throw new WebException(State);
-                //return string.Empty;
-            }
             catch (HttpRequestException ex)
             {
                 string State = ex.StatusCode switch
                 {
-                    null => "Undefined - 未定義です。",
+                    null => $"{ex.Message}",
                     HttpStatusCode.BadRequest => "400 - リクエスト構文が無効です。",
                     HttpStatusCode.Unauthorized => "401 - 認証の必要があります。",
                     HttpStatusCode.PaymentRequired => "402 - 決済が必要です。(実験的機能)",
@@ -177,8 +90,8 @@ namespace MisakiEQ.Lib
                     _ => $"{(int)ex.StatusCode} - {ex.StatusCode}",
                 };
 
-                log.Error($"{State} 参照元:\"{URL}\"");
-                return string.Empty;
+                throw new FileLoadException($"{State} 参照元:\"{URL}\"");
+                //return string.Empty;
 
             }
             catch (TaskCanceledException ex)
@@ -189,6 +102,7 @@ namespace MisakiEQ.Lib
             catch (Exception ex)
             {
                 log.Error(ex);
+                await Task.FromException<string>(ex);
                 return string.Empty;
             }
         }

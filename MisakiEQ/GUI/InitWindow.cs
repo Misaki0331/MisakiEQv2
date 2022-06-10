@@ -22,17 +22,32 @@ namespace MisakiEQ
         {
         }
 
-        private void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        private async void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             InitialTask.ReportProgress(0,"APIの起動初期化を実行中");
             var api = Background.APIs.GetInstance();
-            InitialTask.ReportProgress(25, "コンフィグを読み込んでいます");
+            InitialTask.ReportProgress(17, "コンフィグを読み込んでいます");
             var config = Lib.Config.Funcs.GetInstance();
             config.ReadConfig();
-            InitialTask.ReportProgress(50, "コンフィグを適用しています");
+            InitialTask.ReportProgress(33, "コンフィグを適用しています");
             config.ApplyConfig();
-            InitialTask.ReportProgress(75, "APIスレッド起動中");
+            InitialTask.ReportProgress(50, "APIスレッド起動中");
             api.Run();
+            InitialTask.ReportProgress(67, "Discord RPC接続中");
+            Lib.Discord.RichPresence.GetInstance().Init();
+            Lib.Discord.RichPresence.GetInstance().Update(detail:"MisakiEQのテスト実行です。");
+            InitialTask.ReportProgress(83, "Twitter API認証中");
+            try
+            {
+                using var reader = new StreamReader("TwitterAuth.cfg");
+                var text = reader.ReadToEnd();
+                var args = text.Split('\n');
+                await Lib.Twitter.APIs.GetInstance().AuthFromToken(args[0], args[1]);
+            }
+            catch(Exception ex)
+            {
+                log.Error(ex.Message);
+            }
             e.Result = "OK";
 
         }
