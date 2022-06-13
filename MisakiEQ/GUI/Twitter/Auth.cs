@@ -24,7 +24,6 @@ namespace MisakiEQ.GUI.Twitter
             }
             if (e.KeyChar < '0' || '9' < e.KeyChar)
             {
-                //押されたキーが 0～9でない場合は、イベントをキャンセルする
                 e.Handled = true;
             }
         }

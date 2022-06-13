@@ -34,8 +34,9 @@ namespace MisakiEQ
             InitialTask.ReportProgress(50, "APIスレッド起動中");
             api.Run();
             InitialTask.ReportProgress(67, "Discord RPC接続中");
-            Lib.Discord.RichPresence.GetInstance().Init();
-            Lib.Discord.RichPresence.GetInstance().Update(detail:"MisakiEQのテスト実行です。");
+            var discord = Lib.Discord.RichPresence.GetInstance();
+            discord.Init();
+            discord.Update(detail:"MisakiEQのテスト実行です。");
             InitialTask.ReportProgress(83, "Twitter API認証中");
             try
             {

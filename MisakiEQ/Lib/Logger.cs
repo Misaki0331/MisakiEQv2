@@ -208,7 +208,7 @@ namespace MisakiEQ.Log
             }
             else
             {
-                para=para.PadLeft(50);
+                para=para.PadLeft(STACKLEN);
             }
             string trace = msg.Replace("\n", "\n"+"".PadLeft(44+STACKLEN, ' '));
             Trace.WriteLine($"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [{para}]: {trace}");

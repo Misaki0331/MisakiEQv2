@@ -8,6 +8,15 @@ namespace MisakiEQ.Struct
 {
     public class Tsunami
     {
+        /// <summary> 
+        /// <para>apiのjsonデータ単体から津波情報を汎用クラスに代入します。</para>
+        /// <para>※この関数は津波情報のみ対応しています。</para>
+        /// </summary>
+        /// <param name="data">jsonデータ単体</param>
+        /// <param name="from"><para>書き換え元の地震情報汎用クラス</para>
+        /// <para>nullの場合は新規クラスを返します。</para></param>
+        /// <returns>地震情報汎用クラス</returns>
+        /// <exception cref="ArgumentException">津波情報と互換性が無いjsonデータが渡された時に発生します。</exception>
         public static Tsunami GetData(Background.API.EQInfo.JSON.Root data,Tsunami? from = null)
         {
             if (data.code != 552) throw new ArgumentException($"このコード値({data.code})は津波情報(552)と互換性がありません。");
@@ -47,6 +56,11 @@ namespace MisakiEQ.Struct
             }
             return from;
         }
+        /// <summary>
+        /// 津波情報のEnumから文字列に変換します。
+        /// </summary>
+        /// <param name="grade">津波予報発令タイプ</param>
+        /// <returns>日本語の文字列が返されます。</returns>
         public static string GradeToString(TsunamiGrade grade)
         {
             return grade switch
@@ -58,17 +72,41 @@ namespace MisakiEQ.Struct
                 _ => $"コード:{grade}",
             };
         }
+        /// <summary>
+        /// 津波予報発令タイプ
+        /// </summary>
         public enum TsunamiGrade
         {
+            /// <summary>大津波警報</summary>
             MajorWarning,
+            /// <summary>津波警報</summary>
             Warning,
+            /// <summary>津波注意報</summary>
             Watch,
+            /// <summary>不明</summary>
             Unknown
         }
+        /// <summary>
+        /// <para>イベントID</para>
+        /// <para>情報毎に現れるランダムなIDです。</para>
+        /// </summary>
         public string EventID = string.Empty;
+        /// <summary>
+        /// <para>情報作成時刻</para>
+        /// <para>P2P地震情報API内のデータベース内に作られた時間です。</para>
+        /// <para>存在しなければ DateTime.MinValue が返されます。</para>
+        /// </summary>
         public DateTime CreatedAt = DateTime.MinValue;
+        /// <summary>
+        /// <para>津波予報発令解除フラグ</para>
+        /// <para>発令解除したときはAreasが空の配列になります。</para>
+        /// </summary>
         public bool Cancelled = false;
+
         public cTsunami.Issue Issue = new();
+        /// <summary>
+        /// <para>津波予報が発令されている地域と発令種類、直ちに来るかどうかのリストです。</para>
+        /// </summary>
         public List<cTsunami.Areas> Areas = new();
     }
 }
@@ -83,8 +121,11 @@ namespace MisakiEQ.Struct.cTsunami
     }
     public class Areas
     {
+        /// <summary>地域名</summary>
         public string Name = string.Empty;
+        /// <summary>すぐに到達するかのフラグ</summary>
         public bool Immediate = false;
+        /// <summary>津波予報情報</summary>
         public Tsunami.TsunamiGrade Grade = Tsunami.TsunamiGrade.Unknown;
 
     }

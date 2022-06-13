@@ -13,9 +13,8 @@ namespace MisakiEQ.Background.API
 #pragma warning restore IDE1006 // 命名スタイル
     {
         readonly Log.Logger log = Log.Logger.GetInstance();
-        private readonly Thread? thread = null;
         private readonly Stopwatch TSW = new();//thread起動状態兼タイマー
-        public EEW._Config Config = new();
+        public EEW.Config Config = new();
         public EEW.JSON.Root? Data = new();
         private bool IsUpdatedData=false;
         private string OldTemp = "";
@@ -61,8 +60,8 @@ namespace MisakiEQ.Background.API
         }
         public bool GetThreadWorking()
         {
-            if (thread == null) return false;
-            return thread.IsAlive;
+            if (Threads == null) return false;
+            return Threads.Status == TaskStatus.Running;
         }
         public long GetThreadTimer() //100ナノ秒単位
         {

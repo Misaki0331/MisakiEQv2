@@ -53,6 +53,11 @@ namespace MisakiEQ.Struct
             ///<summary>震度５弱以上推定</summary>
             Int5Over = -2,
         }
+        /// <summary>
+        /// 文字列から都道府県Enumに変換します。
+        /// </summary>
+        /// <param name="str">都道府県名</param>
+        /// <returns>列挙型都道府県</returns>
         public static Prefectures StringToPrefectures(string str)
         {
             string comp = str.Replace("県", "").Replace("府", "");
@@ -109,6 +114,11 @@ namespace MisakiEQ.Struct
                 _ => Prefectures.Unknown
             };
         }
+        /// <summary>
+        /// 列挙型都道府県を文字列に変換します
+        /// </summary>
+        /// <param name="pref">変換する列挙型都道府県名</param>
+        /// <returns>日本語の文字列が返されます。</returns>
         public static string PrefecturesToString(Prefectures pref)
         {
             return pref switch
@@ -164,6 +174,12 @@ namespace MisakiEQ.Struct
                 _=>"不明"
             };
         }
+        /// <summary>
+        /// <para>ASCIIでも示すことができる震度表示に変換します</para>
+        /// <para>例 : <br/>震度3→「3」<br/>震度5強→「5+」<br/>震度不明→「-」</para>
+        /// </summary>
+        /// <param name="value">列挙型震度情報</param>
+        /// <returns>ASCIIのみの2文字以下の文字列が返されます。</returns>
         public static string IntToStringShort(Intensity value)
         {
             return value switch
@@ -183,6 +199,12 @@ namespace MisakiEQ.Struct
                 _ => value.ToString(),
             };
         }
+        /// <summary>
+        /// <para>日本語の全角震度表示に変換します</para>
+        /// <para>例 : <br/>震度3→「３」<br/>震度5強→「５強」<br/>震度不明→「不明」</para>
+        /// </summary>
+        /// <param name="value">列挙型震度情報</param>
+        /// <returns>日本語の文字列が返されます。</returns>
         public static string IntToStringLong(Intensity value)
         {
             return value switch
@@ -202,6 +224,14 @@ namespace MisakiEQ.Struct
                 _ => value.ToString(),
             };
         }
+
+        /// <summary>
+        /// <para>文字列から列挙型震度情報に変換します</para>
+        /// <para>どのフォーマットでもOK<br/>例:<br/>
+        /// 5+→OK 6弱→OK ５＋→OK ６強→OK</para>
+        /// </summary>
+        /// <param name="value">任意の変換したい文字列</param>
+        /// <returns>列挙型の震度情報が返されます。</returns>
         public static Intensity StringToInt(string value)
         {
             string from = "０１２３４５６７８９強弱＋－";
@@ -224,7 +254,12 @@ namespace MisakiEQ.Struct
                 _ => Intensity.Unknown,
             };
         }
-
+        /// <summary>
+        /// 震源の深さを文字列に変換します。<br/>
+        /// ごく浅いと不明の場合の処理を入れています。
+        /// </summary>
+        /// <param name="depth">Int型の震源の深さ</param>
+        /// <returns>震源の深さの文字列</returns>
         public static string DepthToString(int depth)
         {
             if (depth < 0) return "不明";

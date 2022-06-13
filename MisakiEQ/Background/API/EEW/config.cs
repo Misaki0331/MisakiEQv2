@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#pragma warning disable IDE1006 // 命名スタイル
 namespace MisakiEQ.Background.API.EEW
 {
-    internal class _Config
+    internal class Config
     {
         ///<summary>通常時の遅延(ms)/summary>
         public uint Delay;
