@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#pragma warning disable CA1822
 namespace MisakiEQ.Background.API
 {
 #pragma warning disable IDE1006 // 命名スタイル

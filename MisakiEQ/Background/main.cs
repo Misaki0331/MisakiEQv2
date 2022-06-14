@@ -19,6 +19,7 @@ namespace MisakiEQ.Background
         }
         public API._EEW EEW =new ();
         public API._EQInfo EQInfo = new();
+        public API.KyoshinAPI.KyoshinAPI KyoshinAPI=new();
         public void Init()
         {
             EEW.Init();
@@ -28,13 +29,16 @@ namespace MisakiEQ.Background
         {
             var a = EEW.AbortAndWait();
             var b = EQInfo.AbortAndWait();
+            var c = KyoshinAPI.AbortAndWait();
             await a;
             await b;
+            await c;
         }
         public void Run()
         {
             EEW.RunThread();
             EQInfo.RunThread();
+            KyoshinAPI.RunThread();
         }
     }
 }

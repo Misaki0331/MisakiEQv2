@@ -23,6 +23,7 @@ namespace MisakiEQ.GUI
             InitializeComponent();
             var config = Lib.Config.Funcs.GetInstance().Configs;
             controller = new Lib.ConfigController.Controller(groupBox1, config.Connections);
+            Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin += PictureBox1_update;
         }
 
         
@@ -63,23 +64,51 @@ namespace MisakiEQ.GUI
         }
         private async void button1_Click(object sender, EventArgs e)
         {
-            var task=Lib.Twitter.APIs.GetInstance().GetAuthURL();
-            await task;
-            Process.Start(new ProcessStartInfo(task.Result)
+            try
             {
-                UseShellExecute = true
-            });
-            if (TwitterAuthGUI != null && TwitterAuthGUI.Visible) TwitterAuthGUI.Close();
-            TwitterAuthGUI = new();
-            TwitterAuthGUI.ShowDialog();
+                var task = Lib.Twitter.APIs.GetInstance().GetAuthURL();
+                await task;
+                Process.Start(new ProcessStartInfo(task.Result)
+                {
+                    UseShellExecute = true
+                });
+                if (TwitterAuthGUI != null && TwitterAuthGUI.Visible) TwitterAuthGUI.Close();
+                TwitterAuthGUI = new();
+                TwitterAuthGUI.ShowDialog();
 
-            TwitterAuthInfo.Text = $"@{Lib.Twitter.APIs.GetInstance().GetUserScreenID()} - {Lib.Twitter.APIs.GetInstance().GetUserName()} " +
-            $"(Follower:{Lib.Twitter.APIs.GetInstance().GetUserFollowers()} Tweet:{Lib.Twitter.APIs.GetInstance().GetUserTweets()})";
+                TwitterAuthInfo.Text = $"@{Lib.Twitter.APIs.GetInstance().GetUserScreenID()} - {Lib.Twitter.APIs.GetInstance().GetUserName()} " +
+                $"(Follower:{Lib.Twitter.APIs.GetInstance().GetUserFollowers()} Tweet:{Lib.Twitter.APIs.GetInstance().GetUserTweets()})";
+            }catch(Exception ex)
+            {
+                Log.Logger.GetInstance().Error(ex);
+            }
         }
         private async void button3_Click(object sender, EventArgs e)
         {
             var id=await Lib.Twitter.APIs.GetInstance().Tweet(textBox2.Text);
             Log.Logger.GetInstance().Debug($"Tweet ID : {id}");
+        }
+
+        void PictureBox1_update(object? sender, EventArgs e)
+        {
+            Log.Logger.GetInstance().Debug($"{sender}が呼び出されました");
+            _ = Invoke(async () =>
+            {
+                if(Enum.TryParse<Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType>(comboBox1.Text,out var type))
+                pictureBox1.Image = await Background.APIs.GetInstance().KyoshinAPI.GetImage(type);
+
+            });
+        }
+
+        private void Config_Menu_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin -= PictureBox1_update;
+        }
+
+        private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(Enum.TryParse<Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType>(comboBox1.Text, out var type))
+            pictureBox1.Image = await Background.APIs.GetInstance().KyoshinAPI.GetImage(type);
         }
     }
 }

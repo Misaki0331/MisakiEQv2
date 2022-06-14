@@ -33,6 +33,9 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.TwitterAuthInfo = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -43,10 +46,10 @@
             this.ButtonApply = new System.Windows.Forms.Button();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOK = new System.Windows.Forms.Button();
-            this.TwitterAuthInfo = new System.Windows.Forms.Label();
             this.SettingTabs.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // SettingTabs
@@ -81,6 +84,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.comboBox1);
+            this.tabPage2.Controls.Add(this.pictureBox1);
             this.tabPage2.Controls.Add(this.TwitterAuthInfo);
             this.tabPage2.Controls.Add(this.button3);
             this.tabPage2.Controls.Add(this.textBox2);
@@ -93,6 +98,55 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "テスト用";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "PSWaveImg",
+            "EstShindoImg",
+            "jma_s",
+            "jma_b",
+            "acmap_s",
+            "acmap_b",
+            "vcmap_s",
+            "vcmap_b",
+            "dcmap_s",
+            "dcmap_b",
+            "rsp0125_s",
+            "rsp0125_b",
+            "rsp0250_s",
+            "rsp0250_b",
+            "rsp0500_s",
+            "rsp0500_b",
+            "rsp1000_s",
+            "rsp1000_b",
+            "rsp2000_s",
+            "rsp2000_b",
+            "rsp4000_b",
+            "rsp4000_s"});
+            this.comboBox1.Location = new System.Drawing.Point(277, 309);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 23);
+            this.comboBox1.TabIndex = 13;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Location = new System.Drawing.Point(404, 6);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(352, 400);
+            this.pictureBox1.TabIndex = 12;
+            this.pictureBox1.TabStop = false;
+            // 
+            // TwitterAuthInfo
+            // 
+            this.TwitterAuthInfo.AutoSize = true;
+            this.TwitterAuthInfo.Location = new System.Drawing.Point(116, 40);
+            this.TwitterAuthInfo.Name = "TwitterAuthInfo";
+            this.TwitterAuthInfo.Size = new System.Drawing.Size(0, 15);
+            this.TwitterAuthInfo.TabIndex = 11;
             // 
             // button3
             // 
@@ -188,14 +242,6 @@
             this.ButtonOK.UseVisualStyleBackColor = true;
             this.ButtonOK.Click += new System.EventHandler(this.ButtonOK_Click);
             // 
-            // TwitterAuthInfo
-            // 
-            this.TwitterAuthInfo.AutoSize = true;
-            this.TwitterAuthInfo.Location = new System.Drawing.Point(116, 40);
-            this.TwitterAuthInfo.Name = "TwitterAuthInfo";
-            this.TwitterAuthInfo.Size = new System.Drawing.Size(0, 15);
-            this.TwitterAuthInfo.TabIndex = 11;
-            // 
             // Config_Menu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -214,11 +260,13 @@
             this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "Config_Menu";
             this.Text = "設定画面だにょ";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Config_Menu_FormClosed);
             this.Load += new System.EventHandler(this.Config_Menu_Load);
             this.SettingTabs.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -240,5 +288,7 @@
         private Button button3;
         private TextBox textBox2;
         private Label TwitterAuthInfo;
+        private PictureBox pictureBox1;
+        private ComboBox comboBox1;
     }
 }
