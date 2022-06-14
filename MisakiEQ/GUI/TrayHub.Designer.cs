@@ -34,6 +34,7 @@
             this.OpenConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.ExitApplication = new System.Windows.Forms.ToolStripMenuItem();
             this.DisplayEEWInfo = new System.Windows.Forms.ToolStripMenuItem();
+            this.OpenKmoni = new System.Windows.Forms.ToolStripMenuItem();
             this.ApplicationMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,36 +50,45 @@
             this.ApplicationMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.OpenConfig,
             this.ExitApplication,
-            this.DisplayEEWInfo});
+            this.DisplayEEWInfo,
+            this.OpenKmoni});
             this.ApplicationMenu.Name = "ApplicationMenu";
-            this.ApplicationMenu.Size = new System.Drawing.Size(146, 70);
+            this.ApplicationMenu.Size = new System.Drawing.Size(181, 114);
+            this.ApplicationMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ApplicationMenu_Opening);
             // 
             // OpenConfig
             // 
             this.OpenConfig.Name = "OpenConfig";
-            this.OpenConfig.Size = new System.Drawing.Size(145, 22);
+            this.OpenConfig.Size = new System.Drawing.Size(180, 22);
             this.OpenConfig.Text = "設定";
             this.OpenConfig.Click += new System.EventHandler(this.OpenConfig_Click);
             // 
             // ExitApplication
             // 
             this.ExitApplication.Name = "ExitApplication";
-            this.ExitApplication.Size = new System.Drawing.Size(145, 22);
+            this.ExitApplication.Size = new System.Drawing.Size(180, 22);
             this.ExitApplication.Text = "終了";
             this.ExitApplication.Click += new System.EventHandler(this.ExitApplication_Click);
             // 
             // DisplayEEWInfo
             // 
             this.DisplayEEWInfo.Name = "DisplayEEWInfo";
-            this.DisplayEEWInfo.Size = new System.Drawing.Size(145, 22);
+            this.DisplayEEWInfo.Size = new System.Drawing.Size(180, 22);
             this.DisplayEEWInfo.Text = "EEW簡易表示";
             this.DisplayEEWInfo.Click += new System.EventHandler(this.DisplayEEWInfo_Click);
+            // 
+            // OpenKmoni
+            // 
+            this.OpenKmoni.Name = "OpenKmoni";
+            this.OpenKmoni.Size = new System.Drawing.Size(180, 22);
+            this.OpenKmoni.Text = "強震モニタ";
+            this.OpenKmoni.Click += new System.EventHandler(this.OpenKmoni_Click);
             // 
             // TrayHub
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(0, 0);
+            this.ClientSize = new System.Drawing.Size(508, 331);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "TrayHub";
             this.ShowIcon = false;
@@ -96,5 +106,6 @@
         private ToolStripMenuItem ExitApplication;
         private ToolStripMenuItem OpenConfig;
         private ToolStripMenuItem DisplayEEWInfo;
+        private ToolStripMenuItem OpenKmoni;
     }
 }

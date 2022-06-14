@@ -167,5 +167,11 @@ namespace MisakiEQ.GUI
             e.Cancel = true;
             Hide();
         }
+
+        private async void EEW_Compact_Load(object sender, EventArgs e)
+        {
+            await Task.Delay(100);
+            Opacity = 1;
+        }
     }
 }

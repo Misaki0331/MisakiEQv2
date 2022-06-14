@@ -23,7 +23,6 @@ namespace MisakiEQ.Background.API.KyoshinAPI
         static readonly CancellationTokenSource CancelTokenSource = new();
         static readonly CancellationToken CancelToken = CancelTokenSource.Token;
         DateTime LatestDate = DateTime.MinValue;
-        public readonly KyoshinMap EEWShindo = new(KyoshinImageType.EstShindoImg);
         public readonly List<KyoshinMap> ImageList = new();
         private readonly Lib.AsyncLock s_lock = new();
         DateTime LatestAdjustTime = DateTime.MinValue;
@@ -209,7 +208,6 @@ Init()
                             TmpTimer = TSW.ElapsedMilliseconds / 1000;
 
                             var eew = Lib.WebAPI.GetString($"http://www.kmoni.bosai.go.jp/webservice/hypo/eew/{LatestDate.AddSeconds(-Config.KyoshinDelayTime):yyyyMMddHHmmss}.json"); 
-                            var eewimg = EEWShindo.AccessImage(LatestDate.AddSeconds(-Config.KyoshinDelayTime));
                             using (await s_lock.LockAsync())
                             {
                                 log.Debug($"強震モニタ取得中... {LatestDate}");
@@ -230,7 +228,6 @@ Init()
                                 try
                                 {
                                     await eew;
-                                    await eewimg;
                                     for (int i = 0; i < ImageList.Count; i++) await tsk[i];
                                     UpdatedKyoshin?.Invoke(this, new EventArgs());
                                 }
@@ -313,6 +310,7 @@ Init()
                 try
                 {
                     using var ms = new MemoryStream(data);
+                    if (Data != null) Data.Dispose();
                     Data = Image.FromStream(ms);
                 }
                 catch(Exception ex)

@@ -14,6 +14,7 @@ namespace MisakiEQ.GUI
     {
         readonly InitWindow? Init=null;
         Config_Menu? Config = null;
+        ExApp.KyoshinWindow? Kyoshin = null;
         readonly EEW_Compact EEW_Compact = new();
         private TrayHub()
         {
@@ -109,6 +110,19 @@ namespace MisakiEQ.GUI
         private void TrayIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
 
+        }
+
+        private void ApplicationMenu_Opening(object sender, CancelEventArgs e)
+        {
+
+        }
+
+        private void OpenKmoni_Click(object sender, EventArgs e)
+        {
+
+            if (Kyoshin == null || Kyoshin.IsDisposed) Kyoshin = new();
+            Kyoshin.Show();
+            Kyoshin.Activate();
         }
     }
 }

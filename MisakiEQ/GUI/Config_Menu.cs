@@ -23,7 +23,6 @@ namespace MisakiEQ.GUI
             InitializeComponent();
             var config = Lib.Config.Funcs.GetInstance().Configs;
             controller = new Lib.ConfigController.Controller(groupBox1, config.Connections);
-            Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin += PictureBox1_update;
         }
 
         
@@ -89,26 +88,10 @@ namespace MisakiEQ.GUI
             Log.Logger.GetInstance().Debug($"Tweet ID : {id}");
         }
 
-        void PictureBox1_update(object? sender, EventArgs e)
-        {
-            Log.Logger.GetInstance().Debug($"{sender}が呼び出されました");
-            _ = Invoke(async () =>
-            {
-                if(Enum.TryParse<Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType>(comboBox1.Text,out var type))
-                pictureBox1.Image = await Background.APIs.GetInstance().KyoshinAPI.GetImage(type);
-
-            });
-        }
 
         private void Config_Menu_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin -= PictureBox1_update;
         }
 
-        private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if(Enum.TryParse<Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType>(comboBox1.Text, out var type))
-            pictureBox1.Image = await Background.APIs.GetInstance().KyoshinAPI.GetImage(type);
-        }
     }
 }

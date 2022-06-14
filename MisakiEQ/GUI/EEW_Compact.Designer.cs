@@ -202,12 +202,14 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "EEW_Compact";
+            this.Opacity = 0D;
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "MisakiEQ 緊急地震速報";
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.EEW_Compact_FormClosing);
+            this.Load += new System.EventHandler(this.EEW_Compact_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

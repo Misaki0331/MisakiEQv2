@@ -72,6 +72,16 @@ namespace MisakiEQ.Properties {
         /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
+        public static System.Drawing.Bitmap K_moni_BaseMap {
+            get {
+                object obj = ResourceManager.GetObject("K-moni.BaseMap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
         public static System.Drawing.Bitmap Logo_AppIcon {
             get {
                 object obj = ResourceManager.GetObject("Logo.AppIcon", resourceCulture);

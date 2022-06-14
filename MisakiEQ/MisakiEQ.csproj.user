@@ -4,6 +4,9 @@
     <Compile Update="GUI\EEW_Compact.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="GUI\ExApp\KyoshinWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="GUI\InitWindow.cs">
       <SubType>Form</SubType>
     </Compile>
