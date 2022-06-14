@@ -83,6 +83,7 @@ namespace MisakiEQ.GUI.ExApp
                     var tmp = pictureBox1.Image;
                     pictureBox1.Image = img;
                     tmp.Dispose();
+                    gettext();
                 }
                 catch (Exception ex)
                 {
@@ -143,5 +144,43 @@ namespace MisakiEQ.GUI.ExApp
             Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin -= UpdateImage;
         }
 
+        int x0=0, y0=0;
+        private void gettext()
+        {
+            int x = x0;
+            int y = y0;
+            Bitmap b = (Bitmap)pictureBox1.Image;
+            //Log.Logger.GetInstance().Debug($"{x} {y}");
+            if (b.Width <= x || b.Height <= y) return;
+            switch (KyoshinType.SelectedIndex)
+            {
+                case 0:
+                    label1.Text = $"震度{Lib.KyoshinColor.GetIntensity(b.GetPixel(x,y)):0.00}";
+                    break;
+                case 1:
+                    label1.Text = $"{Lib.KyoshinColor.GetPGA(b.GetPixel(x,y)):0.00}gal";
+                    break;
+                case 2:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                    label1.Text = $"{Lib.KyoshinColor.GetPGV(b.GetPixel(x,y)):0.00}cm/s";
+                    break;
+                case 3:
+                    label1.Text = $"{Lib.KyoshinColor.GetPGD(b.GetPixel(x,y)):0.00}cm";
+                    break;
+
+            }
+        }
+
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            x0 = e.X;
+            y0 = e.Y;
+            gettext();
+        }
     }
 }

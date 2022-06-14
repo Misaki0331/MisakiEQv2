@@ -210,7 +210,6 @@ Init()
                             var eew = Lib.WebAPI.GetString($"http://www.kmoni.bosai.go.jp/webservice/hypo/eew/{LatestDate.AddSeconds(-Config.KyoshinDelayTime):yyyyMMddHHmmss}.json"); 
                             using (await s_lock.LockAsync())
                             {
-                                log.Debug($"強震モニタ取得中... {LatestDate}");
 
                                 for (int i = 0; i < ImageList.Count; i++)
                                 {
@@ -229,7 +228,13 @@ Init()
                                 {
                                     await eew;
                                     for (int i = 0; i < ImageList.Count; i++) await tsk[i];
-                                    UpdatedKyoshin?.Invoke(this, new EventArgs());
+                                    try
+                                    {
+                                        UpdatedKyoshin?.Invoke(this, new EventArgs());
+                                    }catch(Exception ex)
+                                    {
+                                        log.Warn($"イベント送信時にエラーが発生しました。{ex.Message}");
+                                    }
                                 }
                                 catch (Exception ex)
                                 {
@@ -322,7 +327,6 @@ Init()
             {
                 try
                 {
-                    Log.Logger.GetInstance().Debug($"{ImageType}:取得呼出");
                     Lifetime--;
                     string URL = "";
                     URL = ImageType switch

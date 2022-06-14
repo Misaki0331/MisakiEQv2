@@ -33,6 +33,7 @@
             this.Position = new System.Windows.Forms.CheckBox();
             this.DisplayEEWCircle = new System.Windows.Forms.CheckBox();
             this.DisplayEEWShindo = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -44,6 +45,7 @@
             this.pictureBox1.Size = new System.Drawing.Size(352, 400);
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
             // 
             // KyoshinType
             // 
@@ -106,12 +108,22 @@
             this.DisplayEEWShindo.UseVisualStyleBackColor = true;
             this.DisplayEEWShindo.CheckedChanged += new System.EventHandler(this.DisplayEEWShindo_CheckedChanged);
             // 
+            // label1
+            // 
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(192, 336);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(160, 15);
+            this.label1.TabIndex = 5;
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // KyoshinWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(353, 401);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.DisplayEEWShindo);
             this.Controls.Add(this.DisplayEEWCircle);
             this.Controls.Add(this.Position);
@@ -133,5 +145,6 @@
         private CheckBox Position;
         private CheckBox DisplayEEWCircle;
         private CheckBox DisplayEEWShindo;
+        private Label label1;
     }
 }
