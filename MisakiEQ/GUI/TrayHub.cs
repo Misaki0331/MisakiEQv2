@@ -27,7 +27,6 @@ namespace MisakiEQ.GUI
             Background.APIs.GetInstance().EQInfo.TsunamiUpdateHandler += EventTsunami;
             EEW_Compact.Show();
             EEW_Compact.Hide();
-            Log.Logger.GetInstance().Info($"{Enum.GetNames(typeof(Struct.Common.Prefectures)).Length}");
         }
         static TrayHub? Instance = null;
 

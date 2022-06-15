@@ -80,10 +80,10 @@ namespace MisakiEQ.GUI.ExApp
                         }
                     }
                     g.Dispose();
-                    var tmp = pictureBox1.Image;
-                    pictureBox1.Image = img;
+                    var tmp = KyoshinImage.Image;
+                    KyoshinImage.Image = img;
                     tmp.Dispose();
-                    gettext();
+                    GetKyoshinPosText();
                 }
                 catch (Exception ex)
                 {
@@ -145,7 +145,7 @@ namespace MisakiEQ.GUI.ExApp
         }
 
         int x0=0, y0=0;
-        private async void gettext()
+        private async void GetKyoshinPosText()
         {
             try
             {
@@ -154,26 +154,26 @@ namespace MisakiEQ.GUI.ExApp
                 var a = await Background.APIs.GetInstance().KyoshinAPI.GetImage(GetEnumType());
                 var lal = Lib.KyoshinLib.KyoshinMapToLAL(new Struct.Common.Point(x, y));
                 var pnt = Lib.KyoshinLib.LALtoKyoshinMap(lal);
+                var str = $"{lal.Lon:0.00}E {lal.Lat:0.00}N";
                 if (a == null)
                 {
-                    label1.Text = $"{lal.Lon:0.00}E {lal.Lat:0.00}N ({(int)pnt.X},{(int)pnt.Y})";
+                    label1.Text = str;
                     return;
                 }
                 var b = (Bitmap)a;
                 if (b.Width <= x || b.Height <= y) return;
-                var str = $"{lal.Lon:0.00}E {lal.Lat:0.00}N ({pnt.X:0},{pnt.Y:0})";
                 if (b.GetPixel(x, y).ToArgb()==0)
                 {
-                    label1.Text = str + "\n";
+                    label1.Text = str;
                     return;
                 }
                 switch (KyoshinType.SelectedIndex)
                 {
                     case 0:
-                        label1.Text = $"{str}\n震度{Lib.KyoshinLib.GetIntensity(b.GetPixel(x, y)):0.00}";
+                        label1.Text = $"震度 : {Lib.KyoshinLib.GetIntensity(b.GetPixel(x, y)):0.00}\n{str}";
                         break;
                     case 1:
-                        label1.Text = $"{str}\n{Lib.KyoshinLib.GetPGA(b.GetPixel(x, y)):0.00}gal";
+                        label1.Text = $"PGA : {Lib.KyoshinLib.GetPGA(b.GetPixel(x, y)):0.00}gal\n{str}";
                         break;
                     case 2:
                     case 4:
@@ -182,10 +182,10 @@ namespace MisakiEQ.GUI.ExApp
                     case 7:
                     case 8:
                     case 9:
-                        label1.Text = $"{str}\n{Lib.KyoshinLib.GetPGV(b.GetPixel(x, y)):0.00}cm/s";
+                        label1.Text = $"PGV : {Lib.KyoshinLib.GetPGV(b.GetPixel(x, y)):0.00}cm/s\n{str}";
                         break;
                     case 3:
-                        label1.Text = $"{str}\n{Lib.KyoshinLib.GetPGD(b.GetPixel(x, y)):0.00}cm";
+                        label1.Text = $"PGD : {Lib.KyoshinLib.GetPGD(b.GetPixel(x, y)):0.00}cm\n{str}";
                         break;
 
                 }
@@ -195,11 +195,12 @@ namespace MisakiEQ.GUI.ExApp
             }
         }
 
-        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        private void KyoshinMapMoved(object sender, MouseEventArgs e)
         {
             x0 = e.X;
             y0 = e.Y;
-            gettext();
+            GetKyoshinPosText();
         }
+
     }
 }

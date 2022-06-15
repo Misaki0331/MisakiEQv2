@@ -28,24 +28,24 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.KyoshinImage = new System.Windows.Forms.PictureBox();
             this.KyoshinType = new System.Windows.Forms.ComboBox();
             this.Position = new System.Windows.Forms.CheckBox();
             this.DisplayEEWCircle = new System.Windows.Forms.CheckBox();
             this.DisplayEEWShindo = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.KyoshinImage)).BeginInit();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // KyoshinImage
             // 
-            this.pictureBox1.Image = global::MisakiEQ.Properties.Resources.K_moni_BaseMap;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(352, 400);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
+            this.KyoshinImage.Image = global::MisakiEQ.Properties.Resources.K_moni_BaseMap;
+            this.KyoshinImage.Location = new System.Drawing.Point(0, 0);
+            this.KyoshinImage.Name = "KyoshinImage";
+            this.KyoshinImage.Size = new System.Drawing.Size(352, 400);
+            this.KyoshinImage.TabIndex = 0;
+            this.KyoshinImage.TabStop = false;
+            this.KyoshinImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.KyoshinMapMoved);
             // 
             // KyoshinType
             // 
@@ -111,11 +111,11 @@
             // label1
             // 
             this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(192, 321);
+            this.label1.Location = new System.Drawing.Point(86, 354);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(160, 30);
+            this.label1.Size = new System.Drawing.Size(107, 46);
             this.label1.TabIndex = 5;
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label1.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // KyoshinWindow
             // 
@@ -128,19 +128,19 @@
             this.Controls.Add(this.DisplayEEWCircle);
             this.Controls.Add(this.Position);
             this.Controls.Add(this.KyoshinType);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.KyoshinImage);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "KyoshinWindow";
             this.Text = "MisakiEQ 強震モニタ";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.KyoshinWindow_FormClosed);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.KyoshinImage)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private PictureBox pictureBox1;
+        private PictureBox KyoshinImage;
         private ComboBox KyoshinType;
         private CheckBox Position;
         private CheckBox DisplayEEWCircle;
