@@ -39,6 +39,8 @@
             this.OriginTime = new System.Windows.Forms.Label();
             this.AreaIntensityLabel = new System.Windows.Forms.Label();
             this.AreaIntensity = new System.Windows.Forms.Label();
+            this.WarnLabel = new System.Windows.Forms.Label();
+            this.Forecasts = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // SignalType
@@ -50,9 +52,8 @@
             this.SignalType.Location = new System.Drawing.Point(0, 0);
             this.SignalType.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.SignalType.Name = "SignalType";
-            this.SignalType.Size = new System.Drawing.Size(302, 41);
+            this.SignalType.Size = new System.Drawing.Size(0, 41);
             this.SignalType.TabIndex = 2;
-            this.SignalType.Text = "緊急地震速報(予報)";
             // 
             // MaxIntensity
             // 
@@ -64,7 +65,6 @@
             this.MaxIntensity.Name = "MaxIntensity";
             this.MaxIntensity.Size = new System.Drawing.Size(122, 93);
             this.MaxIntensity.TabIndex = 3;
-            this.MaxIntensity.Text = "1";
             this.MaxIntensity.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // MaxIntensityLabel
@@ -90,7 +90,6 @@
             this.SignalCount.Name = "SignalCount";
             this.SignalCount.Size = new System.Drawing.Size(635, 45);
             this.SignalCount.TabIndex = 5;
-            this.SignalCount.Text = "第 12 報 (最終報)";
             this.SignalCount.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // Magnitude
@@ -102,7 +101,6 @@
             this.Magnitude.Name = "Magnitude";
             this.Magnitude.Size = new System.Drawing.Size(198, 47);
             this.Magnitude.TabIndex = 7;
-            this.Magnitude.Text = "M 3.3";
             this.Magnitude.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
             // 
             // Hypocenter
@@ -114,7 +112,6 @@
             this.Hypocenter.Name = "Hypocenter";
             this.Hypocenter.Size = new System.Drawing.Size(511, 46);
             this.Hypocenter.TabIndex = 10;
-            this.Hypocenter.Text = "北海道地方";
             this.Hypocenter.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // Depth
@@ -126,7 +123,6 @@
             this.Depth.Name = "Depth";
             this.Depth.Size = new System.Drawing.Size(209, 58);
             this.Depth.TabIndex = 11;
-            this.Depth.Text = "100 km";
             this.Depth.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // DepthLabel
@@ -150,7 +146,6 @@
             this.OriginTime.Name = "OriginTime";
             this.OriginTime.Size = new System.Drawing.Size(424, 35);
             this.OriginTime.TabIndex = 13;
-            this.OriginTime.Text = "2022/12/31 12:34:56";
             this.OriginTime.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // AreaIntensityLabel
@@ -176,8 +171,27 @@
             this.AreaIntensity.Name = "AreaIntensity";
             this.AreaIntensity.Size = new System.Drawing.Size(86, 78);
             this.AreaIntensity.TabIndex = 14;
-            this.AreaIntensity.Text = "1";
             this.AreaIntensity.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            // 
+            // WarnLabel
+            // 
+            this.WarnLabel.BackColor = System.Drawing.Color.Teal;
+            this.WarnLabel.Font = new System.Drawing.Font("Meiryo UI", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.WarnLabel.Location = new System.Drawing.Point(1, 174);
+            this.WarnLabel.Name = "WarnLabel";
+            this.WarnLabel.Size = new System.Drawing.Size(634, 43);
+            this.WarnLabel.TabIndex = 16;
+            this.WarnLabel.Text = "以下の地域は強い揺れに注意";
+            this.WarnLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // Forecasts
+            // 
+            this.Forecasts.BackColor = System.Drawing.Color.Teal;
+            this.Forecasts.Font = new System.Drawing.Font("Meiryo UI", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.Forecasts.Location = new System.Drawing.Point(1, 218);
+            this.Forecasts.Name = "Forecasts";
+            this.Forecasts.Size = new System.Drawing.Size(634, 118);
+            this.Forecasts.TabIndex = 17;
             // 
             // EEW_Compact
             // 
@@ -185,6 +199,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(635, 174);
+            this.Controls.Add(this.Forecasts);
+            this.Controls.Add(this.WarnLabel);
             this.Controls.Add(this.Hypocenter);
             this.Controls.Add(this.AreaIntensityLabel);
             this.Controls.Add(this.AreaIntensity);
@@ -228,5 +244,7 @@
         private System.Windows.Forms.Label OriginTime;
         private System.Windows.Forms.Label AreaIntensityLabel;
         private System.Windows.Forms.Label AreaIntensity;
+        private Label WarnLabel;
+        private Label Forecasts;
     }
 }

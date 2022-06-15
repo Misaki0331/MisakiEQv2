@@ -31,10 +31,12 @@ namespace MisakiEQ.GUI
                 case Struct.EEW.InfomationLevel.Forecast:
                     temp = "緊急地震速報(予報)";
                     TopColor(Color.DarkOrange, Color.White);
+                    Size = new Size(651,213);
                     break;
                 case Struct.EEW.InfomationLevel.Warning:
                     temp = "緊急地震速報(警報)";
                     TopColor(Color.Red,Color.White);
+                    Size = new Size(651, 375);
                     break;
                 case Struct.EEW.InfomationLevel.Cancelled:
                     temp = "この緊急地震速報はキャンセルされました。";
@@ -73,6 +75,12 @@ namespace MisakiEQ.GUI
             {
                 Depth.Text = $"{eew.EarthQuake.Depth} km";
             }
+            string args = "";
+            for(int i=0;i< eew.EarthQuake.ForecastArea.LocalAreas.Count&&eew.Serial.Infomation==Struct.EEW.InfomationLevel.Warning; i++)
+            {
+                args += $"{eew.EarthQuake.ForecastArea.LocalAreas[i]} ";
+            }
+            Forecasts.Text=args;
             /*
             SetColor(true, eew.UserInfo.LocalIntensity);
             AreaIntensity.Text = Struct.Common.IntToStringShort(eew.UserInfo.LocalIntensity);
@@ -138,6 +146,10 @@ namespace MisakiEQ.GUI
             SignalCount.BackColor = bg;
             SignalType.ForeColor = fr;
             SignalCount.ForeColor = fr;
+            WarnLabel.BackColor = bg;
+            Forecasts.BackColor = bg;
+            WarnLabel.ForeColor = fr;
+            Forecasts.ForeColor = fr;
         }
         void InfoColor(Color bg,Color fr)
         {
