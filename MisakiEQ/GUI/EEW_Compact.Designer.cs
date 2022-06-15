@@ -210,6 +210,7 @@
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.EEW_Compact_FormClosing);
             this.Load += new System.EventHandler(this.EEW_Compact_Load);
+            this.VisibleChanged += new System.EventHandler(this.EEW_Compact_VisibleChanged);
             this.ResumeLayout(false);
             this.PerformLayout();
 

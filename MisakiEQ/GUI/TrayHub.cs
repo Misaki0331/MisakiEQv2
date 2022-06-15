@@ -79,10 +79,10 @@ namespace MisakiEQ.GUI
             EEW_Compact.SetInfomation(Background.APIs.GetInstance().EEW.GetData());
             EEW_Compact.Activate();
         }
-
-        private void EventEEW(object? sender,Background.API.EEWEventArgs e)
+        private async void EventEEW(object? sender,Background.API.EEWEventArgs e)
         {
             if (e.eew == null) return;
+            e.eew.UserInfo.LocalIntensity= await Background.API.KyoshinAPI.KyoshinAPI.GetUserIntensity();
             Log.Logger.GetInstance().Debug($"緊急地震速報のイベントが発生: {e.eew.Serial.Infomation}");
             //ToDo: 緊急地震速報のイベント処理を入れる
             EEW_Compact.Invoke(() =>
@@ -93,6 +93,7 @@ namespace MisakiEQ.GUI
             });
             Funcs.Toast.Post(e.eew);
         }
+        
 
         private void EventEarthQuake(object? sender, Background.API.EarthQuakeEventArgs e)
         {

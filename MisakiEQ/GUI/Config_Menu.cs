@@ -14,7 +14,8 @@ namespace MisakiEQ.GUI
     public partial class Config_Menu : Form
     {
 #pragma warning disable IDE0052 // 読み取られていないプライベート メンバーを削除
-        readonly Lib.ConfigController.Controller? controller;
+        readonly Lib.ConfigController.Controller? ConnectionSetting;
+        readonly Lib.ConfigController.Controller? UserSetting;
 #pragma warning restore IDE0052 // 読み取られていないプライベート メンバーを削除
 
         Twitter.Auth? TwitterAuthGUI = null;
@@ -22,7 +23,8 @@ namespace MisakiEQ.GUI
         {
             InitializeComponent();
             var config = Lib.Config.Funcs.GetInstance().Configs;
-            controller = new Lib.ConfigController.Controller(groupBox1, config.Connections);
+            ConnectionSetting = new Lib.ConfigController.Controller(groupBox1, config.Connections);
+            UserSetting = new Lib.ConfigController.Controller(groupBox2, config.UserSetting);
         }
 
         

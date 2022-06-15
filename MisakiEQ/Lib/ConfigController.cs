@@ -35,12 +35,12 @@ namespace MisakiEQ.Lib.ConfigController
             gb.Controls.Add(ToolUnitLabel);
             gb.Controls.Add(ToolTrack);
             gb.Controls.Add(ToolNumUD);
-            ToolUnitLabel.Location = new Point(300, 22 + pos * 23);
+            ToolUnitLabel.Location = new Point(310, 22 + pos * 23);
             ToolUnitLabel.Size = new Size(60, 23);
             ToolUnitLabel.Text = data.GetUnitName();
             ToolUnitLabel.TextAlign = ContentAlignment.MiddleLeft;
             ToolNumUD.Location = new Point(230, 22 + pos * 23);
-            ToolNumUD.Size = new Size(70, 23);
+            ToolNumUD.Size = new Size(80, 23);
             ToolTrack.AutoSize = false;
             ToolTrack.BackColor = Color.White;
             ToolTrack.Location = new Point(122, 22 + pos * 23);
@@ -93,34 +93,16 @@ namespace MisakiEQ.Lib.ConfigController
 
             
         }
-        bool IsChanged = true;
         void TrackChanged(object? sender, EventArgs e)
         {
-            if (!IsChanged)
-            {
-                IsChanged = true;
                 ToolNumUD.Value = (decimal)((double)ToolTrack.Value / cl.GetDisplayMag());
                 cl.SetValue((long)ToolTrack.Value);
-
-            }
-            else
-            {
-                IsChanged = false;
-            }
 
         }
         void NumUDChanged(object? sender, EventArgs e)
         {
-            if (!IsChanged)
-            {
-                IsChanged = true;
                 ToolTrack.Value = (int)((double)ToolNumUD.Value * cl.GetDisplayMag());
                 cl.SetValue((long)ToolTrack.Value);
-            }
-            else
-            {
-                IsChanged = false;
-            }
         }
         void TextBoxChanged(object? sender, EventArgs e)
         {

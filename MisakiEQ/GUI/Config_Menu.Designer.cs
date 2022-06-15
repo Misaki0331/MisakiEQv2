@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.SettingTabs = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.TwitterAuthInfo = new System.Windows.Forms.Label();
@@ -53,6 +54,7 @@
             // 
             this.SettingTabs.Controls.Add(this.tabPage1);
             this.SettingTabs.Controls.Add(this.tabPage2);
+            this.SettingTabs.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.SettingTabs.Location = new System.Drawing.Point(-5, 53);
             this.SettingTabs.Name = "SettingTabs";
             this.SettingTabs.SelectedIndex = 0;
@@ -61,7 +63,9 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.groupBox2);
             this.tabPage1.Controls.Add(this.groupBox1);
+            this.tabPage1.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tabPage1.Location = new System.Drawing.Point(4, 24);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -69,6 +73,15 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "一般";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Location = new System.Drawing.Point(6, 347);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(339, 97);
+            this.groupBox2.TabIndex = 6;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "ユーザー設定";
             // 
             // groupBox1
             // 
@@ -86,6 +99,7 @@
             this.tabPage2.Controls.Add(this.textBox2);
             this.tabPage2.Controls.Add(this.button1);
             this.tabPage2.Controls.Add(this.TestButton);
+            this.tabPage2.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -241,5 +255,6 @@
         private Button button3;
         private TextBox textBox2;
         private Label TwitterAuthInfo;
+        private GroupBox groupBox2;
     }
 }

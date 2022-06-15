@@ -21,6 +21,10 @@ namespace MisakiEQ.Lib.Config
             }
             return singleton;
         }
+        private Funcs()
+        {
+
+        }
         private const string CfgFile = "Config.cfg";
 
         public bool SaveConfig()
@@ -99,6 +103,9 @@ namespace MisakiEQ.Lib.Config
             api.KyoshinAPI.Config.KyoshinDelayTime = (int)GetConfigValue("API_K-moni_Delay");
             api.KyoshinAPI.Config.KyoshinFrequency = (int)GetConfigValue("API_K-moni_Frequency");
             api.KyoshinAPI.Config.AutoAdjustKyoshinTime = (int)GetConfigValue("API_K-moni_Adjust")*60;
+            var gui = APIs.GetInstance().KyoshinAPI.Config;
+            gui.UserLong = (int)GetConfigValue("USER_Pos_Long");
+            gui.UserLat = (int)GetConfigValue("USER_Pos_Lat");
         }
         IndexData? GetConfigClass(string name)
         {
@@ -137,6 +144,7 @@ namespace MisakiEQ.Lib.Config
         public class Cfg
         {
             public readonly List<IndexData> Connections=new();
+            public readonly List<IndexData> UserSetting=new();
             public Cfg()
             {
                 Connections.Add(new IndexData("API_EEW_Delay","EEW標準遅延",unitName:"秒",displayMag:1000, description:"標準状態の緊急地震速報の遅延時間です。", min:1000, max:5000, def:1000));   //通常時の遅延(ms)
@@ -147,7 +155,8 @@ namespace MisakiEQ.Lib.Config
                 Connections.Add(new IndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:5, def:1,unitName:"秒"));   //取得時の配列の数
                 Connections.Add(new IndexData("API_K-moni_Frequency", "強震モニタ更新間隔", description: "強震モニタの更新間隔です。データ消費量を抑えたい時にお使いください。", min:1, max:5, def:1,unitName:"秒"));   //取得時の配列の数
                 Connections.Add(new IndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
-            
+                UserSetting.Add(new IndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数
+                UserSetting.Add(new IndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
             }
             public Cfg Clone()
             {

@@ -101,8 +101,35 @@ Init()
             LatestAdjustTime = DateTime.Now.AddSeconds(-Config.AutoAdjustKyoshinTime + 10);
             log.Warn($"強震モニタ時刻取得失敗");
         }
+        public static async Task<Struct.Common.Intensity> GetUserIntensity()
+        {
+            try
+            {
+                var api = await APIs.GetInstance().KyoshinAPI.GetImage(KyoshinImageType.EstShindoImg);
+                if (api == null)
+                {
+                    Log.Logger.GetInstance().Warn("強震モニタの推定震度マップを取得できませんでした。");
+                    return Struct.Common.Intensity.Unknown;
+                }
+                Struct.Common.LAL lal = new(APIs.GetInstance().KyoshinAPI.Config.UserLong, APIs.GetInstance().KyoshinAPI.Config.UserLat);
+                var pnt = Lib.KyoshinLib.LALtoKyoshinMap(lal);
+                if (api.Width <= (int)pnt.X || api.Height <= (int)pnt.Y)
+                {
+                    return Struct.Common.Intensity.Unknown;
+                }
+                var img = (Bitmap)api;
+                var res = Struct.Common.FloatToInt(Lib.KyoshinLib.GetIntensity(img.GetPixel((int)pnt.X, (int)pnt.Y)));
+                return res;
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.GetInstance().Error(ex);
+                return Struct.Common.Intensity.Unknown;
+            }
+        }
         public async Task<Image?> GetImage(KyoshinImageType type)
         {
+            if (LatestDate.Year <= 2000) return null;
             using (await s_lock.LockAsync())
             {
                 for (int i = 0; i < ImageList.Count; i++)

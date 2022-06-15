@@ -14,5 +14,9 @@ namespace MisakiEQ.Background.API.KyoshinAPI
         public int KyoshinDelayTime = 1;
         /// <summary>強震モニタの更新頻度(n秒)</summary>
         public int KyoshinFrequency = 1;
+
+
+        public double UserLong = 139.6983;
+        public double UserLat = 35.6896;
     }
 }

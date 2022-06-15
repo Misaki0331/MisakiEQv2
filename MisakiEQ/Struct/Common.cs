@@ -9,6 +9,87 @@ namespace MisakiEQ.Struct
     public class Common
     {
         /// <summary>
+        /// 座標
+        /// </summary>
+        public class Point
+        {
+            public Point()
+            {
+                X = 0;
+                Y = 0;
+            }
+            public Point(double x, double y)
+            {
+                X = x;
+                Y = y;
+            }
+            public Point(System.Drawing.Point point)
+            {
+                X = point.X;
+                Y = point.Y;
+            }
+
+            public double X { get; set; }
+            public double Y { get; set; }
+
+        }
+        /// <summary>
+        /// 緯経度
+        /// </summary>
+        public class LAL
+        {
+            public LAL()
+            {
+                Lo = 0;
+                La = 0;
+            }
+            public LAL(double lon, double lat)
+            {
+                Lon = lon;
+                Lat = lat;
+            }
+
+            public double Lon{ 
+                get 
+                { 
+                    return Lo; 
+                } 
+                set 
+                {
+                    if (double.IsNaN(value))
+                    {
+                        Lo = double.NaN;
+                        La = double.NaN;
+                        return;
+                    }
+                    if (value > 180 || value < -180) throw new ArgumentOutOfRangeException("Lon","経度は-180より下、もしくは180より上を超えてはいけません。");
+                    Lo = value;
+                } 
+            }
+            public double Lat
+            {
+                get
+                {
+                    return La;
+                }
+                set
+                {
+                    if (double.IsNaN(value))
+                    {
+                        Lo = double.NaN;
+                        La = double.NaN;
+                        return;
+                    }
+                    if (value > 90 || value < -90) throw new ArgumentOutOfRangeException("Lat", "緯度は-90より下、もしくは90より上を超えてはいけません。");
+                    La = value;
+                }
+            }
+            double Lo;
+            double La;
+        }
+        
+
+        /// <summary>
         /// stringからDateTimeに変換します。
         /// </summary>
         /// <param name="str">変換させる文字列</param>
@@ -253,6 +334,20 @@ namespace MisakiEQ.Struct
                 "7" => Intensity.Int7,
                 _ => Intensity.Unknown,
             };
+        }
+        public static Intensity FloatToInt(double value)
+        {
+            if (value <= 0) return Intensity.Unknown;
+            if (value < 0.5) return Intensity.Int0;
+            if (value < 1.5) return Intensity.Int1;
+            if (value < 2.5) return Intensity.Int2;
+            if (value < 3.5) return Intensity.Int3;
+            if (value < 4.5) return Intensity.Int4;
+            if (value < 5.0) return Intensity.Int5Down;
+            if (value < 5.5) return Intensity.Int5Up;
+            if (value < 6.0) return Intensity.Int6Down;
+            if (value < 6.5) return Intensity.Int6Up;
+            return Intensity.Int7;
         }
         /// <summary>
         /// 震源の深さを文字列に変換します。<br/>

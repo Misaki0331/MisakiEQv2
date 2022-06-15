@@ -57,7 +57,6 @@ namespace MisakiEQ.GUI
                     break;
             }
             SignalType.Text = temp;
-            MaxIntensity.Text = Struct.Common.IntToStringShort(eew.EarthQuake.MaxIntensity);
             SetColor(false, eew.EarthQuake.MaxIntensity);
             Hypocenter.Text = eew.EarthQuake.Hypocenter;
             OriginTime.Text=eew.EarthQuake.OriginTime.ToString("yyyy/MM/dd HH:mm:ss");
@@ -74,9 +73,10 @@ namespace MisakiEQ.GUI
             {
                 Depth.Text = $"{eew.EarthQuake.Depth} km";
             }
+            /*
             SetColor(true, eew.UserInfo.LocalIntensity);
             AreaIntensity.Text = Struct.Common.IntToStringShort(eew.UserInfo.LocalIntensity);
-
+            */
 
             Log.Logger.GetInstance().Debug("データの更新完了");
         }
@@ -124,10 +124,12 @@ namespace MisakiEQ.GUI
             if (IsArea)
             {
                 AreaColor(bg, fc);
+                AreaIntensity.Text = Struct.Common.IntToStringShort(value);
             }
             else
             {
                 InfoColor(bg, fc);
+                MaxIntensity.Text = Struct.Common.IntToStringShort(value);
             }
         }
         void TopColor(Color bg,Color fr)
@@ -173,5 +175,24 @@ namespace MisakiEQ.GUI
             await Task.Delay(100);
             Opacity = 1;
         }
+
+        private async void EEW_Compact_VisibleChanged(object sender, EventArgs e)
+        {
+            if (Visible)
+            {
+                Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin += EEW_Compact_KyoshinEvent;
+                SetColor(true, await Background.API.KyoshinAPI.KyoshinAPI.GetUserIntensity());
+            }
+            else Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin -= EEW_Compact_KyoshinEvent;
+        }
+        private void EEW_Compact_KyoshinEvent(object? sender, EventArgs e)
+        {
+            this.Invoke(async () =>
+            {
+                SetColor(true, await Background.API.KyoshinAPI.KyoshinAPI.GetUserIntensity());
+            });
+            
+        }
+
     }
 }

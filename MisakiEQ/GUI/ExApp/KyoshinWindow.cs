@@ -145,34 +145,53 @@ namespace MisakiEQ.GUI.ExApp
         }
 
         int x0=0, y0=0;
-        private void gettext()
+        private async void gettext()
         {
-            int x = x0;
-            int y = y0;
-            Bitmap b = (Bitmap)pictureBox1.Image;
-            //Log.Logger.GetInstance().Debug($"{x} {y}");
-            if (b.Width <= x || b.Height <= y) return;
-            switch (KyoshinType.SelectedIndex)
+            try
             {
-                case 0:
-                    label1.Text = $"震度{Lib.KyoshinColor.GetIntensity(b.GetPixel(x,y)):0.00}";
-                    break;
-                case 1:
-                    label1.Text = $"{Lib.KyoshinColor.GetPGA(b.GetPixel(x,y)):0.00}gal";
-                    break;
-                case 2:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                    label1.Text = $"{Lib.KyoshinColor.GetPGV(b.GetPixel(x,y)):0.00}cm/s";
-                    break;
-                case 3:
-                    label1.Text = $"{Lib.KyoshinColor.GetPGD(b.GetPixel(x,y)):0.00}cm";
-                    break;
+                int x = x0;
+                int y = y0;
+                var a = await Background.APIs.GetInstance().KyoshinAPI.GetImage(GetEnumType());
+                var lal = Lib.KyoshinLib.KyoshinMapToLAL(new Struct.Common.Point(x, y));
+                var pnt = Lib.KyoshinLib.LALtoKyoshinMap(lal);
+                if (a == null)
+                {
+                    label1.Text = $"{lal.Lon:0.00}E {lal.Lat:0.00}N ({(int)pnt.X},{(int)pnt.Y})";
+                    return;
+                }
+                var b = (Bitmap)a;
+                if (b.Width <= x || b.Height <= y) return;
+                var str = $"{lal.Lon:0.00}E {lal.Lat:0.00}N ({pnt.X:0},{pnt.Y:0})";
+                if (b.GetPixel(x, y).ToArgb()==0)
+                {
+                    label1.Text = str + "\n";
+                    return;
+                }
+                switch (KyoshinType.SelectedIndex)
+                {
+                    case 0:
+                        label1.Text = $"{str}\n震度{Lib.KyoshinLib.GetIntensity(b.GetPixel(x, y)):0.00}";
+                        break;
+                    case 1:
+                        label1.Text = $"{str}\n{Lib.KyoshinLib.GetPGA(b.GetPixel(x, y)):0.00}gal";
+                        break;
+                    case 2:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                        label1.Text = $"{str}\n{Lib.KyoshinLib.GetPGV(b.GetPixel(x, y)):0.00}cm/s";
+                        break;
+                    case 3:
+                        label1.Text = $"{str}\n{Lib.KyoshinLib.GetPGD(b.GetPixel(x, y)):0.00}cm";
+                        break;
 
+                }
+            }catch(Exception ex)
+            {
+                Log.Logger.GetInstance().Error(ex);
             }
         }
 
