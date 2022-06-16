@@ -90,6 +90,7 @@ namespace MisakiEQ.GUI
                 EEW_Compact.Show();
                 EEW_Compact.Activate();
             });
+            Lib.Twitter.Tweets.GetInstance().EEWPost(e.eew);
             Funcs.Toast.Post(e.eew);
         }
         

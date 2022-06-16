@@ -33,11 +33,10 @@ namespace MisakiEQ.GUI.Twitter
             Pincode.ReadOnly = true;
             EnterButton.Enabled = false;
             label1.Text = "Authenticating...";
-            bool IsSuccess=await Lib.Twitter.APIs.GetInstance().AuthFromPincode(Pincode.Text);
-            if (IsSuccess)
+            if (await Lib.Twitter.APIs.GetInstance().AuthFromPincode(Pincode.Text))
             {
                 label1.ForeColor = Color.DarkGreen;
-                label1.Text = "Successed!";
+                label1.Text = "Success!";
                 try
                 {
                     using var stream = new StreamWriter("TwitterAuth.cfg");
