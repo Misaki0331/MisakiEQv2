@@ -177,7 +177,6 @@
             // 
             // UpdateDataTimer
             // 
-            this.UpdateDataTimer.Interval = 200;
             this.UpdateDataTimer.Tick += new System.EventHandler(this.UpdateDataTimer_Tick);
             // 
             // ButtonApply

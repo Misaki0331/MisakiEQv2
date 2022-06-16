@@ -56,6 +56,7 @@ namespace MisakiEQ.GUI
 
         private void Config_Menu_Load(object sender, EventArgs e)
         {
+            UpdateDataTimer.Interval = 150;
             UpdateDataTimer.Start();
         }
 

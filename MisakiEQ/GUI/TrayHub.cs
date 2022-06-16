@@ -49,8 +49,8 @@ namespace MisakiEQ.GUI
         public static bool IsAlliveInstance()
         {
             if (Instance == null || Instance.IsDisposed)
-                return true;
-            return false;
+                return false;
+            return true;
         }
 
         private async void ExitApplication_Click(object sender, EventArgs e)
