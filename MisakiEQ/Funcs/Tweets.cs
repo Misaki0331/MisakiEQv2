@@ -264,12 +264,10 @@ namespace MisakiEQ.Funcs
                 }
             }
         }
-#pragma warning disable CA1822 // メンバーを static に設定します
         public async void TsunamiPost(Struct.Tsunami tsunami)
-#pragma warning restore CA1822 // メンバーを static に設定します
         {
 
-            using (await EEW_Lock.LockAsync())
+            using (await Tsunami_Lock.LockAsync())
             {
                 try
                 {

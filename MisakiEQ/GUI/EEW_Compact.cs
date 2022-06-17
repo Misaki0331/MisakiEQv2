@@ -199,7 +199,7 @@ namespace MisakiEQ.GUI
         }
         private void EEW_Compact_KyoshinEvent(object? sender, EventArgs e)
         {
-            this.Invoke(async () =>
+            Invoke(async () =>
             {
                 SetColor(true, await Background.API.KyoshinAPI.KyoshinAPI.GetUserIntensity());
             });

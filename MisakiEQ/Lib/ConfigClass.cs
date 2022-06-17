@@ -37,6 +37,10 @@ namespace MisakiEQ.Lib.Config
                 {
                     sw.WriteLine($"{Configs.Connections[i].GetName()}={Configs.Connections[i].ConfigWrite()}");
                 }
+                for (int i = 0; i < Configs.UserSetting.Count; i++)
+                {
+                    sw.WriteLine($"{Configs.UserSetting[i].GetName()}={Configs.UserSetting[i].ConfigWrite()}");
+                }
                 sw.Close();
 
                 TmpConfigs = Configs.Clone();
@@ -104,8 +108,8 @@ namespace MisakiEQ.Lib.Config
             api.KyoshinAPI.Config.KyoshinFrequency = (int)GetConfigValue("API_K-moni_Frequency");
             api.KyoshinAPI.Config.AutoAdjustKyoshinTime = (int)GetConfigValue("API_K-moni_Adjust")*60;
             var gui = APIs.GetInstance().KyoshinAPI.Config;
-            gui.UserLong = (int)GetConfigValue("USER_Pos_Long");
-            gui.UserLat = (int)GetConfigValue("USER_Pos_Lat");
+            gui.UserLong = GetConfigValue("USER_Pos_Long")/10000.0;
+            gui.UserLat = GetConfigValue("USER_Pos_Lat") / 10000.0;
         }
         IndexData? GetConfigClass(string name)
         {
@@ -114,6 +118,13 @@ namespace MisakiEQ.Lib.Config
                 if(Configs.Connections[i].GetName() == name)
                 {
                     return Configs.Connections[i];
+                }
+            }
+            for (int i = 0; i < Configs.UserSetting.Count; i++)
+            {
+                if (Configs.UserSetting[i].GetName() == name)
+                {
+                    return Configs.UserSetting[i];
                 }
             }
             return null;
@@ -152,7 +163,7 @@ namespace MisakiEQ.Lib.Config
                 Connections.Add(new IndexData("API_EEW_DelayDetectCoolDown", "EEWモード移行時間", unitName: "秒", displayMag: 1000, description: "検知状態から標準状態に回復する時間です。", min:1000, max:10000, def:4000));     //検出から通常時に戻る時間(ms)
                 Connections.Add(new IndexData("API_EQInfo_Delay", "地震情報遅延", unitName: "秒", displayMag: 1000, description: "地震情報全般の取得遅延時間です。\n地震と津波情報共通でリクエスト多過ぎるとエラー出ます。", min:2000, max:30000, def:3000));   //通常時の遅延(ms)
                 Connections.Add(new IndexData("API_EQInfo_Limit", "地震情報取得項目数", description: "1回で地震情報を取得する数です。\n値を大きくすると1回あたりより多くの情報が更新されますが、その分遅くなります。", min:1, max:100, def:10));   //取得時の配列の数
-                Connections.Add(new IndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:5000, def:1,unitName:"秒"));   //取得時の配列の数
+                Connections.Add(new IndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:10000, def:1,unitName:"秒"));   //取得時の配列の数
                 Connections.Add(new IndexData("API_K-moni_Frequency", "強震モニタ更新間隔", description: "強震モニタの更新間隔です。データ消費量を抑えたい時にお使いください。", min:1, max:5, def:1,unitName:"秒"));   //取得時の配列の数
                 Connections.Add(new IndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
                 UserSetting.Add(new IndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数

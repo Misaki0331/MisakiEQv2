@@ -119,7 +119,6 @@ Init()
                 }
                 var img = (Bitmap)api;
                 var res = Struct.Common.FloatToInt(Lib.KyoshinLib.GetIntensity(img.GetPixel((int)pnt.X, (int)pnt.Y)));
-                Log.Logger.GetInstance().Debug($"{api.Width}x{api.Height} {pnt.X},{pnt.Y} {Lib.KyoshinLib.GetIntensity(img.GetPixel((int)pnt.X, (int)pnt.Y))}");
                 return res;
             }
             catch (Exception ex)
