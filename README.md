@@ -59,14 +59,14 @@ MisakiEQはWindows上で動作する地震通知アプリケーションです�
 
 > #### API  
 
-- [api.iedred7584.com]("iedred7584.dev") iedred7584様 (高度利用者向け緊急地震速報の提供)  
-- [P2Pquake.net]("p2pquake.net") たくや様 (地震・津波情報の提供)
-- [kmoni.bosai.go.jp]("kmoni.bosai.go.jp") 防災科学技術研究所様 (強震モニタの提供)  
+- [api.iedred7584.com](https://iedred7584.dev) iedred7584様 (高度利用者向け緊急地震速報の提供)  
+- [P2Pquake.net](https://p2pquake.net) たくや様 (地震・津波情報の提供)
+- [kmoni.bosai.go.jp](http://kmoni.bosai.go.jp) 防災科学技術研究所様 (強震モニタの提供)  
 
 > #### ライブラリ  
 
-- [多項式補間を使用して強震モニタ画像から数値データを決定する](https://qiita.com/NoneType1/items/a4d2cf932e20b56ca444 "") NoneType1様 (強震モニタの値の取得に使用)
-- [TweetinviAPI]("https://github.com/linvi/tweetinvi") (TwitterBotの製作に使用)
-- [DiscordRichPresence]("https://github.com/Lachee/discord-rpc-csharp") (Discord RPCのデータ更新に使用)
-- [Microsoft.Toolkit.Uwp.Notificaitions]("https://github.com/CommunityToolkit/WindowsCommunityToolkit") (Windows10以降の通知のカスタマイズ)
-- [Newtonsoft.Json]("https://www.newtonsoft.com/json") (APIに使用するJSON関係の処理)
+- [多項式補間を使用して強震モニタ画像から数値データを決定する](https://qiita.com/NoneType1/items/a4d2cf932e20b56ca444) NoneType1様 (強震モニタの値の取得に使用)
+- [TweetinviAPI](https://github.com/linvi/tweetinvi) (TwitterBotの製作に使用)
+- [DiscordRichPresence](https://github.com/Lachee/discord-rpc-csharp) (Discord RPCのデータ更新に使用)
+- [Microsoft.Toolkit.Uwp.Notificaitions](https://github.com/CommunityToolkit/WindowsCommunityToolkit) (Windows10以降の通知のカスタマイズ)
+- [Newtonsoft.Json](https://www.newtonsoft.com/json) (APIに使用するJSON関係の処理)
