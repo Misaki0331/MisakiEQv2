@@ -96,5 +96,9 @@ namespace MisakiEQ.GUI
         {
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Background.APIs.GetInstance().EQInfo.Test(textBox1.Text);
+        }
     }
 }

@@ -1,0 +1,421 @@
+﻿using MisakiEQ.Lib;
+using MisakiEQ.Lib.Twitter;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MisakiEQ.Funcs
+{
+    internal class Tweets
+    {
+        private class EEWTweet
+        {
+            public EEWTweet(string Event, long Latest)
+            {
+                LatestTime = DateTime.Now;
+                EventID = Event;
+                LatestTweet = Latest;
+            }
+            public string EventID { get; set; } = string.Empty;
+            public long LatestTweet { get; set; } = 0;
+            public DateTime LatestTime { get; set; } = DateTime.Now;
+        }
+
+        private class EarthquakeTweet
+        {
+            public EarthquakeTweet(DateTime origin, long Latest)
+            {
+                LatestTime = DateTime.Now;
+                OriginTime = origin;
+                LatestTweet = Latest;
+            }
+            public DateTime OriginTime { get; set; } = DateTime.MinValue;
+            public long LatestTweet { get; set; } = 0;
+            public DateTime LatestTime { get; set; } = DateTime.Now;
+        }
+        private static Tweets? singleton = null;
+        /// <summary>
+        /// インスタンスを生成する
+        /// </summary>
+        public static Tweets GetInstance()
+        {
+            if (singleton == null)
+            {
+                singleton = new Tweets();
+            }
+            return singleton;
+        }
+        readonly List<EEWTweet> EEWReplyList = new();
+        readonly List<EarthquakeTweet> EQReplyList = new();
+        private readonly AsyncLock EEW_Lock = new();
+        private readonly AsyncLock EQ_Lock = new();
+        private readonly AsyncLock Tsunami_Lock = new();
+        public async void EEWPost(Struct.EEW eew)
+        {
+            string TweetIndex = string.Empty;
+            switch (eew.Serial.Infomation)
+            {
+                case Struct.EEW.InfomationLevel.Forecast:
+                    TweetIndex += $"🔵緊急地震速報(予報) 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
+                    break;
+                case Struct.EEW.InfomationLevel.Warning:
+                    TweetIndex += $"🔴⚠️緊急地震速報(警報) 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
+                    break;
+                case Struct.EEW.InfomationLevel.Cancelled:
+                    TweetIndex += $"🟢緊急地震速報(キャンセル)\n";
+                    break;
+                default:
+                    return;
+            }
+            if (eew.Serial.Infomation != Struct.EEW.InfomationLevel.Cancelled)
+            {
+                TweetIndex += $"{eew.EarthQuake.Hypocenter} 深さ: {Struct.Common.DepthToString(eew.EarthQuake.Depth)} M {eew.EarthQuake.Magnitude}\n";
+                TweetIndex += $"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n";
+                TweetIndex += $"発生時刻 : {eew.EarthQuake.OriginTime:M/dd HH:mm:ss}\n";
+                if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
+                {
+                    TweetIndex += "\n⚠️以下の地域は強い揺れに注意⚠️\n";
+                    for (int i = 0; i < eew.EarthQuake.ForecastArea.LocalAreas.Count; i++)
+                    {
+                        TweetIndex += $"{eew.EarthQuake.ForecastArea.LocalAreas[i]}";
+                        if (i + 1 != eew.EarthQuake.ForecastArea.LocalAreas.Count)
+                        {
+                            if (i % 5 == 4) TweetIndex += "\n";
+                            else TweetIndex += " ";
+                        }
+                    }
+                    TweetIndex += "\n";
+                }
+            }
+            else
+            {
+                TweetIndex += $"この緊急地震速報は取り消されました。\n";
+            }
+            TweetIndex += "\n";
+            TweetIndex += $"発表時刻 : {eew.Serial.UpdateTime:M/dd HH:mm:ss}\n";
+            TweetIndex += $"#MisakiEQ #緊急地震速報";
+            using (await EEW_Lock.LockAsync())
+            {
+                try
+                {
+                    int Index = -1;
+                    long LatestID = 0;
+                    for (int i = 0; i < EEWReplyList.Count; i++)
+                    {
+                        if (EEWReplyList[i].EventID == eew.Serial.EventID)
+                        {
+                            LatestID = EEWReplyList[i].LatestTweet;
+                            Index = i;
+                        }
+                    }
+                    var twitter = APIs.GetInstance();
+                    //LatestID = await twitter.Tweet(reply: LatestID, tweet: "@null " + TweetIndex);
+                    Log.Logger.GetInstance().Debug(TweetIndex);
+                    if (Index != -1)
+                    {
+                        EEWReplyList[Index].LatestTweet = LatestID;
+                        EEWReplyList[Index].LatestTime = DateTime.Now;
+                    }
+                    else
+                    {
+                        EEWReplyList.Add(new(eew.Serial.EventID, LatestID));
+                    }
+                    for (int i = EEWReplyList.Count - 1; i >= 0; i--)
+                    {
+                        TimeSpan T = DateTime.Now - EEWReplyList[i].LatestTime;
+                        if (T.Seconds > 180) EEWReplyList.RemoveAt(i);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.GetInstance().Warn($"ツイート中にエラー : {ex.Message}");
+                }
+            }
+        }
+        public async void EarthquakePost(Struct.EarthQuake eq)
+        {
+            using (await EQ_Lock.LockAsync())
+            {
+                try
+                {
+                    List<string> index = new();
+                    switch (eq.Issue.Type)
+                    {
+                        case Struct.EarthQuake.EarthQuakeType.ScalePrompt:
+                            index.Add($"震度速報 - {eq.Details.OriginTime:M/dd H:mm}頃");
+                            index.Add($"最大震度{Struct.Common.IntToStringLong(eq.Details.MaxIntensity)}を観測する地震が発生しました。");
+                            break;
+                        case Struct.EarthQuake.EarthQuakeType.Destination:
+                            index.Add($"震源情報 - {eq.Details.OriginTime:M/dd H:mm}頃");
+                            index.Add($"震源地: {eq.Details.Hypocenter}");
+                            index.Add($"震源の深さ: {Struct.Common.DepthToString(eq.Details.Depth)}");
+                            index.Add($"地震の規模: Ｍ{eq.Details.Magnitude}:0.0");
+                            index.Add($"この地震による{Struct.EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}");
+                            break;
+                        case Struct.EarthQuake.EarthQuakeType.ScaleAndDestination:
+                            index.Add($"震度&震源情報 - {eq.Details.OriginTime:M/dd H:mm}頃");
+                            index.Add($"震源地: {eq.Details.Hypocenter}");
+                            index.Add($"震源の深さ: {Struct.Common.DepthToString(eq.Details.Depth)}");
+                            index.Add($"地震の規模: Ｍ{eq.Details.Magnitude:0.0}");
+                            index.Add($"最大震度: {Struct.Common.IntToStringLong(eq.Details.MaxIntensity)}");
+                            index.Add($"この地震による{Struct.EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}");
+                            break;
+                        case Struct.EarthQuake.EarthQuakeType.DetailScale:
+                            index.Add($"詳細情報 - {eq.Details.OriginTime:M/dd H:mm}頃");
+                            index.Add($"震源地: {eq.Details.Hypocenter}");
+                            index.Add($"震源の深さ: {Struct.Common.DepthToString(eq.Details.Depth)}");
+                            index.Add($"地震の規模: Ｍ{eq.Details.Magnitude:0.0}");
+                            index.Add($"最大震度: {Struct.Common.IntToStringLong(eq.Details.MaxIntensity)}");
+                            index.Add($"この地震による{Struct.EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}");
+                            break;
+                        default:
+                            return;
+                    }
+                    if (eq.Issue.Type == Struct.EarthQuake.EarthQuakeType.ScalePrompt ||
+                       eq.Issue.Type == Struct.EarthQuake.EarthQuakeType.ScaleAndDestination ||
+                       eq.Issue.Type == Struct.EarthQuake.EarthQuakeType.DetailScale)
+                    {
+                        if (eq.Details.Points.Count > 0)
+                        {
+                            index.Add(string.Empty);
+                            index.Add("各地の震度は以下の通りです。");
+                            index.Add(string.Empty);
+                            int cnt = 0;
+                            for (int i = 0; i < index.Count; i++) cnt += APIs.GetLen(index[i]) + 1;
+                            var list = eq.Details.PrefIntensity.GetIntensityPrefectures();
+                            for (int i = 0; i < list.Count; i++)
+                            {
+                                string txt = $"震度{Struct.Common.IntToStringLong(list[i].Intensity)}：";
+                                for (int j = 0; j < list[i].Prefectures.Count; j++)
+                                {
+                                    txt += Struct.Common.PrefecturesToString(list[i].Prefectures[j]);
+                                    if (list[i].Prefectures.Count - 1 != j && j % 6 == 5)
+                                    {
+                                        if (cnt + APIs.GetLen(txt) + 1 > 250 && txt.Contains('　'))
+                                        {
+                                            txt = $"震度{Struct.Common.IntToStringLong(list[i].Intensity)}：" + txt.Replace("　", "");
+                                            cnt = 0;
+                                        }
+                                        index.Add(txt);
+                                        cnt += APIs.GetLen(txt) + 1;
+                                        txt = "";
+                                        for (int k = 0; k < (Struct.Common.IntToStringLong(list[i].Intensity).Length + 3); k++) txt += "　";
+                                    }
+                                    else
+                                    {
+                                        txt += " ";
+                                    }
+                                }
+                                cnt += APIs.GetLen(txt) + 1;
+                                index.Add(txt);
+
+                            }
+                        }
+                    }
+                    bool IsExist = false;
+                    long LatestTweet = 0;
+
+                    for (int i = 0; i < EQReplyList.Count; i++)
+                    {
+                        if (eq.Details.OriginTime == EQReplyList[i].OriginTime)
+                        {
+                            IsExist = true;
+                            LatestTweet = EQReplyList[i].LatestTweet;
+                            break;
+                        }
+                    }
+
+                    List<string> TweetIndexs = new();
+                    string Text = "";
+                    for (int i = 0; i < index.Count; i++)
+                    {
+                        if (APIs.GetLen(Text + index[i]) + 1 > 250)
+                        {
+                            TweetIndexs.Add(Text + "\n#MisakiEQ #地震");
+                            Text = $"{index[i]}\n";
+                        }
+                        else
+                            Text += $"{index[i]}\n";
+                    }
+                    TweetIndexs.Add(Text + "\n#MisakiEQ #地震");
+                    if (TweetIndexs.Count > 1)
+                    {
+                        for (int i = 0; i < TweetIndexs.Count; i++)
+                            TweetIndexs[i] += $" ({i + 1}/{TweetIndexs.Count})";
+                    }
+                    for (int i = 0; i < TweetIndexs.Count; i++)
+                    {
+                        //LatestTweet = await APIs.GetInstance().Tweet(TweetIndexs[i], LatestTweet);
+                        Log.Logger.GetInstance().Debug($"ツイートしました。 ID:{LatestTweet}\n" + TweetIndexs[i]);
+                    }
+                    if (!IsExist)
+                        EQReplyList.Add(new(eq.Details.OriginTime, LatestTweet));
+                    for (int i = EQReplyList.Count - 1; i >= 0; i--)
+                    {
+                        TimeSpan T = DateTime.Now - EQReplyList[i].LatestTime;
+                        if (T.Seconds > 1800) EQReplyList.RemoveAt(i);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.GetInstance().Error(ex);
+                }
+            }
+        }
+#pragma warning disable CA1822 // メンバーを static に設定します
+        public async void TsunamiPost(Struct.Tsunami tsunami)
+#pragma warning restore CA1822 // メンバーを static に設定します
+        {
+
+            using (await EEW_Lock.LockAsync())
+            {
+                try
+                {
+                    List<string> TweetList = new();
+                    List<string> index = new()
+                {
+                    $"津波情報 - {tsunami.Issue.Time:M/dd H:mm:ss}発表"
+                };
+                    if (tsunami.Cancelled)
+                    {
+                        index.Add("");
+                        index.Add("全ての津波予報が解除されました。");
+                        index.Add("");
+                        string l = string.Empty;
+                        for (int k = 0; k < index.Count; k++)
+                            l += index[k] + '\n';
+                        index.Clear();
+                        if (!string.IsNullOrWhiteSpace(l.Replace('\n', ' ')))
+                            TweetList.Add(l);
+                    }
+                    else
+                    {
+                        index.Add("");
+                        index.Add("現在以下の地域に津波予報が発表されています。");
+                        index.Add("");
+                        List<string>[] grades = new List<string>[6];
+                        for (int i = 0; i < 6; i++) grades[i] = new();
+                        for (int i = 0; i < tsunami.Areas.Count; i++)
+                        {
+                            switch (tsunami.Areas[i].Grade)
+                            {
+                                case Struct.Tsunami.TsunamiGrade.MajorWarning:
+                                    if (tsunami.Areas[i].Immediate) grades[0].Add(tsunami.Areas[i].Name);
+                                    else grades[1].Add(tsunami.Areas[i].Name);
+                                    break;
+                                case Struct.Tsunami.TsunamiGrade.Warning:
+                                    if (tsunami.Areas[i].Immediate) grades[2].Add(tsunami.Areas[i].Name);
+                                    else grades[3].Add(tsunami.Areas[i].Name);
+                                    break;
+                                case Struct.Tsunami.TsunamiGrade.Watch:
+                                    if (tsunami.Areas[i].Immediate) grades[4].Add(tsunami.Areas[i].Name);
+                                    else grades[5].Add(tsunami.Areas[i].Name);
+                                    break;
+                            }
+                        }
+                        int cnt = 0;
+                        for (int i = 0; i < index.Count; i++) cnt += APIs.GetLen(index[i]) + 1;
+                        bool IsFirst = false;
+                        for (int i = 0; i < grades.Length; i++)
+                        {
+                            if (grades[i].Count != 0)
+                            {
+                                if (IsFirst)
+                                {
+                                    index.Add("");
+                                    cnt++;
+                                }
+                                else
+                                    IsFirst = true;
+                                switch (i)
+                                {
+                                    case 0:
+                                        index.Add("🟥⬜大津波警報 (まもなく到達)");
+                                        break;
+                                    case 1:
+                                        index.Add("🟥⬜大津波警報");
+                                        break;
+                                    case 2:
+                                        index.Add("🟥津波警報 (まもなく到達)");
+                                        break;
+                                    case 3:
+                                        index.Add("🟥津波警報");
+                                        break;
+                                    case 4:
+                                        index.Add("🟨津波注意報 (まもなく到達)");
+                                        break;
+                                    case 5:
+                                        index.Add("🟨津波注意報");
+                                        break;
+                                }
+                                string tmp = index[^1];
+                                cnt += APIs.GetLen(index[^1]) + 1;
+                                string text = string.Empty;
+                                for (int j = 0; j < grades[i].Count; j++)
+                                {
+                                    if (text.Length + grades[i][j].Length + 1 > 20)
+                                    {
+                                        if (cnt + APIs.GetLen(text) + 1 > 250)
+                                        {
+                                            string t = string.Empty;
+                                            for (int k = 0; k < index.Count; k++)
+                                            {
+                                                t += index[k] + '\n';
+                                            }
+                                            index.Clear();
+                                            TweetList.Add(t);
+                                            index.Add(tmp);
+                                            cnt = APIs.GetLen(tmp);
+                                        }
+                                        index.Add(text);
+                                        cnt += APIs.GetLen(text) + 1;
+                                        text = $"{grades[i][j]}";
+                                    }
+                                    else
+                                    {
+                                        if (j != 0) text += " ";
+                                        text += $"{grades[i][j]}";
+                                    }
+                                }
+                                Log.Logger.GetInstance().Debug("2");
+                                cnt += APIs.GetLen(text) + 1;
+                                index.Add(text);
+                                if (cnt > 230)
+                                {
+                                    string t = string.Empty;
+                                    for (int k = 0; k < index.Count; k++)
+                                    {
+                                        t += index[k] + '\n';
+                                    }
+                                    cnt = 0;
+                                    index.Clear();
+                                    TweetList.Add(t);
+                                }
+                            }
+                        }
+                        string l = string.Empty;
+                        for (int k = 0; k < index.Count; k++)
+                            l += index[k] + '\n';
+                        index.Clear();
+                        if (!string.IsNullOrWhiteSpace(l.Replace('\n', ' ')))
+                            TweetList.Add(l);
+                    }
+                    long Latest = 0;
+                    for (int i = 0; i < TweetList.Count; i++)
+                    {
+                        TweetList[i] += "#MisakiEQ #津波";
+                        if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
+                        //Latest = await APIs.GetInstance().Tweet(TweetList[i], Latest);
+                        Log.Logger.GetInstance().Debug(TweetList[i]);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.GetInstance().Error(ex);
+                }
+            }
+        }
+    }
+}

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MisakiEQ.Funcs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -90,8 +91,8 @@ namespace MisakiEQ.GUI
                 EEW_Compact.Show();
                 EEW_Compact.Activate();
             });
-            Lib.Twitter.Tweets.GetInstance().EEWPost(e.eew);
-            Funcs.Toast.Post(e.eew);
+            if(Lib.Twitter.APIs.GetInstance().Config.TweetEnabled)Tweets.GetInstance().EEWPost(e.eew);
+            Toast.Post(e.eew);
         }
         
 
@@ -99,13 +100,15 @@ namespace MisakiEQ.GUI
         {
             if (e.data == null) return;
             Log.Logger.GetInstance().Debug($"地震情報のイベントが発生: {e.data.Details.OriginTime:d日HH:mm} {Struct.EarthQuake.TypeToString(e.data.Issue.Type)}");
-            Funcs.Toast.Post(e.data);
+            Tweets.GetInstance().EarthquakePost(e.data);
+            Toast.Post(e.data);
         }
         private void EventTsunami(object? sender, Background.API.TsunamiEventArgs e)
         {
             if (e.data == null) return;
             Log.Logger.GetInstance().Debug($"津波情報のイベントが発生: {e.data.CreatedAt:d日HH:mm} 津波発表エリア数:{e.data.Areas.Count}件");
-            Funcs.Toast.Post(e.data);
+            Tweets.GetInstance().TsunamiPost(e.data);
+            Toast.Post(e.data);
         }
 
         private void TrayIcon_MouseDoubleClick(object sender, MouseEventArgs e)

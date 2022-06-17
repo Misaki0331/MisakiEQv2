@@ -162,7 +162,28 @@ namespace MisakiEQ.Background.API
                 return false;
             }
         }
-
+        public void Test(string json)
+        {
+            var Data = JsonConvert.DeserializeObject<EQInfo.JSON.Root>(json);
+            if (Data == null) return;
+            switch (Data.code)
+            {
+                case 551:
+                    if (EarthQuakeUpdateHandler != null)
+                    {
+                        var args = new EarthQuakeEventArgs(Struct.EarthQuake.GetData(Data));
+                        EarthQuakeUpdateHandler(this, args);
+                    }
+                    break;
+                case 552:
+                    if (TsunamiUpdateHandler != null)
+                    {
+                        var args = new TsunamiEventArgs(Struct.Tsunami.GetData(Data));
+                        TsunamiUpdateHandler(this, args);
+                    }
+                    break;
+            }
+        }
     }
     class EarthQuakeEventArgs
     {

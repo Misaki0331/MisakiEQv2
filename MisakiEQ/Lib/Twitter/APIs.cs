@@ -11,6 +11,7 @@ namespace MisakiEQ.Lib.Twitter
 {
     public class APIs
     {
+        public readonly Config Config = new();
         private static APIs? singleton = null;
         /// <summary>
         /// インスタンスを生成する
@@ -22,6 +23,21 @@ namespace MisakiEQ.Lib.Twitter
                 singleton = new APIs();
             }
             return singleton;
+        }
+        public static int GetLen(string str)
+        {
+            var replace = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&'()=~|-^\\@[`{;:]+*},./<>?\n";
+            for(int i = 0; i < replace.Length; i++)
+            {
+                str = str.Replace(replace[i], ' ');
+            }
+            int len = 0;
+            for(int i = 0; i < str.Length; i++)
+            {
+                if (str[i] == ' ') len++;
+                else len += 2;
+            }
+            return len;
         }
 
         TwitterClient? client = null;
