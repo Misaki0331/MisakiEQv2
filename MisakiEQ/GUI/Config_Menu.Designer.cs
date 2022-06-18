@@ -31,23 +31,20 @@
             this.components = new System.ComponentModel.Container();
             this.SettingTabs = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.button2 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.TwitterAuthInfo = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.TestButton = new System.Windows.Forms.CheckBox();
             this.LabelTime = new System.Windows.Forms.Label();
             this.LabelDate = new System.Windows.Forms.Label();
             this.UpdateDataTimer = new System.Windows.Forms.Timer(this.components);
             this.ButtonApply = new System.Windows.Forms.Button();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOK = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.SettingTabs.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -66,6 +63,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.groupBox3);
             this.tabPage1.Controls.Add(this.groupBox2);
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
@@ -76,6 +74,15 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "一般";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Location = new System.Drawing.Point(351, 6);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(338, 335);
+            this.groupBox3.TabIndex = 6;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "SNS関連投稿の設定";
             // 
             // groupBox2
             // 
@@ -97,14 +104,10 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.checkBox1);
-            this.tabPage2.Controls.Add(this.button2);
-            this.tabPage2.Controls.Add(this.textBox1);
             this.tabPage2.Controls.Add(this.TwitterAuthInfo);
             this.tabPage2.Controls.Add(this.button3);
             this.tabPage2.Controls.Add(this.textBox2);
             this.tabPage2.Controls.Add(this.button1);
-            this.tabPage2.Controls.Add(this.TestButton);
             this.tabPage2.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
@@ -113,26 +116,6 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "テスト用";
             this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(643, 315);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(113, 23);
-            this.button2.TabIndex = 13;
-            this.button2.Text = "Earthquakeテスト";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(399, 40);
-            this.textBox1.MaxLength = 6553600;
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(357, 269);
-            this.textBox1.TabIndex = 12;
             // 
             // TwitterAuthInfo
             // 
@@ -168,18 +151,6 @@
             this.button1.Text = "TwitterAuth";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // TestButton
-            // 
-            this.TestButton.Appearance = System.Windows.Forms.Appearance.Button;
-            this.TestButton.Location = new System.Drawing.Point(6, 6);
-            this.TestButton.Name = "TestButton";
-            this.TestButton.Size = new System.Drawing.Size(104, 24);
-            this.TestButton.TabIndex = 5;
-            this.TestButton.Text = "発信テスト";
-            this.TestButton.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.TestButton.UseVisualStyleBackColor = true;
-            this.TestButton.CheckedChanged += new System.EventHandler(this.TestButton_CheckedChanged);
             // 
             // LabelTime
             // 
@@ -235,16 +206,6 @@
             this.ButtonOK.UseVisualStyleBackColor = true;
             this.ButtonOK.Click += new System.EventHandler(this.ButtonOK_Click);
             // 
-            // checkBox1
-            // 
-            this.checkBox1.Appearance = System.Windows.Forms.Appearance.Button;
-            this.checkBox1.Location = new System.Drawing.Point(114, 234);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(103, 27);
-            this.checkBox1.TabIndex = 14;
-            this.checkBox1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
             // Config_Menu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -285,14 +246,11 @@
         private Button ButtonCancel;
         private Button ButtonOK;
         private GroupBox groupBox1;
-        private CheckBox TestButton;
         private Button button1;
         private Button button3;
         private TextBox textBox2;
         private Label TwitterAuthInfo;
         private GroupBox groupBox2;
-        private Button button2;
-        private TextBox textBox1;
-        private CheckBox checkBox1;
+        private GroupBox groupBox3;
     }
 }

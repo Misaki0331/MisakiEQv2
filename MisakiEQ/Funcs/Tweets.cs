@@ -111,8 +111,8 @@ namespace MisakiEQ.Funcs
                         }
                     }
                     var twitter = APIs.GetInstance();
-                    //LatestID = await twitter.Tweet(reply: LatestID, tweet: "@null " + TweetIndex);
-                    Log.Logger.GetInstance().Debug(TweetIndex);
+                    LatestID = await twitter.Tweet(reply: LatestID, tweet: "@null " + TweetIndex);
+                    Log.Logger.GetInstance().Debug($"ツイートしました。 ID:{LatestID}\n" + TweetIndex);
                     if (Index != -1)
                     {
                         EEWReplyList[Index].LatestTweet = LatestID;
@@ -247,7 +247,7 @@ namespace MisakiEQ.Funcs
                     }
                     for (int i = 0; i < TweetIndexs.Count; i++)
                     {
-                        //LatestTweet = await APIs.GetInstance().Tweet(TweetIndexs[i], LatestTweet);
+                        LatestTweet = await APIs.GetInstance().Tweet(TweetIndexs[i], LatestTweet);
                         Log.Logger.GetInstance().Debug($"ツイートしました。 ID:{LatestTweet}\n" + TweetIndexs[i]);
                     }
                     if (!IsExist)
@@ -405,8 +405,8 @@ namespace MisakiEQ.Funcs
                     {
                         TweetList[i] += "#MisakiEQ #津波";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
-                        //Latest = await APIs.GetInstance().Tweet(TweetList[i], Latest);
-                        Log.Logger.GetInstance().Debug(TweetList[i]);
+                        Latest = await APIs.GetInstance().Tweet(TweetList[i], Latest);
+                        Log.Logger.GetInstance().Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
                     }
                 }
                 catch (Exception ex)

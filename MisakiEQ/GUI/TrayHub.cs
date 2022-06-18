@@ -44,8 +44,22 @@ namespace MisakiEQ.GUI
         {
             if (Instance != null && !Instance.IsDisposed)
             {
+                Instance.ErrorClosing();
                 Instance.Close();
+
             }
+        }
+        public async void ErrorClosing()
+        {
+            TrayIcon.Visible = false;
+            if (Config != null && !Config.IsDisposed) Config.Close();
+            if (Kyoshin != null && !Kyoshin.IsDisposed) Kyoshin.Close();
+            if (EEW_Compact != null && !EEW_Compact.IsDisposed) EEW_Compact.Close();
+            if (Init != null && !Init.IsDisposed) Init.Close();
+            Log.Logger.GetInstance().Debug("APIスレッドを終了中です...");
+            var ApiStop = Background.APIs.GetInstance().Abort();
+            await ApiStop;
+            Log.Logger.GetInstance().Debug("APIスレッド終了完了");
         }
         public static bool IsAlliveInstance()
         {
@@ -87,11 +101,21 @@ namespace MisakiEQ.GUI
             //ToDo: 緊急地震速報のイベント処理を入れる
             EEW_Compact.Invoke(() =>
             {
+                if (!EEW_Compact.Visible && !EEW_Compact.IsShowFromEEW)
+                {
+                    EEW_Compact.IsShowFromEEW = true;
+                    EEW_Compact.HideTimer.Start();
+                }
+                else if(EEW_Compact.IsShowFromEEW)
+                {
+                    EEW_Compact.HideTimer.Stop();
+                    EEW_Compact.HideTimer.Start();
+                }
                 EEW_Compact.SetInfomation(e.eew);
                 EEW_Compact.Show();
                 EEW_Compact.Activate();
             });
-            if(Lib.Twitter.APIs.GetInstance().Config.TweetEnabled)Tweets.GetInstance().EEWPost(e.eew);
+            if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EEWPost(e.eew);
             Toast.Post(e.eew);
         }
         
@@ -100,14 +124,14 @@ namespace MisakiEQ.GUI
         {
             if (e.data == null) return;
             Log.Logger.GetInstance().Debug($"地震情報のイベントが発生: {e.data.Details.OriginTime:d日HH:mm} {Struct.EarthQuake.TypeToString(e.data.Issue.Type)}");
-            Tweets.GetInstance().EarthquakePost(e.data);
+            if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EarthquakePost(e.data);
             Toast.Post(e.data);
         }
         private void EventTsunami(object? sender, Background.API.TsunamiEventArgs e)
         {
             if (e.data == null) return;
             Log.Logger.GetInstance().Debug($"津波情報のイベントが発生: {e.data.CreatedAt:d日HH:mm} 津波発表エリア数:{e.data.Areas.Count}件");
-            Tweets.GetInstance().TsunamiPost(e.data);
+            if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().TsunamiPost(e.data);
             Toast.Post(e.data);
         }
 

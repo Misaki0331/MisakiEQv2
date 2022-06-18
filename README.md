@@ -69,4 +69,4 @@ MisakiEQはWindows上で動作する地震通知アプリケーションです�
 - [TweetinviAPI](https://github.com/linvi/tweetinvi) (TwitterBotの製作に使用)
 - [DiscordRichPresence](https://github.com/Lachee/discord-rpc-csharp) (Discord RPCのデータ更新に使用)
 - [Microsoft.Toolkit.Uwp.Notificaitions](https://github.com/CommunityToolkit/WindowsCommunityToolkit) (Windows10以降の通知のカスタマイズ)
-- [Newtonsoft.Json](https://www.newtonsoft.com/json) (APIに使用するJSON関係の処理)
+- [Newtonsoft.Json](https://www.newtonsoft.com/json) (APIに使用するJSON関係の処理)  

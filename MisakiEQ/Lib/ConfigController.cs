@@ -26,6 +26,7 @@ namespace MisakiEQ.Lib.ConfigController
         public TrackBar ToolTrack = new();
         public NumericUpDown ToolNumUD = new();
         public TextBox ToolTextBox = new();
+        public CheckBox ToolCheckBox = new();
         readonly Config.Funcs.IndexData cl;
         void LongInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
         {
@@ -76,6 +77,19 @@ namespace MisakiEQ.Lib.ConfigController
             ToolTextBox.Text = (string)data.GetValue();
             ToolTextBox.TextChanged += new EventHandler(TextBoxChanged);
         }
+        void BoolInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
+        {
+            gb.Controls.Add(ToolCheckBox);
+            ToolCheckBox.Location = new Point(122, 22 + pos * 23);
+            ToolCheckBox.Size = new Size(189, 23);
+            ToolCheckBox.Checked = (bool)data.GetValue();
+            if (ToolCheckBox.Checked)
+                ToolCheckBox.Text = cl.GetToggleOnText();
+            else ToolCheckBox.Text = cl.GetToggleOffText();
+            ToolCheckBox.Appearance = Appearance.Button;
+            ToolCheckBox.CheckedChanged += new EventHandler(CheckBoxChanged);
+            ToolCheckBox.TextAlign = ContentAlignment.MiddleCenter;
+        }
         public ToolBox(GroupBox gb, Config.Funcs.IndexData data, int pos)//,)
         {
             cl = data;
@@ -89,6 +103,7 @@ namespace MisakiEQ.Lib.ConfigController
             {
                 case "long":LongInit(gb,data, pos);break;
                 case "string":StringInit(gb, data, pos); break;
+                case "bool":BoolInit(gb, data, pos);break;
             }
 
             
@@ -96,17 +111,24 @@ namespace MisakiEQ.Lib.ConfigController
         void TrackChanged(object? sender, EventArgs e)
         {
                 ToolNumUD.Value = (decimal)((double)ToolTrack.Value / cl.GetDisplayMag());
-                cl.SetValue((long)ToolTrack.Value);
+                cl.SetValue(ToolTrack.Value);
 
         }
         void NumUDChanged(object? sender, EventArgs e)
         {
                 ToolTrack.Value = (int)((double)ToolNumUD.Value * cl.GetDisplayMag());
-                cl.SetValue((long)ToolTrack.Value);
+                cl.SetValue(ToolTrack.Value);
         }
         void TextBoxChanged(object? sender, EventArgs e)
         {
             cl.SetValue(ToolTextBox.Text);
+        }
+        void CheckBoxChanged(object? sender, EventArgs e)
+        {
+            cl.SetValue(ToolCheckBox.Checked);
+            if (ToolCheckBox.Checked)
+                ToolCheckBox.Text = cl.GetToggleOnText();
+            else ToolCheckBox.Text = cl.GetToggleOffText();
         }
     }
 }

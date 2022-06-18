@@ -16,6 +16,7 @@ namespace MisakiEQ.GUI
 #pragma warning disable IDE0052 // 読み取られていないプライベート メンバーを削除
         readonly Lib.ConfigController.Controller? ConnectionSetting;
         readonly Lib.ConfigController.Controller? UserSetting;
+        readonly Lib.ConfigController.Controller? SNSSetting;
 #pragma warning restore IDE0052 // 読み取られていないプライベート メンバーを削除
 
         Twitter.Auth? TwitterAuthGUI = null;
@@ -25,6 +26,7 @@ namespace MisakiEQ.GUI
             var config = Lib.Config.Funcs.GetInstance().Configs;
             ConnectionSetting = new Lib.ConfigController.Controller(groupBox1, config.Connections);
             UserSetting = new Lib.ConfigController.Controller(groupBox2, config.UserSetting);
+            SNSSetting = new Lib.ConfigController.Controller(groupBox3, config.SNSSetting);
         }
 
         
@@ -60,10 +62,6 @@ namespace MisakiEQ.GUI
             UpdateDataTimer.Start();
         }
 
-        private void TestButton_CheckedChanged(object sender, EventArgs e)
-        {
-            Background.APIs.GetInstance().EEW.IsTest = TestButton.Checked;
-        }
         private async void button1_Click(object sender, EventArgs e)
         {
             try
@@ -96,9 +94,5 @@ namespace MisakiEQ.GUI
         {
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            Background.APIs.GetInstance().EQInfo.Test(textBox1.Text);
-        }
     }
 }

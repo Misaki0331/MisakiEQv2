@@ -35,6 +35,8 @@
             this.ExitApplication = new System.Windows.Forms.ToolStripMenuItem();
             this.DisplayEEWInfo = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenKmoni = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.ApplicationMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -48,12 +50,14 @@
             // ApplicationMenu
             // 
             this.ApplicationMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.OpenConfig,
-            this.ExitApplication,
             this.DisplayEEWInfo,
-            this.OpenKmoni});
+            this.OpenKmoni,
+            this.toolStripSeparator1,
+            this.OpenConfig,
+            this.toolStripSeparator2,
+            this.ExitApplication});
             this.ApplicationMenu.Name = "ApplicationMenu";
-            this.ApplicationMenu.Size = new System.Drawing.Size(181, 114);
+            this.ApplicationMenu.Size = new System.Drawing.Size(181, 126);
             this.ApplicationMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ApplicationMenu_Opening);
             // 
             // OpenConfig
@@ -84,6 +88,16 @@
             this.OpenKmoni.Text = "強震モニタ";
             this.OpenKmoni.Click += new System.EventHandler(this.OpenKmoni_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            // 
             // TrayHub
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -107,5 +121,7 @@
         private ToolStripMenuItem OpenConfig;
         private ToolStripMenuItem DisplayEEWInfo;
         private ToolStripMenuItem OpenKmoni;
+        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripSeparator toolStripSeparator2;
     }
 }

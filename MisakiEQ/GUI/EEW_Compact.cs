@@ -178,6 +178,7 @@ namespace MisakiEQ.GUI
 
         private void EEW_Compact_FormClosing(object sender, FormClosingEventArgs e)
         {
+            IsShowFromEEW = false;
             e.Cancel = true;
             Hide();
         }
@@ -205,6 +206,12 @@ namespace MisakiEQ.GUI
             });
             
         }
-
+        public bool IsShowFromEEW = false;
+        private void HideTimer_Tick(object sender, EventArgs e)
+        {
+            IsShowFromEEW = false;
+            Hide();
+            HideTimer.Stop();
+        }
     }
 }

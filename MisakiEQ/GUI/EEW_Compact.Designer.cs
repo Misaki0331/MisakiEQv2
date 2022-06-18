@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.SignalType = new System.Windows.Forms.Label();
             this.MaxIntensity = new System.Windows.Forms.Label();
             this.MaxIntensityLabel = new System.Windows.Forms.Label();
@@ -41,6 +42,7 @@
             this.AreaIntensity = new System.Windows.Forms.Label();
             this.WarnLabel = new System.Windows.Forms.Label();
             this.Forecasts = new System.Windows.Forms.Label();
+            this.HideTimer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // SignalType
@@ -193,6 +195,11 @@
             this.Forecasts.Size = new System.Drawing.Size(634, 118);
             this.Forecasts.TabIndex = 17;
             // 
+            // HideTimer
+            // 
+            this.HideTimer.Interval = 1800000;
+            this.HideTimer.Tick += new System.EventHandler(this.HideTimer_Tick);
+            // 
             // EEW_Compact
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -246,5 +253,6 @@
         private System.Windows.Forms.Label AreaIntensity;
         private Label WarnLabel;
         private Label Forecasts;
+        public System.Windows.Forms.Timer HideTimer;
     }
 }

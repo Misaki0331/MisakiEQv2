@@ -41,6 +41,10 @@ namespace MisakiEQ.Lib.Config
                 {
                     sw.WriteLine($"{Configs.UserSetting[i].GetName()}={Configs.UserSetting[i].ConfigWrite()}");
                 }
+                for (int i = 0; i < Configs.SNSSetting.Count; i++)
+                {
+                    sw.WriteLine($"{Configs.SNSSetting[i].GetName()}={Configs.SNSSetting[i].ConfigWrite()}");
+                }
                 sw.Close();
 
                 TmpConfigs = Configs.Clone();
@@ -60,6 +64,7 @@ namespace MisakiEQ.Lib.Config
             int PASS = 0, TOTAL = 0;
             try
             {
+                Log.Logger.GetInstance().Debug("Config読込開始");
                 using var sr = new StreamReader(CfgFile, Encoding.UTF8);
                 while (true)
                 {
@@ -71,6 +76,8 @@ namespace MisakiEQ.Lib.Config
                         try
                         {
                             SetConfigValue(lines[0],lines[1]);
+
+                            Log.Logger.GetInstance().Debug($"{line}");
                             PASS++;
                         }catch(Exception ex)
                         {
@@ -99,17 +106,18 @@ namespace MisakiEQ.Lib.Config
         public void ApplyConfig()
         {
             var api = APIs.GetInstance();
-            api.EEW.Config.Delay = (uint)GetConfigValue("API_EEW_Delay");
-            api.EEW.Config.DelayDetectMode = (uint)GetConfigValue("API_EEW_DelayDetectMode");
-            api.EEW.Config.DelayDetectCoolDown = (uint)GetConfigValue("API_EEW_DelayDetectCoolDown"); 
-            api.EQInfo.Config.Delay = (uint)GetConfigValue("API_EQInfo_Delay");
-            api.EQInfo.Config.Limit = (uint)GetConfigValue("API_EQInfo_Limit");
-            api.KyoshinAPI.Config.KyoshinDelayTime = (int)GetConfigValue("API_K-moni_Delay");
-            api.KyoshinAPI.Config.KyoshinFrequency = (int)GetConfigValue("API_K-moni_Frequency");
-            api.KyoshinAPI.Config.AutoAdjustKyoshinTime = (int)GetConfigValue("API_K-moni_Adjust")*60;
+            api.EEW.Config.Delay = (uint)(GetConfigValue("API_EEW_Delay") as long ? ?? long.MaxValue);
+            api.EEW.Config.DelayDetectMode = (uint)(GetConfigValue("API_EEW_DelayDetectMode") as long? ?? long.MaxValue);
+            api.EEW.Config.DelayDetectCoolDown = (uint)(GetConfigValue("API_EEW_DelayDetectCoolDown") as long? ?? long.MaxValue); 
+            api.EQInfo.Config.Delay = (uint)(GetConfigValue("API_EQInfo_Delay") as long? ?? long.MaxValue);
+            api.EQInfo.Config.Limit = (uint)(GetConfigValue("API_EQInfo_Limit") as long? ?? long.MaxValue);
+            api.KyoshinAPI.Config.KyoshinDelayTime = (int)(GetConfigValue("API_K-moni_Delay") as long? ?? long.MaxValue);
+            api.KyoshinAPI.Config.KyoshinFrequency = (int)(GetConfigValue("API_K-moni_Frequency") as long? ?? long.MaxValue);
+            api.KyoshinAPI.Config.AutoAdjustKyoshinTime = (int)(GetConfigValue("API_K-moni_Adjust") as long? ?? long.MaxValue) * 60;
             var gui = APIs.GetInstance().KyoshinAPI.Config;
-            gui.UserLong = GetConfigValue("USER_Pos_Long")/10000.0;
-            gui.UserLat = GetConfigValue("USER_Pos_Lat") / 10000.0;
+            gui.UserLong = (int)(GetConfigValue("USER_Pos_Long") as long? ?? long.MaxValue) / 10000.0;
+            gui.UserLat = (int)(GetConfigValue("USER_Pos_Lat") as long? ?? long.MaxValue) / 10000.0;
+            Lib.Twitter.APIs.GetInstance().Config.TweetEnabled = (GetConfigValue("Twitter_Enable_Tweet") as bool? ?? false);
         }
         IndexData? GetConfigClass(string name)
         {
@@ -127,14 +135,23 @@ namespace MisakiEQ.Lib.Config
                     return Configs.UserSetting[i];
                 }
             }
+
+            for (int i = 0; i < Configs.SNSSetting.Count; i++)
+            {
+                if (Configs.SNSSetting[i].GetName() == name)
+                {
+                    return Configs.SNSSetting[i];
+                }
+            }
             return null;
         }
-        long GetConfigValue(string name)
+        object GetConfigValue(string name)
         {
             var cls = GetConfigClass(name);
             if (cls == null) return 0;
-            return (long)cls.GetValue();
+            return (object)cls.GetValue();
         }
+
 
         void SetConfigValue(string name, string value, bool IsThrow=true)
         {
@@ -156,6 +173,7 @@ namespace MisakiEQ.Lib.Config
         {
             public readonly List<IndexData> Connections=new();
             public readonly List<IndexData> UserSetting=new();
+            public readonly List<IndexData> SNSSetting = new();
             public Cfg()
             {
                 Connections.Add(new IndexData("API_EEW_Delay","EEW標準遅延",unitName:"秒",displayMag:1000, description:"標準状態の緊急地震速報の遅延時間です。", min:1000, max:5000, def:1000));   //通常時の遅延(ms)
@@ -168,6 +186,7 @@ namespace MisakiEQ.Lib.Config
                 Connections.Add(new IndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
                 UserSetting.Add(new IndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数
                 UserSetting.Add(new IndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
+                SNSSetting.Add(new IndexData("Twitter_Enable_Tweet", "自動ツイートの有効化", "自動でユーザーに地震情報をツイートします", def: false, "自動ツイートが有効", "自動ツイートが無効"));
             }
             public Cfg Clone()
             {
@@ -199,7 +218,7 @@ namespace MisakiEQ.Lib.Config
                 StringValue = def;
                 Type = "string";
             }
-            public IndexData(string name,string title,string description="",bool def = false)
+            public IndexData(string name,string title, string description = "", bool def = false, string ToggleOnText = "", string ToggleOffText = "")
             {
                 Name = name;
                 Title = title;
@@ -207,6 +226,8 @@ namespace MisakiEQ.Lib.Config
                 BooleanDefault = def;
                 BooleanValue = def;
                 Type = "bool";
+                BoolToggleOn = ToggleOnText;
+                BoolToggleOff = ToggleOffText;
             }
             public void SetValue(long val)
             {
@@ -231,7 +252,7 @@ namespace MisakiEQ.Lib.Config
                 {
                     "long" => (object)(long)LongValue,
                     "string"=> (object)(string)StringValue,
-                    "bool"=> (object)(bool)BooleanValue,
+                    "bool" => (object)(bool)BooleanValue,
                     _ => throw new NullReferenceException("タイプが一致しません。"),
                 };
             }
@@ -240,9 +261,9 @@ namespace MisakiEQ.Lib.Config
             {
                 return Type switch
                 {
-                    "long" => (object)(long)LongValue,
-                    "string" => (object)(string)StringValue.Replace("%","%%").Replace("=","%3D").Replace("\n","%0D"),
-                    "bool" => (object)(string)(BooleanValue?"true":"false"),
+                    "long" => (object)LongValue,
+                    "string" => StringValue.Replace("%","%%").Replace("=","%3D").Replace("\n","%0D"),
+                    "bool" => BooleanValue,
                     _ => throw new NullReferenceException("タイプが一致しません。"),
                 };
             }
@@ -297,7 +318,7 @@ namespace MisakiEQ.Lib.Config
                 return Type switch
                 {
                     "long" => (object)LongMin,
-                    _ => throw new NullReferenceException("タイプが一致しません。"),
+                    _ => throw new ArgumentException("タイプが一致しません。"),
                 };
             }
             public object GetMax()
@@ -305,7 +326,23 @@ namespace MisakiEQ.Lib.Config
                 return Type switch
                 {
                     "long" => (object)LongMax,
-                    _ => throw new NullReferenceException("タイプが一致しません。"),
+                    _ => throw new ArgumentException("タイプが一致しません。"),
+                };
+            }
+            public string GetToggleOffText()
+            {
+                return Type switch
+                {
+                    "bool" => BoolToggleOff,
+                    _ => throw new ArgumentException("タイプが一致しません。")
+                };
+            }
+            public string GetToggleOnText()
+            {
+                return Type switch
+                {
+                    "bool" => BoolToggleOn,
+                    _ => throw new ArgumentException("タイプが一致しません。")
                 };
             }
 
@@ -316,7 +353,7 @@ namespace MisakiEQ.Lib.Config
                     "long" => (object)LongDefault,
                     "string"=> (object)StringDefault,
                     "bool"=>(object)BooleanDefault,
-                    _ => throw new NullReferenceException("タイプが一致しません。"),
+                    _ => throw new ArgumentException("タイプが一致しません。"),
                 };
             }
             public string GetUnitName()
@@ -324,7 +361,7 @@ namespace MisakiEQ.Lib.Config
                 return Type switch
                 {
                     "long" => UnitName,
-                    _ => throw new NullReferenceException("タイプが一致しません。"),
+                    _ => throw new ArgumentException("タイプが一致しません。"),
                 };
             }
             public double GetDisplayMag()
@@ -332,7 +369,7 @@ namespace MisakiEQ.Lib.Config
                 return Type switch
                 {
                     "long" => DisplayMag,
-                    _ => throw new NullReferenceException("タイプが一致しません。"),
+                    _ => throw new ArgumentException("タイプが一致しません。"),
                 };
             }
 
@@ -351,6 +388,8 @@ namespace MisakiEQ.Lib.Config
             readonly string StringDefault="";
             bool BooleanValue = false;
             readonly bool BooleanDefault = false;
+            string BoolToggleOn = "";
+            string BoolToggleOff = "";
 
         }
     }

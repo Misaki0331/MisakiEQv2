@@ -26,10 +26,16 @@
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.2" />
     <PackageReference Include="NAudio" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Management" Version="6.0.0" />
     <PackageReference Include="TweetinviAPI" Version="5.0.4" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Properties\Images.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Images.resx</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -40,9 +46,18 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Sound.resx</DependentUpon>
     </Compile>
+    <Compile Update="Properties\version.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Version.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Properties\Images.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Images.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -50,6 +65,10 @@
     <EmbeddedResource Update="Properties\Sound.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Sound.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Version.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>version.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
