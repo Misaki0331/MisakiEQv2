@@ -111,11 +111,14 @@ namespace MisakiEQ.Funcs
                         }
                     }
                     var twitter = APIs.GetInstance();
-                    LatestID = await twitter.Tweet(reply: LatestID, tweet: "@null " + TweetIndex);
+                    LatestID = await twitter.Tweet(reply: LatestID, tweet: TweetIndex);
                     Log.Logger.GetInstance().Debug($"ツイートしました。 ID:{LatestID}\n" + TweetIndex);
                     if (Index != -1)
                     {
-                        EEWReplyList[Index].LatestTweet = LatestID;
+                        if (LatestID != 1)
+                        {
+                            EEWReplyList[Index].LatestTweet = LatestID;
+                        }
                         EEWReplyList[Index].LatestTime = DateTime.Now;
                     }
                     else
@@ -151,7 +154,7 @@ namespace MisakiEQ.Funcs
                             index.Add($"震源情報 - {eq.Details.OriginTime:M/dd H:mm}頃");
                             index.Add($"震源地: {eq.Details.Hypocenter}");
                             index.Add($"震源の深さ: {Struct.Common.DepthToString(eq.Details.Depth)}");
-                            index.Add($"地震の規模: Ｍ{eq.Details.Magnitude}:0.0");
+                            index.Add($"地震の規模: Ｍ{eq.Details.Magnitude:0.0}");
                             index.Add($"この地震による{Struct.EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}");
                             break;
                         case Struct.EarthQuake.EarthQuakeType.ScaleAndDestination:
@@ -216,13 +219,14 @@ namespace MisakiEQ.Funcs
                     }
                     bool IsExist = false;
                     long LatestTweet = 0;
-
+                    EarthquakeTweet eqdata = new(eq.Details.OriginTime,0);
                     for (int i = 0; i < EQReplyList.Count; i++)
                     {
                         if (eq.Details.OriginTime == EQReplyList[i].OriginTime)
                         {
                             IsExist = true;
                             LatestTweet = EQReplyList[i].LatestTweet;
+                            eqdata=EQReplyList[i];
                             break;
                         }
                     }
@@ -247,11 +251,18 @@ namespace MisakiEQ.Funcs
                     }
                     for (int i = 0; i < TweetIndexs.Count; i++)
                     {
-                        LatestTweet = await APIs.GetInstance().Tweet(TweetIndexs[i], LatestTweet);
-                        Log.Logger.GetInstance().Debug($"ツイートしました。 ID:{LatestTweet}\n" + TweetIndexs[i]);
+                        long id= await APIs.GetInstance().Tweet(TweetIndexs[i], eqdata.LatestTweet);
+                        if (id != -1)
+                        {
+                            eqdata.LatestTweet = id;
+                        }
+                        else
+                        {
+                            Log.Logger.GetInstance().Warn($"ツイートできませんでした。\n{TweetIndexs[i]}");
+                        }
                     }
                     if (!IsExist)
-                        EQReplyList.Add(new(eq.Details.OriginTime, LatestTweet));
+                        EQReplyList.Add(new(eq.Details.OriginTime, eqdata.LatestTweet));
                     for (int i = EQReplyList.Count - 1; i >= 0; i--)
                     {
                         TimeSpan T = DateTime.Now - EQReplyList[i].LatestTime;
