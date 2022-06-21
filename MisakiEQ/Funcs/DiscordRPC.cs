@@ -47,7 +47,7 @@ namespace MisakiEQ.Funcs
             switch (eq.Issue.Type)
             {
                 case EarthQuake.EarthQuakeType.ScalePrompt:
-                    detail = $"【震度速報】{eq.Details.OriginTime:D日h:mm}頃 最大震度{Common.IntToStringLong(eq.Details.MaxIntensity)}";
+                    detail = $"【震度】{eq.Details.OriginTime:d日H:mm}頃 最大:{Common.IntToStringLong(eq.Details.MaxIntensity)}";
                     var list = eq.Details.PrefIntensity.GetIntensityPrefectures();
                     if (list.Count > 0)
                     {
@@ -63,15 +63,15 @@ namespace MisakiEQ.Funcs
                     }
                     break;
                 case EarthQuake.EarthQuakeType.Destination:
-                    detail = $"【震源情報】{eq.Details.OriginTime:D日h:mm}頃";
+                    detail = $"【震源情報】{eq.Details.OriginTime:d日H:mm}頃";
                     status = $"{eq.Details.Hypocenter} 深さ:{Common.DepthToString(eq.Details.Depth)} M{eq.Details.Magnitude:0.0}";
                     break;
                 case EarthQuake.EarthQuakeType.ScaleAndDestination:
-                    detail = $"【震度・震源情報】{eq.Details.OriginTime:D日h:mm}頃";
+                    detail = $"【震度・震源】{eq.Details.OriginTime:d日H:mm}頃";
                     status = $"{eq.Details.Hypocenter} 深さ:{Common.DepthToString(eq.Details.Depth)} M{eq.Details.Magnitude:0.0}";
                     break;
                 case EarthQuake.EarthQuakeType.DetailScale:
-                    detail = $"【詳細情報】{eq.Details.OriginTime:D日h:mm}頃 最大震度{Common.IntToStringLong(eq.Details.MaxIntensity)}";
+                    detail = $"【詳細】{eq.Details.OriginTime:d日H:mm}頃 最大:{Common.IntToStringLong(eq.Details.MaxIntensity)}";
                     status = $"{eq.Details.Hypocenter} 深さ:{Common.DepthToString(eq.Details.Depth)} M{eq.Details.Magnitude:0.0}"; 
                     list = eq.Details.PrefIntensity.GetIntensityPrefectures();
                     if (list.Count > 0)
