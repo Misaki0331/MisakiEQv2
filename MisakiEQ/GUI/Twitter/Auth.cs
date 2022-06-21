@@ -15,6 +15,7 @@ namespace MisakiEQ.GUI.Twitter
         public Auth()
         {
             InitializeComponent();
+            Icon = Properties.Resources.Logo_MainIcon;
         }
         private void Pincode_KeyPress(object sender, KeyPressEventArgs e)
         {

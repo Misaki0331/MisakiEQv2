@@ -131,6 +131,7 @@
             this.Controls.Add(this.KyoshinImage);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "KyoshinWindow";
+            this.ShowInTaskbar = false;
             this.Text = "MisakiEQ 強震モニタ";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.KyoshinWindow_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.KyoshinImage)).EndInit();

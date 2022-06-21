@@ -18,6 +18,7 @@ namespace MisakiEQ.GUI.ExApp
             InitializeComponent();
             KyoshinType.SelectedIndex = 0;
             Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin += UpdateImage;
+            Icon = Properties.Resources.Logo_MainIcon;
         }
 
         private void Position_CheckedChanged(object sender, EventArgs e)

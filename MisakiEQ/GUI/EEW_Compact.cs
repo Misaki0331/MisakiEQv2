@@ -15,6 +15,7 @@ namespace MisakiEQ.GUI
         public EEW_Compact()
         {
             InitializeComponent();
+            Icon = Properties.Resources.Logo_MainIcon;
         }
         public void SetInfomation(Struct.EEW eew)
         {

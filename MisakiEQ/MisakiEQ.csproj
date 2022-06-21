@@ -9,6 +9,19 @@
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
     <ApplicationIcon>main.ico</ApplicationIcon>
     <PackageIcon>logo.AppIcon.png</PackageIcon>
+    <Configurations>Debug;Release;ADMIN</Configurations>
+    <RepositoryUrl>https://github.com/Misaki0331/MisakiEQv2</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/Misaki0331/MisakiEQv2</PackageProjectUrl>
+    <Copyright>©Misaki - 2020-2022 All Rights Reserved.</Copyright>
+    <Description>地震通知アプリケーション</Description>
+    <Company>水咲(みさき)</Company>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ADMIN|AnyCPU'">
+    <Optimize>True</Optimize>
   </PropertyGroup>
 
   <ItemGroup>

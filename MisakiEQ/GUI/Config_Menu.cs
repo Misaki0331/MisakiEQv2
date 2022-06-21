@@ -16,7 +16,9 @@ namespace MisakiEQ.GUI
 #pragma warning disable IDE0052 // 読み取られていないプライベート メンバーを削除
         readonly Lib.ConfigController.Controller? ConnectionSetting;
         readonly Lib.ConfigController.Controller? UserSetting;
+#if DEBUG || ADMIN
         readonly Lib.ConfigController.Controller? SNSSetting;
+#endif
 #pragma warning restore IDE0052 // 読み取られていないプライベート メンバーを削除
 
         Twitter.Auth? TwitterAuthGUI = null;
@@ -26,13 +28,29 @@ namespace MisakiEQ.GUI
             var config = Lib.Config.Funcs.GetInstance().Configs;
             ConnectionSetting = new Lib.ConfigController.Controller(groupBox1, config.Connections);
             UserSetting = new Lib.ConfigController.Controller(groupBox2, config.UserSetting);
+            LabelVersion.Text = $"バージョン : {Properties.Version.Name}";
+            Icon = Properties.Resources.Logo_MainIcon;
+#if ADMIN
+            LabelVersion.Text += "(Admin)";
+#elif DEBUG
+            LabelVersion.Text += "(Debug)";
+#endif
+#if ADMIN || DEBUG
             SNSSetting = new Lib.ConfigController.Controller(groupBox3, config.SNSSetting);
-
             TwitterAuthInfo.Text = $"@{Lib.Twitter.APIs.GetInstance().GetUserScreenID()} - {Lib.Twitter.APIs.GetInstance().GetUserName()} " +
             $"(Follower:{Lib.Twitter.APIs.GetInstance().GetUserFollowers()} Tweet:{Lib.Twitter.APIs.GetInstance().GetUserTweets()})";
+            AuthTwitter.Visible = true;
+            TweetBox.Visible = true;
+            TweetButton.Visible = true;
+#else
+            groupBox3.Visible=false;
+            AuthTwitter.Visible = false;
+            TweetBox.Visible = false;
+            TweetButton.Visible = false;
+#endif
         }
 
-        
+
 
         private void ButtonApply_Click(object sender, EventArgs e)
         {
@@ -102,14 +120,33 @@ namespace MisakiEQ.GUI
             await Background.APIs.GetInstance().KyoshinAPI.FixKyoshinTime();
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private void LinkToGitHub_Click(object sender, EventArgs e)
         {
-            (await Lib.Sounds.GetInstance().GetSound("EEW_None")).Replay();
+            OpenLink("https://github.com/Misaki0331/MisakiEQv2");
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void LinkToTwitterBot_Click(object sender, EventArgs e)
         {
+            OpenLink("https://twitter.com/MisakiEQ");
+        }
 
+        private void LinkToDevTwitter_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://twitter.com/0x7FF");
+        }
+
+        private void LinkToKoFi_Click(object sender, EventArgs e)
+        {
+            OpenLink("https://ko-fi.com/misaki0331");
+        }
+        private void OpenLink(string url)
+        {
+            ProcessStartInfo pi = new ProcessStartInfo()
+            {
+                FileName = url,
+                UseShellExecute = true,
+            };
+            Process.Start(pi);
         }
     }
 }

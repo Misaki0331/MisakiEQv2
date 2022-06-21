@@ -353,7 +353,7 @@ namespace MisakiEQ.Struct
         }
         public static Intensity FloatToInt(double value)
         {
-            if (value <= 0) return Intensity.Unknown;
+            if (value <= 0||double.IsNaN(value)) return Intensity.Unknown;
             if (value < 0.5) return Intensity.Int0;
             if (value < 1.5) return Intensity.Int1;
             if (value < 2.5) return Intensity.Int2;

@@ -17,6 +17,7 @@ namespace MisakiEQ.GUI
         Config_Menu? Config = null;
         ExApp.KyoshinWindow? Kyoshin = null;
         readonly EEW_Compact EEW_Compact = new();
+        readonly ExApp.UserESTWindow ESTWindow = new();
         private TrayHub()
         {
             InitializeComponent();
@@ -28,6 +29,8 @@ namespace MisakiEQ.GUI
             Background.APIs.GetInstance().EQInfo.TsunamiUpdateHandler += EventTsunami;
             EEW_Compact.Show();
             EEW_Compact.Hide();
+            ESTWindow.Show();
+            ESTWindow.Hide();
         }
         static TrayHub? Instance = null;
 
@@ -98,18 +101,11 @@ namespace MisakiEQ.GUI
             try
             {
                 if (e.eew == null) return;
-                e.eew.UserInfo.LocalIntensity = await Background.API.KyoshinAPI.KyoshinAPI.GetUserIntensity();
-                var distance = new Struct.Common.LAL(e.eew.EarthQuake.Location.Lat, e.eew.EarthQuake.Location.Long)
-                    .GetDistanceTo(new Struct.Common.LAL(
-                        Background.APIs.GetInstance().KyoshinAPI.Config.UserLat,
-                        Background.APIs.GetInstance().KyoshinAPI.Config.UserLong));
-                //√|r*sin(2π*a/(2πr))|²+|r*cos(2π*a/(2πr))-r-1000d|²
-                double r = 6378136.59;
-                double d = e.eew.EarthQuake.Depth;
-                double a = distance;
-                double di = Math.Sqrt(Math.Pow(Math.Abs(r * Math.Sin(2 * Math.PI * r)), 2)
-                    + Math.Pow(Math.Abs(r * Math.Cos(2 * Math.PI * a / (2 * Math.PI * r)) - r - 1000 * d), 2));
+                double distance = Struct.EEW.GetDistance(e.eew, new(Background.APIs.GetInstance().KyoshinAPI.Config.UserLong, Background.APIs.GetInstance().KyoshinAPI.Config.UserLat));
+                e.eew.UserInfo.ArrivalTime = e.eew.EarthQuake.OriginTime.AddSeconds(distance / 3.5);
+#if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EEWPost(e.eew);
+#endif
                 EEW_Compact.Invoke(() =>
                 {
                     if (!EEW_Compact.Visible && !EEW_Compact.IsShowFromEEW)
@@ -128,6 +124,20 @@ namespace MisakiEQ.GUI
                 });
                 Toast.Post(e.eew);
                 EventLog.EEW(e.eew);
+                Funcs.DiscordRPC.PostEEW(e.eew);
+                ESTWindow.ESTTime = e.eew.UserInfo.ArrivalTime;
+                if (e.eew.UserInfo.LocalIntensity >= Struct.Common.Intensity.Int1)
+                {
+                    ESTWindow.Invoke(() =>
+                    {
+                        if (!ESTWindow.Visible)
+                        {
+                            ESTWindow.Show();
+                            ESTWindow.Location = new Point(0,214);
+                        }
+                        ESTWindow.Activate();
+                    });
+                }
                 await SoundCollective.GetInstance().SoundEEW(e.eew);
             }catch(Exception ex)
             {
@@ -138,12 +148,16 @@ namespace MisakiEQ.GUI
 
         private void EventEarthQuake(object? sender, Background.API.EarthQuakeEventArgs e)
         {
-            try { 
-            if (e.data == null) return;
-            Log.Logger.GetInstance().Debug($"地震情報のイベントが発生: {e.data.Details.OriginTime:d日HH:mm} {Struct.EarthQuake.TypeToString(e.data.Issue.Type)}");
-            if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EarthquakePost(e.data);
-            Toast.Post(e.data);
-            SoundCollective.SoundEarthquake(e.data);
+            try
+            {
+                if (e.data == null) return;
+                Log.Logger.GetInstance().Debug($"地震情報のイベントが発生: {e.data.Details.OriginTime:d日HH:mm} {Struct.EarthQuake.TypeToString(e.data.Issue.Type)}");
+#if DEBUG||ADMIN
+                if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EarthquakePost(e.data);
+#endif
+                Toast.Post(e.data);
+                Funcs.DiscordRPC.PostEarthquake(e.data);
+                SoundCollective.SoundEarthquake(e.data);
             }
             catch (Exception ex)
             {
@@ -156,7 +170,9 @@ namespace MisakiEQ.GUI
             {
                 if (e.data == null) return;
                 Log.Logger.GetInstance().Debug($"津波情報のイベントが発生: {e.data.CreatedAt:d日HH:mm} 津波発表エリア数:{e.data.Areas.Count}件");
+#if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().TsunamiPost(e.data);
+#endif
                 Toast.Post(e.data);
                 SoundCollective.SoundTsunami(e.data);
             }
@@ -183,5 +199,16 @@ namespace MisakiEQ.GUI
             Kyoshin.Show();
             Kyoshin.Activate();
         }
+
+        private void OpenAreaESTMonitor_Click(object sender, EventArgs e)
+        {
+            if (!ESTWindow.Visible)
+            {
+                ESTWindow.Show();
+                ESTWindow.Location = new Point(0,214);
+            }
+            ESTWindow.Activate();
+        }
+
     }
 }

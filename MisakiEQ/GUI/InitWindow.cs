@@ -6,6 +6,7 @@ namespace MisakiEQ
         public InitWindow()
         {
             InitializeComponent();
+            Icon = Properties.Resources.Logo_MainIcon;
         }
         private void InitWindow_Load(object sender, EventArgs e)
         {
@@ -22,7 +23,11 @@ namespace MisakiEQ
         {
         }
 
+#if ADMIN || DEBUG
         private async void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+#else
+        private void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+#endif
         {
             InitialTask.ReportProgress(0,"APIの起動初期化を実行中");
             var api = Background.APIs.GetInstance();
@@ -36,9 +41,10 @@ namespace MisakiEQ
             InitialTask.ReportProgress(55, "Discord RPC接続中");
             var discord = Lib.Discord.RichPresence.GetInstance();
             discord.Init();
-            discord.Update(detail: "MisakiEQのテスト実行です。");
+            discord.Update(detail: "MisakiEQは地震監視中です。");
             InitialTask.ReportProgress(60, "サウンド読込中");
             Funcs.SoundCollective.Init();
+#if ADMIN || DEBUG
             InitialTask.ReportProgress(70, "Twitter API認証中");
             try
             {
@@ -51,6 +57,7 @@ namespace MisakiEQ
             {
                 log.Error(ex.Message);
             }
+#endif
             e.Result = "OK";
 
         }

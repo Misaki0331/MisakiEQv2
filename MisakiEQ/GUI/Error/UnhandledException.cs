@@ -118,6 +118,7 @@ namespace MisakiEQ.GUI.ErrorInfo
         public UnhandledException(string str, int ErrorCount = 0, string CrashMethod = "")
         {
             InitializeComponent();
+            Icon = Properties.Resources.Logo_MainIcon;
             string[] result = str.Split(new char[] { '\n' });
             ErrorIndex.Lines = result;
             index = str;

@@ -100,7 +100,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
             LatestAdjustTime = DateTime.Now.AddSeconds(-Config.AutoAdjustKyoshinTime + 10);
             log.Warn($"強震モニタ時刻取得失敗");
         }
-        public static async Task<Struct.Common.Intensity> GetUserIntensity()
+        public static async Task<double> GetUserRawIntensity()
         {
             try
             {
@@ -108,22 +108,33 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                 if (api == null)
                 {
                     Log.Logger.GetInstance().Warn("強震モニタの推定震度マップを取得できませんでした。");
-                    return Struct.Common.Intensity.Unknown;
+                    return double.NaN;
                 }
                 Struct.Common.LAL lal = new(APIs.GetInstance().KyoshinAPI.Config.UserLong, APIs.GetInstance().KyoshinAPI.Config.UserLat);
                 var pnt = Lib.KyoshinLib.LALtoKyoshinMap(lal);
                 if (api.Width <= (int)pnt.X || api.Height <= (int)pnt.Y)
                 {
-                    return Struct.Common.Intensity.Unknown;
+                    return double.NaN;
                 }
                 var img = (Bitmap)api;
-                var res = Struct.Common.FloatToInt(Lib.KyoshinLib.GetIntensity(img.GetPixel((int)pnt.X, (int)pnt.Y)));
-                return res;
+                return Lib.KyoshinLib.GetIntensity(img.GetPixel((int)pnt.X, (int)pnt.Y));
             }
             catch (Exception ex)
             {
                 Log.Logger.GetInstance().Error(ex);
+                return double.NaN;
+            }
+        }
+        public static async Task<Struct.Common.Intensity> GetUserIntensity()
+        {
+            double raw = await GetUserRawIntensity();
+            if (double.IsNaN(raw)||raw<=0.0)
+            {
                 return Struct.Common.Intensity.Unknown;
+            }
+            else
+            {
+                return Struct.Common.FloatToInt(raw);
             }
         }
         public async Task<Image?> GetImage(KyoshinImageType type)

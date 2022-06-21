@@ -117,7 +117,9 @@ namespace MisakiEQ.Lib.Config
             var gui = APIs.GetInstance().KyoshinAPI.Config;
             gui.UserLong = (int)(GetConfigValue("USER_Pos_Long") as long? ?? long.MaxValue) / 10000.0;
             gui.UserLat = (int)(GetConfigValue("USER_Pos_Lat") as long? ?? long.MaxValue) / 10000.0;
-            Lib.Twitter.APIs.GetInstance().Config.TweetEnabled = (GetConfigValue("Twitter_Enable_Tweet") as bool? ?? false);
+#if DEBUG||ADMIN
+            Twitter.APIs.GetInstance().Config.TweetEnabled = (GetConfigValue("Twitter_Enable_Tweet") as bool? ?? false);
+#endif
         }
         IndexData? GetConfigClass(string name)
         {
@@ -186,7 +188,9 @@ namespace MisakiEQ.Lib.Config
                 Connections.Add(new IndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
                 UserSetting.Add(new IndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数
                 UserSetting.Add(new IndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
+#if ADMIN||DEBUG
                 SNSSetting.Add(new IndexData("Twitter_Enable_Tweet", "自動ツイートの有効化", "自動でユーザーに地震情報をツイートします", def: false, "自動ツイートが有効", "自動ツイートが無効"));
+#endif
             }
             public Cfg Clone()
             {
@@ -388,8 +392,8 @@ namespace MisakiEQ.Lib.Config
             readonly string StringDefault="";
             bool BooleanValue = false;
             readonly bool BooleanDefault = false;
-            string BoolToggleOn = "";
-            string BoolToggleOff = "";
+            readonly string BoolToggleOn = "";
+            readonly string BoolToggleOff = "";
 
         }
     }

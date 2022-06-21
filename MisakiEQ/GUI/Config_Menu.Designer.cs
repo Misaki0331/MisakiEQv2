@@ -35,12 +35,18 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.button1 = new System.Windows.Forms.Button();
             this.FixKyoshinTime = new System.Windows.Forms.Button();
             this.TwitterAuthInfo = new System.Windows.Forms.Label();
             this.TweetButton = new System.Windows.Forms.Button();
             this.TweetBox = new System.Windows.Forms.TextBox();
             this.AuthTwitter = new System.Windows.Forms.Button();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.LabelVersion = new System.Windows.Forms.Label();
+            this.LinkToKoFi = new System.Windows.Forms.Button();
+            this.LinkToDevTwitter = new System.Windows.Forms.Button();
+            this.LinkToTwitterBot = new System.Windows.Forms.Button();
+            this.LinkToGitHub = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.LabelTime = new System.Windows.Forms.Label();
             this.LabelDate = new System.Windows.Forms.Label();
             this.UpdateDataTimer = new System.Windows.Forms.Timer(this.components);
@@ -50,12 +56,15 @@
             this.SettingTabs.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // SettingTabs
             // 
             this.SettingTabs.Controls.Add(this.tabPage1);
             this.SettingTabs.Controls.Add(this.tabPage2);
+            this.SettingTabs.Controls.Add(this.tabPage3);
             this.SettingTabs.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.SettingTabs.Location = new System.Drawing.Point(-5, 53);
             this.SettingTabs.Name = "SettingTabs";
@@ -106,7 +115,6 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.button1);
             this.tabPage2.Controls.Add(this.FixKyoshinTime);
             this.tabPage2.Controls.Add(this.TwitterAuthInfo);
             this.tabPage2.Controls.Add(this.TweetButton);
@@ -118,18 +126,8 @@
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage2.Size = new System.Drawing.Size(787, 447);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "テスト用";
+            this.tabPage2.Text = "調整";
             this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(3, 61);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 13;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // FixKyoshinTime
             // 
@@ -175,6 +173,81 @@
             this.AuthTwitter.Text = "TwitterAuth";
             this.AuthTwitter.UseVisualStyleBackColor = true;
             this.AuthTwitter.Click += new System.EventHandler(this.OpenAuthTwitter);
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.LabelVersion);
+            this.tabPage3.Controls.Add(this.LinkToKoFi);
+            this.tabPage3.Controls.Add(this.LinkToDevTwitter);
+            this.tabPage3.Controls.Add(this.LinkToTwitterBot);
+            this.tabPage3.Controls.Add(this.LinkToGitHub);
+            this.tabPage3.Controls.Add(this.pictureBox1);
+            this.tabPage3.Location = new System.Drawing.Point(4, 24);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(787, 447);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "About";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // LabelVersion
+            // 
+            this.LabelVersion.AutoSize = true;
+            this.LabelVersion.Location = new System.Drawing.Point(6, 154);
+            this.LabelVersion.Name = "LabelVersion";
+            this.LabelVersion.Size = new System.Drawing.Size(65, 15);
+            this.LabelVersion.TabIndex = 4;
+            this.LabelVersion.Text = "バージョン : ";
+            // 
+            // LinkToKoFi
+            // 
+            this.LinkToKoFi.Location = new System.Drawing.Point(424, 157);
+            this.LinkToKoFi.Name = "LinkToKoFi";
+            this.LinkToKoFi.Size = new System.Drawing.Size(88, 23);
+            this.LinkToKoFi.TabIndex = 3;
+            this.LinkToKoFi.Text = "Ko-fi";
+            this.LinkToKoFi.UseVisualStyleBackColor = true;
+            this.LinkToKoFi.Click += new System.EventHandler(this.LinkToKoFi_Click);
+            // 
+            // LinkToDevTwitter
+            // 
+            this.LinkToDevTwitter.Location = new System.Drawing.Point(518, 157);
+            this.LinkToDevTwitter.Name = "LinkToDevTwitter";
+            this.LinkToDevTwitter.Size = new System.Drawing.Size(88, 23);
+            this.LinkToDevTwitter.TabIndex = 3;
+            this.LinkToDevTwitter.Text = "Dev Twitter";
+            this.LinkToDevTwitter.UseVisualStyleBackColor = true;
+            this.LinkToDevTwitter.Click += new System.EventHandler(this.LinkToDevTwitter_Click);
+            // 
+            // LinkToTwitterBot
+            // 
+            this.LinkToTwitterBot.Location = new System.Drawing.Point(608, 157);
+            this.LinkToTwitterBot.Name = "LinkToTwitterBot";
+            this.LinkToTwitterBot.Size = new System.Drawing.Size(88, 23);
+            this.LinkToTwitterBot.TabIndex = 2;
+            this.LinkToTwitterBot.Text = "Twitter Bot";
+            this.LinkToTwitterBot.UseVisualStyleBackColor = true;
+            this.LinkToTwitterBot.Click += new System.EventHandler(this.LinkToTwitterBot_Click);
+            // 
+            // LinkToGitHub
+            // 
+            this.LinkToGitHub.Location = new System.Drawing.Point(697, 157);
+            this.LinkToGitHub.Name = "LinkToGitHub";
+            this.LinkToGitHub.Size = new System.Drawing.Size(80, 23);
+            this.LinkToGitHub.TabIndex = 1;
+            this.LinkToGitHub.Text = "GitHub";
+            this.LinkToGitHub.UseVisualStyleBackColor = true;
+            this.LinkToGitHub.Click += new System.EventHandler(this.LinkToGitHub_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::MisakiEQ.Properties.Images.header_logo;
+            this.pictureBox1.Location = new System.Drawing.Point(0, 6);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(777, 145);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
             // 
             // LabelTime
             // 
@@ -254,6 +327,9 @@
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -277,6 +353,12 @@
         private GroupBox groupBox2;
         private GroupBox groupBox3;
         private Button FixKyoshinTime;
-        private Button button1;
+        private TabPage tabPage3;
+        private PictureBox pictureBox1;
+        private Button LinkToGitHub;
+        private Button LinkToTwitterBot;
+        private Button LinkToDevTwitter;
+        private Button LinkToKoFi;
+        private Label LabelVersion;
     }
 }
