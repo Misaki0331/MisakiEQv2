@@ -266,7 +266,7 @@ namespace MisakiEQ.Funcs
                     for (int i = EQReplyList.Count - 1; i >= 0; i--)
                     {
                         TimeSpan T = DateTime.Now - EQReplyList[i].LatestTime;
-                        if (T.Seconds > 1800) EQReplyList.RemoveAt(i);
+                        if (T.Seconds > 86400) EQReplyList.RemoveAt(i);
                     }
                 }
                 catch (Exception ex)

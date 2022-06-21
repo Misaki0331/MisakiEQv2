@@ -27,6 +27,9 @@ namespace MisakiEQ.GUI
             ConnectionSetting = new Lib.ConfigController.Controller(groupBox1, config.Connections);
             UserSetting = new Lib.ConfigController.Controller(groupBox2, config.UserSetting);
             SNSSetting = new Lib.ConfigController.Controller(groupBox3, config.SNSSetting);
+
+            TwitterAuthInfo.Text = $"@{Lib.Twitter.APIs.GetInstance().GetUserScreenID()} - {Lib.Twitter.APIs.GetInstance().GetUserName()} " +
+            $"(Follower:{Lib.Twitter.APIs.GetInstance().GetUserFollowers()} Tweet:{Lib.Twitter.APIs.GetInstance().GetUserTweets()})";
         }
 
         
@@ -61,8 +64,11 @@ namespace MisakiEQ.GUI
             UpdateDataTimer.Interval = 150;
             UpdateDataTimer.Start();
         }
+        private void Config_Menu_FormClosed(object sender, FormClosedEventArgs e)
+        {
+        }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private async void OpenAuthTwitter(object sender, EventArgs e)
         {
             try
             {
@@ -78,21 +84,32 @@ namespace MisakiEQ.GUI
 
                 TwitterAuthInfo.Text = $"@{Lib.Twitter.APIs.GetInstance().GetUserScreenID()} - {Lib.Twitter.APIs.GetInstance().GetUserName()} " +
                 $"(Follower:{Lib.Twitter.APIs.GetInstance().GetUserFollowers()} Tweet:{Lib.Twitter.APIs.GetInstance().GetUserTweets()})";
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Log.Logger.GetInstance().Error(ex);
             }
         }
-        private async void button3_Click(object sender, EventArgs e)
+
+        private async void SendTweet(object sender, EventArgs e)
         {
-            var id=await Lib.Twitter.APIs.GetInstance().Tweet(textBox2.Text);
+            var id = await Lib.Twitter.APIs.GetInstance().Tweet(TweetBox.Text);
             Log.Logger.GetInstance().Debug($"Tweet ID : {id}");
         }
 
-
-        private void Config_Menu_FormClosed(object sender, FormClosedEventArgs e)
+        private async void FixKyoshinTime_Click(object sender, EventArgs e)
         {
+            await Background.APIs.GetInstance().KyoshinAPI.FixKyoshinTime();
         }
 
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            (await Lib.Sounds.GetInstance().GetSound("EEW_None")).Replay();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

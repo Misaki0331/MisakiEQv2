@@ -8,7 +8,7 @@ using MisakiEQ.Log;
 
 namespace MisakiEQ.Lib
 {
-    internal class SoundController
+    public class SoundController
     {
         class Reader
         {
@@ -38,9 +38,15 @@ namespace MisakiEQ.Lib
             }
             public void SetPosition(double sec)
             {
-                if (audio != null) audio.CurrentTime = TimeSpan.FromSeconds(sec);
-                if (wav != null) wav.CurrentTime = TimeSpan.FromSeconds(sec);
-                if (mp3 != null) mp3.CurrentTime = TimeSpan.FromSeconds(sec);
+                try
+                {
+                    if (audio != null) audio.CurrentTime = TimeSpan.FromSeconds(sec);
+                    if (wav != null) wav.CurrentTime = TimeSpan.FromSeconds(sec);
+                    if (mp3 != null) mp3.CurrentTime = TimeSpan.FromSeconds(sec);
+                }catch(Exception ex)
+                {
+                    Log.Logger.GetInstance().Error(ex);
+                }
             }
             public double GetPosition()
             {
@@ -91,12 +97,13 @@ namespace MisakiEQ.Lib
                 return false;
             }
         }
+        MemoryStream? streams = null;
         public bool WaveInit(byte[] stream)
         {
             try
             {
-                using var str = new MemoryStream(stream);
-                var reader = new WaveFileReader(str);
+                streams= new MemoryStream(stream);
+                var reader = new WaveFileReader(streams);
                 readers.Init(reader);
                 wav.Init(reader);
                 Logger.GetInstance().Debug($"waveストリームを読み込みました。");
@@ -112,11 +119,11 @@ namespace MisakiEQ.Lib
         {
             try
             {
-                using var str = new MemoryStream(stream);
-                var reader = new Mp3FileReader(str);
+                streams = new MemoryStream(stream);
+                var reader = new Mp3FileReader(streams);
                 readers.Init(reader);
                 wav.Init(reader);
-                Logger.GetInstance().Debug($"waveストリームを読み込みました。");
+                Logger.GetInstance().Debug($"mp3ストリームを読み込みました。");
                 return true;
             }
             catch (Exception ex)
@@ -148,17 +155,94 @@ namespace MisakiEQ.Lib
         }
         public void Pause()
         {
-            wav.Pause();
+                wav.Pause();
         }
         public void Stop()
         {
-            wav.Stop();
-            readers.SetPosition(0);
+            if (readers.CanPlay)
+            {
+                wav.Stop();
+                readers.SetPosition(0);
+            }
         }
         public double Position { get { return readers.GetPosition(); } set { readers.SetPosition(value); } }
         public double Length { get { return readers.GetLength(); } }
         public float Volume { get { return wav.Volume; } set { wav.Volume = value; } }
 
+
+    }
+    public class Sounds
+    {
+        private static Sounds? singleton = null;
+        /// <summary>
+        /// インスタンスを生成する
+        /// </summary>
+        public static Sounds GetInstance()
+        {
+            if (singleton == null)
+            {
+                singleton = new Sounds();
+            }
+            return singleton;
+        }
+        public class SoundList
+        {
+            public SoundList(string name)
+            {
+                Name = name;
+                controller = new();
+            }
+            public readonly SoundController controller;
+            public string Name { get; }
+        }
+        readonly List<SoundList> sounds = new();
+        public Sounds()
+        {
+
+
+        }
+        public async Task<SoundController> GetSound(string str)
+        {
+            return await Task.Run(() =>
+            {
+                for (int i = 0; i < sounds.Count; i++)
+                {
+                    if (sounds[i].Name == str) return sounds[i].controller;
+                }
+                sounds.Add(new(str));
+                return sounds[^1].controller;
+            });
+            
+        }
+        public async Task<bool> DeleteSound(string str)
+        {
+            return await Task.Run(() =>
+            {
+                for (int i = 0; i < sounds.Count; i++)
+                {
+                    if (sounds[i].Name == str)
+                    {
+                        sounds.RemoveAt(i);
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
+        public int GetSoundListCount()
+        {
+            return sounds.Count;
+        }
+        public List<string> GetSoundList()
+        {
+            List<string> list = new();
+            for (int i = 0; i < sounds.Count; i++) list.Add(sounds[i].Name);
+            return list;
+        }
+        public void AllDeleteSound()
+        {
+            sounds.Clear();
+        }
 
     }
 }

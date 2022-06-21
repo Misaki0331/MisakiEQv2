@@ -23,6 +23,28 @@ namespace MisakiEQ.Struct
             };
         }
         /// <summary>
+        /// Userと震源の直線距離を計算します。
+        /// </summary>
+        /// <param name="eew">緊急地震速報データ</param>
+        /// <param name="User">ユーザーの場所</param>
+        /// <returns>距離(km)</returns>
+        public static double GetDistance(EEW eew, Common.LAL User)
+        {
+            try
+            {
+                double r = 6378136.59;//地球の半径
+                var distance = new Common.LAL(eew.EarthQuake.Location.Long, eew.EarthQuake.Location.Lat).GetDistanceTo(User);//円周距離
+                double di = Math.Sqrt(Math.Pow(Math.Abs(r * Math.Sin(Math.PI * 2 * (distance / (r * 2 * Math.PI)))), 2) +
+                    Math.Pow(Math.Abs(r - eew.EarthQuake.Depth * 1000.0 - r * Math.Cos(Math.PI * 2 * (distance / (r * 2 * Math.PI)))), 2));//直線距離
+                return di / 1000.0;//km換算
+            }catch(Exception ex)
+            {
+                Log.Logger.GetInstance().Error(ex);
+                return double.NaN;
+            }
+        }
+
+        /// <summary>
         /// <para>apiのjsonデータ単体からの緊急地震速報を汎用クラスに代入します。</para>
         /// </summary>
         /// <param name="Data">jsonデータ単体</param>

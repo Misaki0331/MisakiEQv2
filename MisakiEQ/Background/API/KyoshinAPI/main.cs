@@ -79,8 +79,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
             rsp4000_b,
 
         }
-        async         Task
-Init()
+        public async Task FixKyoshinTime()
         {
             var message = Lib.WebAPI.GetString($"http://www.kmoni.bosai.go.jp/webservice/server/pros/latest.json");
             await message;
@@ -219,7 +218,7 @@ Init()
             log.Info("スレッド開始");
             long TmpTimer = 0;
             long TmpErrTimer = 0;
-            await Init();
+            await FixKyoshinTime();
             while (true)
             {
                 try
@@ -293,12 +292,12 @@ Init()
                         if (TmpErrTimer / 10 != TSW.ElapsedMilliseconds / 10000)
                         {
                             TmpErrTimer = TSW.ElapsedMilliseconds / 1000;
-                            await Init();
+                            await FixKyoshinTime();
                         }
                     }
                     if (LatestAdjustTime.AddSeconds(Config.AutoAdjustKyoshinTime) < DateTime.Now)
                     {
-                        await Init();
+                        await FixKyoshinTime();
                     }
                     await Task.Delay(75, token);
                 }

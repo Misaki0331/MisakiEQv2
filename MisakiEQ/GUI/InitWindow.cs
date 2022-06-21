@@ -26,18 +26,20 @@ namespace MisakiEQ
         {
             InitialTask.ReportProgress(0,"APIの起動初期化を実行中");
             var api = Background.APIs.GetInstance();
-            InitialTask.ReportProgress(17, "コンフィグを読み込んでいます");
+            InitialTask.ReportProgress(2, "コンフィグを読み込んでいます");
             var config = Lib.Config.Funcs.GetInstance();
             config.ReadConfig();
-            InitialTask.ReportProgress(33, "コンフィグを適用しています");
+            InitialTask.ReportProgress(25, "コンフィグを適用しています");
             config.ApplyConfig();
-            InitialTask.ReportProgress(50, "APIスレッド起動中");
+            InitialTask.ReportProgress(40, "APIスレッド起動中");
             api.Run();
-            InitialTask.ReportProgress(67, "Discord RPC接続中");
+            InitialTask.ReportProgress(55, "Discord RPC接続中");
             var discord = Lib.Discord.RichPresence.GetInstance();
             discord.Init();
-            discord.Update(detail:"MisakiEQのテスト実行です。");
-            InitialTask.ReportProgress(83, "Twitter API認証中");
+            discord.Update(detail: "MisakiEQのテスト実行です。");
+            InitialTask.ReportProgress(60, "サウンド読込中");
+            Funcs.SoundCollective.Init();
+            InitialTask.ReportProgress(70, "Twitter API認証中");
             try
             {
                 using var reader = new StreamReader("TwitterAuth.cfg");

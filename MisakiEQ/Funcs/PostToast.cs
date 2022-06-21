@@ -49,7 +49,7 @@ namespace MisakiEQ.Funcs
         {
             var attribution = $"津波情報";
 
-            var title = "";
+            string title;
             var index = "";
             if (data.Cancelled)
             {

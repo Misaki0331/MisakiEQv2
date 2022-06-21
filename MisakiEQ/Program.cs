@@ -8,8 +8,8 @@ namespace MisakiEQ
 
 #if !DEBUG
         static Mutex? mutex=null;
-#endif
         static bool hasHandle = false;
+#endif
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -25,7 +25,7 @@ namespace MisakiEQ
 #endif
 #if ADMIN
             string mutexName = "MisakiEQ(Admin Mode)";
-#else
+#elif !DEBUG
             string mutexName = "MisakiEQ";
 #endif
 

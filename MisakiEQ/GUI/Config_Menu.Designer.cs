@@ -35,10 +35,12 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.TwitterAuthInfo = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
-            this.textBox2 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.FixKyoshinTime = new System.Windows.Forms.Button();
+            this.TwitterAuthInfo = new System.Windows.Forms.Label();
+            this.TweetButton = new System.Windows.Forms.Button();
+            this.TweetBox = new System.Windows.Forms.TextBox();
+            this.AuthTwitter = new System.Windows.Forms.Button();
             this.LabelTime = new System.Windows.Forms.Label();
             this.LabelDate = new System.Windows.Forms.Label();
             this.UpdateDataTimer = new System.Windows.Forms.Timer(this.components);
@@ -104,10 +106,12 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.TwitterAuthInfo);
-            this.tabPage2.Controls.Add(this.button3);
-            this.tabPage2.Controls.Add(this.textBox2);
             this.tabPage2.Controls.Add(this.button1);
+            this.tabPage2.Controls.Add(this.FixKyoshinTime);
+            this.tabPage2.Controls.Add(this.TwitterAuthInfo);
+            this.tabPage2.Controls.Add(this.TweetButton);
+            this.tabPage2.Controls.Add(this.TweetBox);
+            this.tabPage2.Controls.Add(this.AuthTwitter);
             this.tabPage2.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
@@ -117,40 +121,60 @@
             this.tabPage2.Text = "テスト用";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(3, 61);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 13;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // FixKyoshinTime
+            // 
+            this.FixKyoshinTime.Location = new System.Drawing.Point(3, 35);
+            this.FixKyoshinTime.Name = "FixKyoshinTime";
+            this.FixKyoshinTime.Size = new System.Drawing.Size(113, 23);
+            this.FixKyoshinTime.TabIndex = 12;
+            this.FixKyoshinTime.Text = "強震モニタ時刻補正";
+            this.FixKyoshinTime.UseVisualStyleBackColor = true;
+            this.FixKyoshinTime.Click += new System.EventHandler(this.FixKyoshinTime_Click);
+            // 
             // TwitterAuthInfo
             // 
             this.TwitterAuthInfo.AutoSize = true;
-            this.TwitterAuthInfo.Location = new System.Drawing.Point(116, 40);
+            this.TwitterAuthInfo.Location = new System.Drawing.Point(396, 14);
             this.TwitterAuthInfo.Name = "TwitterAuthInfo";
             this.TwitterAuthInfo.Size = new System.Drawing.Size(0, 15);
             this.TwitterAuthInfo.TabIndex = 11;
             // 
-            // button3
+            // TweetButton
             // 
-            this.button3.Location = new System.Drawing.Point(213, 94);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(70, 23);
-            this.button3.TabIndex = 10;
-            this.button3.Text = "ツイート";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.TweetButton.Location = new System.Drawing.Point(320, 6);
+            this.TweetButton.Name = "TweetButton";
+            this.TweetButton.Size = new System.Drawing.Size(70, 23);
+            this.TweetButton.TabIndex = 10;
+            this.TweetButton.Text = "ツイート";
+            this.TweetButton.UseVisualStyleBackColor = true;
+            this.TweetButton.Click += new System.EventHandler(this.SendTweet);
             // 
-            // textBox2
+            // TweetBox
             // 
-            this.textBox2.Location = new System.Drawing.Point(6, 94);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(201, 23);
-            this.textBox2.TabIndex = 9;
+            this.TweetBox.Location = new System.Drawing.Point(113, 6);
+            this.TweetBox.Name = "TweetBox";
+            this.TweetBox.Size = new System.Drawing.Size(201, 23);
+            this.TweetBox.TabIndex = 9;
             // 
-            // button1
+            // AuthTwitter
             // 
-            this.button1.Location = new System.Drawing.Point(6, 36);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(104, 23);
-            this.button1.TabIndex = 6;
-            this.button1.Text = "TwitterAuth";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.AuthTwitter.Location = new System.Drawing.Point(3, 6);
+            this.AuthTwitter.Name = "AuthTwitter";
+            this.AuthTwitter.Size = new System.Drawing.Size(104, 23);
+            this.AuthTwitter.TabIndex = 6;
+            this.AuthTwitter.Text = "TwitterAuth";
+            this.AuthTwitter.UseVisualStyleBackColor = true;
+            this.AuthTwitter.Click += new System.EventHandler(this.OpenAuthTwitter);
             // 
             // LabelTime
             // 
@@ -223,7 +247,7 @@
             this.MaximumSize = new System.Drawing.Size(800, 600);
             this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "Config_Menu";
-            this.Text = "設定画面だにょ";
+            this.Text = "設定 - MisakIEQ";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Config_Menu_FormClosed);
             this.Load += new System.EventHandler(this.Config_Menu_Load);
             this.SettingTabs.ResumeLayout(false);
@@ -246,11 +270,13 @@
         private Button ButtonCancel;
         private Button ButtonOK;
         private GroupBox groupBox1;
-        private Button button1;
-        private Button button3;
-        private TextBox textBox2;
+        private Button AuthTwitter;
+        private Button TweetButton;
+        private TextBox TweetBox;
         private Label TwitterAuthInfo;
         private GroupBox groupBox2;
         private GroupBox groupBox3;
+        private Button FixKyoshinTime;
+        private Button button1;
     }
 }

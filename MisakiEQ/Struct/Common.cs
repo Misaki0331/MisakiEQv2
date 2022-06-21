@@ -86,6 +86,22 @@ namespace MisakiEQ.Struct
             }
             double Lo;
             double La;
+            public double GetDistanceTo(LAL other)
+            {
+                if (double.IsNaN(Lat) || double.IsNaN(Lon) || double.IsNaN(other.Lat) || double.IsNaN(other.Lon))
+                {
+                    return double.NaN;
+                }
+                double num2 = Lat * (Math.PI / 180.0);
+                double num3 = Lon * (Math.PI / 180.0);
+                double num4 = other.Lat * (Math.PI / 180.0);
+                double num5 = other.Lon * (Math.PI / 180.0);
+                double num6 = num5 - num3;
+                double num7 = num4 - num2;
+                double num8 = Math.Pow(Math.Sin(num7 / 2.0), 2.0) + Math.Cos(num2) * Math.Cos(num4) * Math.Pow(Math.Sin(num6 / 2.0), 2.0);
+                double num9 = 2.0 * Math.Atan2(Math.Sqrt(num8), Math.Sqrt(1.0 - num8));
+                return 6376500.0 * num9;
+            }
         }
         
 
