@@ -18,5 +18,6 @@ namespace MisakiEQ.Background.API.KyoshinAPI
 
         public double UserLong = 139.6983;
         public double UserLat = 35.6896;
+        public bool DisplayUserPos = false;
     }
 }
