@@ -31,17 +31,10 @@ namespace MisakiEQ.Lib
             return -val / 0.04065;
 
         }
-        /// <summary>
-        /// 強震モニタの座標から緯度・経度に変換
-        /// </summary>
-        /// <param name="Map">強震モニタの座標</param>
-        /// <returns>緯度・経度</returns>
         public static Struct.Common.LAL KyoshinMapToLAL(Struct.Common.Point Map)
         {
-            if (Map.X < 0 || Map.Y < 0 || Map.X >= 352 || Map.Y >= 400) return new Struct.Common.LAL(double.NaN, double.NaN);
             try
             {
-                
                 bool IsExtend = false;
                 if (Map.Y > 38 && Map.Y < 208 && Map.X >= 0 && Map.X <= 110) IsExtend = true;
                 else if (Map.Y > 38 && Map.Y < 135 && Map.X >= 110 && Map.X < 172) IsExtend = true;
@@ -55,11 +48,7 @@ namespace MisakiEQ.Lib
                 return new Struct.Common.LAL(double.NaN, double.NaN);
             }
         }
-        /// <summary>
-        /// 緯度・経度から強震モニタの座標に変換
-        /// </summary>
-        /// <param name="Map">緯度・経度</param>
-        /// <returns>強震モニタ画像の座標</returns>
+
         public static Struct.Common.Point LALtoKyoshinMap(Struct.Common.LAL Map)
         {
             try
@@ -67,10 +56,9 @@ namespace MisakiEQ.Lib
                 bool IsExtend = false;
                 if (LattoPosY(Map.Lat,true) > 38 && LattoPosY(Map.Lat,true) < 208 && LontoPosX(Map.Lon,true) >= 0 && LontoPosX(Map.Lon,true) <= 110) IsExtend = true;
                 else if (LattoPosY(Map.Lat,true) > 38 && LattoPosY(Map.Lat,true) < 135 && LontoPosX(Map.Lon,true) >= 110 && LontoPosX(Map.Lon,true) < 172) IsExtend = true;
-                else if (LontoPosX(Map.Lon,true) > 110 && LontoPosX(Map.Lon,true) < 172 && LattoPosY(Map.Lat,true) >= 135 && LattoPosY(Map.Lat,true) < 208 &&
+                else if ((LontoPosX(Map.Lon,true) > 110 && LontoPosX(Map.Lon,true) < 172 && LattoPosY(Map.Lat,true) >= 135 && LattoPosY(Map.Lat,true) < 208) &&
                     (LontoPosX(Map.Lon,true) - 110) * 72 / 61 < (73 - (LattoPosY(Map.Lat,true) - 135))) IsExtend = true;
                 Struct.Common.Point Pos = new(LontoPosX(Map.Lon,IsExtend), LattoPosY(Map.Lat,IsExtend));
-                if (Pos.X < 0 || Pos.Y < 0 || Pos.X >= 352 || Pos.Y >= 400) return new Struct.Common.Point(double.NaN, double.NaN);
                 return Pos;
             }
             catch

@@ -129,17 +129,19 @@ namespace MisakiEQ.GUI
         {
             OpenLink("https://twitter.com/MisakiEQ");
         }
+
         private void LinkToDevTwitter_Click(object sender, EventArgs e)
         {
-            OpenLink("https://twitter.com/0x7FF");
+            Process.Start("https://twitter.com/0x7FF");
         }
+
         private void LinkToKoFi_Click(object sender, EventArgs e)
         {
             OpenLink("https://ko-fi.com/misaki0331");
         }
-        static private void OpenLink(string url)
+        private void OpenLink(string url)
         {
-            ProcessStartInfo pi = new()
+            ProcessStartInfo pi = new ProcessStartInfo()
             {
                 FileName = url,
                 UseShellExecute = true,
