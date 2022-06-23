@@ -141,9 +141,9 @@ namespace MisakiEQ.GUI
         {
             OpenLink("https://ko-fi.com/misaki0331");
         }
-        private void OpenLink(string url)
+        private static void OpenLink(string url)
         {
-            ProcessStartInfo pi = new ProcessStartInfo()
+            ProcessStartInfo pi = new()
             {
                 FileName = url,
                 UseShellExecute = true,
