@@ -33,18 +33,10 @@ namespace MisakiEQ.Lib.Config
             {
                 System.Reflection.FieldInfo[] fields = Configs.GetType().GetFields();
                 using var sw = new StreamWriter(CfgFile, false, Encoding.UTF8);
-                for(int i = 0; i < Configs.Connections.Count; i++)
-                {
-                    if(Configs.Connections[i].GetManageType()!="function")sw.WriteLine($"{Configs.Connections[i].GetName()}={Configs.Connections[i].ConfigWrite()}");
-                }
-                for (int i = 0; i < Configs.UserSetting.Count; i++)
-                {
-                    if (Configs.UserSetting[i].GetManageType() != "function")sw.WriteLine($"{Configs.UserSetting[i].GetName()}={Configs.UserSetting[i].ConfigWrite()}");
-                }
-                for (int i = 0; i < Configs.SNSSetting.Count; i++)
-                {
-                    if (Configs.SNSSetting[i].GetManageType() != "function") sw.WriteLine($"{Configs.SNSSetting[i].GetName()}={Configs.SNSSetting[i].ConfigWrite()}");
-                }
+                for(int i = 0; i < Configs.Connections.Count; i++)sw.Write($"{Configs.Connections[i].Config}");
+                for (int i = 0; i < Configs.UserSetting.Count; i++)sw.Write($"{Configs.UserSetting[i].Config}");
+                for (int i = 0; i < Configs.SNSSetting.Count; i++)sw.Write($"{Configs.SNSSetting[i].Config}");
+                for (int i = 0; i < Configs.SoundSetting.Count; i++)sw.Write($"{Configs.SoundSetting[i].Config}");
                 sw.Close();
 
                 TmpConfigs = Configs.Clone();
@@ -129,34 +121,24 @@ namespace MisakiEQ.Lib.Config
         public IndexData? GetConfigClass(string name)
         {
             for(int i = 0; i<Configs.Connections.Count; i++)
-            {
-                if(Configs.Connections[i].GetName() == name)
-                {
+                if(Configs.Connections[i].Name == name)
                     return Configs.Connections[i];
-                }
-            }
             for (int i = 0; i < Configs.UserSetting.Count; i++)
-            {
-                if (Configs.UserSetting[i].GetName() == name)
-                {
+                if (Configs.UserSetting[i].Name == name)
                     return Configs.UserSetting[i];
-                }
-            }
-
             for (int i = 0; i < Configs.SNSSetting.Count; i++)
-            {
-                if (Configs.SNSSetting[i].GetName() == name)
-                {
+                if (Configs.SNSSetting[i].Name == name)
                     return Configs.SNSSetting[i];
-                }
-            }
+            for (int i = 0; i < Configs.SoundSetting.Count; i++)
+                if (Configs.SoundSetting[i].Name == name)
+                    return Configs.SoundSetting[i];
             return null;
         }
         object GetConfigValue(string name)
         {
             var cls = GetConfigClass(name);
             if (cls == null) return 0;
-            return (object)cls.GetValue();
+            return cls.Value;
         }
 
 
@@ -168,7 +150,7 @@ namespace MisakiEQ.Lib.Config
                 if (IsThrow) throw new ArgumentNullException($"\"{name}\"はConfig上に存在しません。");
                 return;
             }
-            cls.ConfigRead(value);
+            cls.Config = value;
         }
         public void DiscardConfig()
         {
@@ -260,72 +242,103 @@ namespace MisakiEQ.Lib.Config
                 if (Type != "function") throw new InvalidOperationException($"{Type}型は関数設定できません！");
                 FunctionAction = act;
             }
-            public void SetValue(long val)
+            public object Value
             {
-                if (Type != "long") throw new ArgumentException($"[{Name}]は{Type}で管理されていますが、longで変更しようとしました。");
-                if (val < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{val} < {LongMin}");
-                if (val > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{val} > {LongMax}");
-                LongValue = val;
-            }
-            public void SetValue(string val)
-            {
-                if (Type != "string") throw new ArgumentException($"[{Name}]は{Type}で管理されていますが、stringで変更しようとしました。");
-                StringValue = val;
-            }
-            public void SetValue(bool val)
-            {
-                if(Type != "bool") throw new ArgumentException($"[{Name}]は{Type}で管理されていますが、boolで変更しようとしました。");
-                BooleanValue = val;
-            }
-            public object GetValue()
-            {
-                return Type switch
+                get
                 {
-                    "long" => (object)(long)LongValue,
-                    "string"=> (object)(string)StringValue,
-                    "bool" => (object)(bool)BooleanValue,
-                    _ => throw new NullReferenceException("タイプが一致しません。"),
-                };
-            }
-
-            public object ConfigWrite()
-            {
-                return Type switch
+                    return Type switch
+                    {
+                        "long" => LongValue,
+                        "string" => StringValue,
+                        "bool" => BooleanValue,
+                        _ => throw new InvalidDataException($"[{Name}]は値がありません。"),
+                    };
+                }
+                set
                 {
-                    "long" => (object)LongValue,
-                    "string" => StringValue.Replace("%","%%").Replace("=","%3D").Replace("\n","%0D"),
-                    "bool" => BooleanValue,
-                    _ => throw new NullReferenceException("タイプが一致しません。"),
-                };
+                    switch (Type)
+                    {
+                        case "long":
+                            if (value.GetType() == typeof(short))
+                            {
+                                if (LongMin < short.MinValue || LongMax > short.MaxValue) throw new ArgumentOutOfRangeException($"[{Name}]の設定可能値はshort型からオーバーフローしています。long型で変更してください。");
+                                if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} < {LongMin}");
+                                if ((long)value > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} > {LongMax}");
+                                LongValue = (long)value;
+                            }
+                            else
+                            if (value.GetType() == typeof(int))
+                            {
+                                if (LongMin < int.MinValue || LongMax > int.MaxValue) throw new ArgumentOutOfRangeException($"[{Name}]の設定可能値はint型オーバーフローしています。long型で変更してください。");
+                                if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} < {LongMin}");
+                                if ((long)value > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} > {LongMax}");
+                                LongValue = (long)value;
+                            }
+                            else if (value.GetType() == typeof(long))
+                            {
+                                if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} < {LongMin}");
+                                if ((long)value > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} > {LongMax}");
+                                LongValue = (long)value;
+                            }
+                            else
+                                throw new InvalidCastException($"[{Name}]は整数型しか対応していませんが、{value.GetType()}で変更しようとしました。");
+                            break;
+                        case "string":
+                            if (value.GetType() != typeof(string)) throw new InvalidCastException($"[{Name}]はstring型しか対応していませんが、{value.GetType()}で変更しようとしました。");
+                            StringValue = (string)value;
+                            break;
+                        case "bool":
+                            if(value.GetType()!=typeof(bool)) throw new InvalidCastException($"[{Name}]はbool型しか対応していませんが、{value.GetType()}で変更しようとしました。");
+                            BooleanValue = (bool)value;
+                            break;
+                        default:
+                            throw new InvalidDataException($"[{Name}は値を設定することができません。");
+                    }
+                }
             }
-            public void ConfigRead(string val)
+            public string Config
             {
-                switch (Type)
+                get
                 {
-                    case "long": 
-                        long value= long.Parse(val);
-                        if (value < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{val} < {LongMin}");
-                        if (value > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{val} > {LongMax}");
-                        LongValue = value;
-                        break;
-                    case "string": 
-                        string? str = (string?)val;
-                        if (string.IsNullOrEmpty(str)) str = string.Empty;
-                        StringValue = str.Replace("%0D", "\n").Replace("%3D", "=").Replace("%%", "%");
-                        break;
-                    case "bool":
-                        if (val.ToLower() == "true"|| val == "0")
-                        {
-                            BooleanValue = true;
-                        }else if (val.ToLower() == "false"||val=="1")
-                        {
-                            BooleanValue = false;
-                        }
-                        else
-                        {
-                            throw new ArgumentException($"bool型ではない、もしくは正しく検出できませんでした。val=\"{val}\"", nameof(val));
-                        }
-                        break;
+                    if (Type == "function") return string.Empty;
+                    return Name+"="+Type switch
+                    {
+                        "long" => LongValue.ToString(),
+                        "string" => StringValue.Replace("%", "%%").Replace("=", "%3D").Replace("\n", "%0D"),
+                        "bool" => BooleanValue.ToString(),
+                        _ => throw new NullReferenceException("タイプが一致しません。"),
+                    }+Environment.NewLine;
+                }
+                set
+                {
+                    switch (Type)
+                    {
+                        case "long":
+                            long val = long.Parse(value);
+                            if (val < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{val} < {LongMin}");
+                            if (val > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{val} > {LongMax}");
+                            LongValue = val;
+                            break;
+                        case "string":
+                            string? str = (string?)value;
+                            if (string.IsNullOrEmpty(str)) str = string.Empty;
+                            StringValue = str.Replace("%0D", "\n").Replace("%3D", "=").Replace("%%", "%");
+                            break;
+                        case "bool":
+                            if (value.ToLower() == "true" || value == "0")
+                            {
+                                BooleanValue = true;
+                            }
+                            else if (value.ToLower() == "false" || value == "1")
+                            {
+                                BooleanValue = false;
+                            }
+                            else
+                            {
+                                throw new ArgumentException($"bool型ではない、もしくは正しく検出できませんでした。val=\"{value}\"", nameof(value));
+                            }
+                            break;
+                    }
                 }
             }
             public void ExecuteAction()
@@ -352,7 +365,7 @@ namespace MisakiEQ.Lib.Config
                             ButtonChanged?.Invoke(this, EventArgs.Empty);
                         }catch(Exception ex)
                         {
-                            Log.Logger.GetInstance().Warn(ex.Message);
+                            Logger.GetInstance().Warn(ex.Message);
                         }
                     }
                 }
@@ -363,38 +376,6 @@ namespace MisakiEQ.Lib.Config
                 if (Type != "function") throw new InvalidCastException($"{Type}型は実行できません。");
                 if (IsWorking) return FunctionWorking?? FunctionReady;
                 else return FunctionReady;
-            }
-            public string GetName()
-            {
-                return Name;
-            }
-            public string GetManageType()
-            {
-                return Type;
-            }
-            public string GetTitle()
-            {
-                return Title;
-            }
-            public string GetDescription()
-            {
-                return Description;
-            }
-            public object GetMin()
-            {
-                return Type switch
-                {
-                    "long" => (object)LongMin,
-                    _ => throw new ArgumentException("タイプが一致しません。"),
-                };
-            }
-            public object GetMax()
-            {
-                return Type switch
-                {
-                    "long" => (object)LongMax,
-                    _ => throw new ArgumentException("タイプが一致しません。"),
-                };
             }
             public string GetToggleOffText()
             {
@@ -413,24 +394,6 @@ namespace MisakiEQ.Lib.Config
                 };
             }
 
-            public object GetDefault()
-            {
-                return Type switch
-                {
-                    "long" => (object)LongDefault,
-                    "string"=> (object)StringDefault,
-                    "bool"=>(object)BooleanDefault,
-                    _ => throw new ArgumentException("タイプが一致しません。"),
-                };
-            }
-            public string GetUnitName()
-            {
-                return Type switch
-                {
-                    "long" => UnitName,
-                    _ => throw new ArgumentException("タイプが一致しません。"),
-                };
-            }
             public double GetDisplayMag()
             {
                 return Type switch
@@ -440,16 +403,144 @@ namespace MisakiEQ.Lib.Config
                 };
             }
 
-            
-            readonly string Type;
-            readonly string Name;
-            readonly string Title;
-            readonly string UnitName = "";
-            readonly string Description;
+            string _type="Unknown";
+            string _name="";
+            string _title = "";
+            string _unitName = "";
+            string _description = "";
+
+            public string Type
+            {
+                get => _type; 
+                private set => _type = value; 
+            }
+            public string Name
+            {
+                get => _name; 
+                private set => _name = value;
+            }
+            public string Title
+            {
+                get => _title;
+                private set => _title = value;
+            }
+            public string UnitName
+            {
+                get { if (Type != "long") throw new InvalidCastException($"\"{Type}\"longに変換できません。");
+                    return _unitName; } 
+                private set => _unitName = value; 
+            }
+            public string Description
+            {
+                get => _description;
+                private set => _description = value;
+            }
+            public object Min
+            {
+                get
+                {
+                    return Type switch
+                    {
+                        "long" => (object)LongMin,
+                        _ => throw new ArgumentException("タイプが一致しません。"),
+                    };
+                }
+                private set
+                {
+                    switch(Type)
+                    {
+                        case "long":
+                            if (value.GetType() == typeof(long))
+                            {
+                                if ((long)value > LongMax) throw new ArgumentOutOfRangeException($"値は必ずMaxより小さければなりません。 {(long)value}<={LongMax}");
+                                LongMin = (long)value;
+                            }else if(value.GetType() == typeof(int))
+                            {
+                                if ((int)value > LongMax) throw new ArgumentOutOfRangeException($"値は必ずMaxより小さければなりません。 {(long)value}<={LongMax}");
+                                LongMin = (int)value;
+                            }
+                            else
+                            {
+                                throw new InvalidCastException($"{value.GetType()}は整数型に変換できません。");
+                            }
+                        break;
+                        default: throw new ArgumentException("タイプが一致しません。");
+                    }
+                }
+            }
+            public object Max
+            {
+                get
+                {
+                    return Type switch
+                    {
+                        "long" => (object)LongMax,
+                        _ => throw new ArgumentException("タイプが一致しません。"),
+                    };
+                }
+                private set
+                {
+                    switch (Type)
+                    {
+                        case "long":
+                            if (value.GetType() == typeof(long))
+                            {
+                                if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"値は必ずMinより大きければなりません。 {(long)value}>={LongMin}");
+                                LongMax = (long)value;
+                            }
+                            else if (value.GetType() == typeof(int))
+                            {
+                                if ((int)value < LongMin) throw new ArgumentOutOfRangeException($"値は必ずMinより大きければなりません。 {(long)value}>={LongMin}");
+                                LongMax = (int)value;
+                            }
+                            else
+                            {
+                                throw new InvalidCastException($"{value.GetType()}は整数型に変換できません。");
+                            }
+                            break;
+                        default: throw new ArgumentException("タイプが一致しません。");
+                    }
+                }
+            }
+            public object Default
+            {
+                get
+                {
+                    return Type switch
+                    {
+                        "long" => LongDefault,
+                        "string" => StringDefault,
+                        "bool" => BooleanDefault,
+                        _ => throw new ArgumentException("タイプが一致しません。"),
+                    };
+                }
+                private set
+                {
+                    switch (Type)
+                    {
+                        case "long":
+                            if (value.GetType() == typeof(long))
+                            {
+                                if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"値は必ずMinより大きければなりません。 {(long)value}>={LongMin}");
+                                LongDefault = (long)value;
+                            }
+                            else if (value.GetType() == typeof(int))
+                            {
+                                LongDefault = (int)value;
+                            }
+                            else
+                            {
+                                throw new InvalidCastException($"{value.GetType()}は整数型に変換できません。");
+                            }
+                            break;
+                        default: throw new ArgumentException("タイプが一致しません。");
+                    }
+                }
+            }
             long LongValue;
-            readonly long LongMin;
-            readonly long LongMax;
-            readonly long LongDefault;
+            long LongMin;
+            long LongMax;
+            long LongDefault;
             readonly double DisplayMag;
             string StringValue="";
             readonly string StringDefault="";
