@@ -85,40 +85,41 @@ namespace MisakiEQ.Funcs
                     {
                         tmp.MaxIntensity = eew.EarthQuake.MaxIntensity;
                         SoundController? controll = null;
+                        var ins = Sounds.GetInstance();
                         switch (eew.EarthQuake.MaxIntensity)
                         {
                             case Struct.Common.Intensity.Unknown:
                             case Struct.Common.Intensity.Int0:
-                                controll = await Sounds.GetInstance().GetSound("EEW_None");
+                                controll = await ins.GetSound("EEW_None");
                                 break;
                             case Struct.Common.Intensity.Int1:
-                                controll = await Sounds.GetInstance().GetSound("EEW_shindo1");
+                                controll = await ins.GetSound("EEW_shindo1");
                                 break;
                             case Struct.Common.Intensity.Int2:
-                                controll = await Sounds.GetInstance().GetSound("EEW_shindo2");
+                                controll = await ins.GetSound("EEW_shindo2");
                                 break;
                             case Struct.Common.Intensity.Int3:
-                                controll = await Sounds.GetInstance().GetSound("EEW_shindo3");
+                                controll = await ins.GetSound("EEW_shindo3");
                                 break;
                             case Struct.Common.Intensity.Int4:
-                                controll = await Sounds.GetInstance().GetSound("EEW_shindo4");
+                                controll = await ins.GetSound("EEW_shindo4");
                                 break;
                             case Struct.Common.Intensity.Int5Down:
                             case Struct.Common.Intensity.Int5Up:
-                                controll = await Sounds.GetInstance().GetSound("EEW_shindo5");
+                                controll = await ins.GetSound("EEW_shindo5");
                                 break;
                             case Struct.Common.Intensity.Int6Down:
                             case Struct.Common.Intensity.Int6Up:
-                                controll = await Sounds.GetInstance().GetSound("EEW_shindo6");
+                                controll = await ins.GetSound("EEW_shindo6");
                                 break;
                             case Struct.Common.Intensity.Int7:
-                                controll = await Sounds.GetInstance().GetSound("EEW_shindo7");
+                                controll = await ins.GetSound("EEW_shindo7");
                                 break;
                         }
 
                         if (controll != null)
                         {
-                            controll.Volume = Sounds.GetInstance().Config.EEWVolume;
+                            controll.Volume = ins.Config.EEWVolume;
                             controll.Replay();
                         }
                     }
@@ -141,28 +142,37 @@ namespace MisakiEQ.Funcs
 
         public static async void SoundEarthquake(Struct.EarthQuake eq)
         {
+            SoundController? controll = null;
+            var ins = Sounds.GetInstance();
             switch (eq.Issue.Type)
             {
                 case Struct.EarthQuake.EarthQuakeType.ScalePrompt:
                     if (eq.Details.MaxIntensity >= Struct.Common.Intensity.Int5Down)
-                        (await Sounds.GetInstance().GetSound("Earthquake_High")).Replay();
-                    else 
-                        (await Sounds.GetInstance().GetSound("Earthquake_Mid")).Replay();
+                        controll = await ins.GetSound("Earthquake_High");
+                    else
+                        controll = await ins.GetSound("Earthquake_Mid");
                     break;
                 case Struct.EarthQuake.EarthQuakeType.Destination:
                 case Struct.EarthQuake.EarthQuakeType.ScaleAndDestination:
-                    (await Sounds.GetInstance().GetSound("Earthquake_Prompt")).Replay();
+                    controll = await ins.GetSound("Earthquake_Prompt");
                     break;
                 case Struct.EarthQuake.EarthQuakeType.DetailScale:
-                    (await Sounds.GetInstance().GetSound("Earthquake_Low")).Replay();
+                    controll = await ins.GetSound("Earthquake_Low");
                     break;
+            }
+            if (controll != null)
+            {
+                controll.Volume = ins.Config.EarthquakeVolume;
+                controll.Replay();
             }
         }
         public static async void SoundTsunami(Struct.Tsunami data)
         {
+            SoundController? controll = null;
+            var ins = Sounds.GetInstance();
             if (data.Cancelled)
             {
-                (await Sounds.GetInstance().GetSound("Tsunami_Cancel")).Replay();
+                controll = await ins.GetSound("Tsunami_Cancel");
             }
             else
             {
@@ -183,11 +193,16 @@ namespace MisakiEQ.Funcs
                     }
                 }
                 if (mwarn > 0)
-                    (await Sounds.GetInstance().GetSound("Tsunami_MajorWarn")).Replay();
+                    controll = await ins.GetSound("Tsunami_MajorWarn");
                 else if (warn > 0)
-                    (await Sounds.GetInstance().GetSound("Tsunami_Warn")).Replay();
+                    controll = await ins.GetSound("Tsunami_Warn");
                 else if (watch > 0)
-                    (await Sounds.GetInstance().GetSound("Tsunami_Watch")).Replay();
+                    controll = await ins.GetSound("Tsunami_Watch");
+            }
+            if (controll != null)
+            {
+                controll.Volume = ins.Config.TsunamiVolume;
+                controll.Replay();
             }
         }
     }
