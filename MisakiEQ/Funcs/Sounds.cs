@@ -119,7 +119,7 @@ namespace MisakiEQ.Funcs
 
                         if (controll != null)
                         {
-                            controll.Volume = ins.Config.EEWVolume;
+                            controll.Volume = ins.Config.EEWVolume / 100f; ;
                             controll.Replay();
                         }
                     }
@@ -162,7 +162,7 @@ namespace MisakiEQ.Funcs
             }
             if (controll != null)
             {
-                controll.Volume = ins.Config.EarthquakeVolume;
+                controll.Volume = ins.Config.EarthquakeVolume / 100f; ;
                 controll.Replay();
             }
         }
@@ -201,7 +201,7 @@ namespace MisakiEQ.Funcs
             }
             if (controll != null)
             {
-                controll.Volume = ins.Config.TsunamiVolume;
+                controll.Volume = ins.Config.TsunamiVolume/100f;
                 controll.Replay();
             }
         }

@@ -11,7 +11,7 @@ namespace MisakiEQ.Background.API.EEW
         public uint Delay;
         ///<summary>検出時の遅延(ms)/summary>
         public uint DelayDetectMode;
-        ///<summary>検出から通常時に戻る時間(ms)/summary>
+        ///<summary>検出から通常時に戻る時間(ms)</summary>
         public uint DelayDetectCoolDown;
     }
 }
