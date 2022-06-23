@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MisakiEQ.Lib;
+using MisakiEQ.Lib.Sound;
 using MisakiEQ.Properties;
 using MisakiEQ.Struct;
 namespace MisakiEQ.Funcs
@@ -78,44 +78,51 @@ namespace MisakiEQ.Funcs
                             eewsound[i].LatestTime = DateTime.Now;
                             Index = i;
                             IsNew = false;
+                            break;
                         }
                     }
                     if (IsNew || tmp.MaxIntensity < eew.EarthQuake.MaxIntensity)
                     {
                         tmp.MaxIntensity = eew.EarthQuake.MaxIntensity;
+                        SoundController? controll = null;
                         switch (eew.EarthQuake.MaxIntensity)
                         {
                             case Struct.Common.Intensity.Unknown:
                             case Struct.Common.Intensity.Int0:
-                                (await Sounds.GetInstance().GetSound("EEW_None")).Replay();
+                                controll = await Sounds.GetInstance().GetSound("EEW_None");
                                 break;
                             case Struct.Common.Intensity.Int1:
-                                (await Sounds.GetInstance().GetSound("EEW_shindo1")).Replay();
+                                controll = await Sounds.GetInstance().GetSound("EEW_shindo1");
                                 break;
                             case Struct.Common.Intensity.Int2:
-                                (await Sounds.GetInstance().GetSound("EEW_shindo2")).Replay();
+                                controll = await Sounds.GetInstance().GetSound("EEW_shindo2");
                                 break;
                             case Struct.Common.Intensity.Int3:
-                                (await Sounds.GetInstance().GetSound("EEW_shindo3")).Replay();
+                                controll = await Sounds.GetInstance().GetSound("EEW_shindo3");
                                 break;
                             case Struct.Common.Intensity.Int4:
-                                (await Sounds.GetInstance().GetSound("EEW_shindo4")).Replay();
+                                controll = await Sounds.GetInstance().GetSound("EEW_shindo4");
                                 break;
                             case Struct.Common.Intensity.Int5Down:
                             case Struct.Common.Intensity.Int5Up:
-                                (await Sounds.GetInstance().GetSound("EEW_shindo5")).Replay();
+                                controll = await Sounds.GetInstance().GetSound("EEW_shindo5");
                                 break;
                             case Struct.Common.Intensity.Int6Down:
                             case Struct.Common.Intensity.Int6Up:
-                                (await Sounds.GetInstance().GetSound("EEW_shindo6")).Replay();
+                                controll = await Sounds.GetInstance().GetSound("EEW_shindo6");
                                 break;
                             case Struct.Common.Intensity.Int7:
-                                (await Sounds.GetInstance().GetSound("EEW_shindo7")).Replay();
+                                controll = await Sounds.GetInstance().GetSound("EEW_shindo7");
                                 break;
                         }
 
+                        if (controll != null)
+                        {
+                            controll.Volume = Sounds.GetInstance().Config.EEWVolume;
+                            controll.Replay();
+                        }
                     }
-
+                    if (IsNew) eewsound.Add(tmp);
                     for (int i = eewsound.Count - 1; i >= 0; i--)
                     {
                         TimeSpan T = DateTime.Now - eewsound[i].LatestTime;

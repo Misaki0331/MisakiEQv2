@@ -80,6 +80,12 @@ namespace MisakiEQ.GUI.ExApp
                             g.DrawImage(image, x: 0, y: 0);
                         }
                     }
+                    if (api.KyoshinAPI.Config.UserDisplay)
+                    {
+                        var pnt = Lib.KyoshinLib.LALtoKyoshinMap(new Struct.Common.LAL(api.KyoshinAPI.Config.UserLong, api.KyoshinAPI.Config.UserLat));
+                        g.FillRectangle(Brushes.Magenta, (int)pnt.X - 5, (int)pnt.Y - 1, 11, 3);
+                        g.FillRectangle(Brushes.Magenta, (int)pnt.X - 1, (int)pnt.Y - 5, 3, 11);
+                    }
                     g.Dispose();
                     var tmp = KyoshinImage.Image;
                     KyoshinImage.Image = img;

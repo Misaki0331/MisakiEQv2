@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using NAudio.Wave;
 using MisakiEQ.Log;
 
-namespace MisakiEQ.Lib
+namespace MisakiEQ.Lib.Sound
 {
     public class SoundController
     {
@@ -43,9 +43,10 @@ namespace MisakiEQ.Lib
                     if (audio != null) audio.CurrentTime = TimeSpan.FromSeconds(sec);
                     if (wav != null) wav.CurrentTime = TimeSpan.FromSeconds(sec);
                     if (mp3 != null) mp3.CurrentTime = TimeSpan.FromSeconds(sec);
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
-                    Log.Logger.GetInstance().Error(ex);
+                    Logger.GetInstance().Error(ex);
                 }
             }
             public double GetPosition()
@@ -71,7 +72,7 @@ namespace MisakiEQ.Lib
                 }
             }
         }
-        readonly WaveOut wav=new();
+        readonly WaveOut wav = new();
         readonly Reader readers = new();
         public SoundController()
         {
@@ -80,7 +81,7 @@ namespace MisakiEQ.Lib
         {
             FileInit(FileName);
         }
-        
+
         public bool FileInit(string FileName)
         {
             try
@@ -91,7 +92,8 @@ namespace MisakiEQ.Lib
                 wav.Init(reader);
                 Logger.GetInstance().Debug($"\"{FileName}\"のwaveファイルを読み込みました。");
                 return true;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Logger.GetInstance().Error(ex);
                 return false;
@@ -102,14 +104,14 @@ namespace MisakiEQ.Lib
         {
             try
             {
-                streams= new MemoryStream(stream);
+                streams = new MemoryStream(stream);
                 var reader = new WaveFileReader(streams);
                 readers.Init(reader);
                 wav.Init(reader);
                 Logger.GetInstance().Debug($"waveストリームを読み込みました。");
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.GetInstance().Error(ex);
                 return false;
@@ -132,7 +134,8 @@ namespace MisakiEQ.Lib
                 return false;
             }
         }
-        public void Dispose(){
+        public void Dispose()
+        {
             wav.Dispose();
         }
         public bool IsPlaying { get { return wav.PlaybackState == PlaybackState.Playing; } }
@@ -155,7 +158,7 @@ namespace MisakiEQ.Lib
         }
         public void Pause()
         {
-                wav.Pause();
+            wav.Pause();
         }
         public void Stop()
         {
@@ -185,6 +188,7 @@ namespace MisakiEQ.Lib
             }
             return singleton;
         }
+        public Config Config = new();
         public class SoundList
         {
             public SoundList(string name)
@@ -212,7 +216,7 @@ namespace MisakiEQ.Lib
                 sounds.Add(new(str));
                 return sounds[^1].controller;
             });
-            
+
         }
         public async Task<bool> DeleteSound(string str)
         {

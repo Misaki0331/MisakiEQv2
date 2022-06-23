@@ -16,6 +16,7 @@ namespace MisakiEQ.GUI
 #pragma warning disable IDE0052 // 読み取られていないプライベート メンバーを削除
         readonly Lib.ConfigController.Controller? ConnectionSetting;
         readonly Lib.ConfigController.Controller? UserSetting;
+        readonly Lib.ConfigController.Controller? SoundSetting;
 #if DEBUG || ADMIN
         readonly Lib.ConfigController.Controller? SNSSetting;
 #endif
@@ -28,6 +29,7 @@ namespace MisakiEQ.GUI
             var config = Lib.Config.Funcs.GetInstance().Configs;
             ConnectionSetting = new Lib.ConfigController.Controller(groupBox1, config.Connections);
             UserSetting = new Lib.ConfigController.Controller(groupBox2, config.UserSetting);
+            SoundSetting = new Lib.ConfigController.Controller(groupBox4, config.SoundSetting);
             LabelVersion.Text = $"バージョン : {Properties.Version.Name}";
             Icon = Properties.Resources.Logo_MainIcon;
 #if ADMIN
@@ -132,7 +134,7 @@ namespace MisakiEQ.GUI
 
         private void LinkToDevTwitter_Click(object sender, EventArgs e)
         {
-            Process.Start("https://twitter.com/0x7FF");
+            OpenLink("https://twitter.com/0x7FF");
         }
 
         private void LinkToKoFi_Click(object sender, EventArgs e)
