@@ -35,15 +35,15 @@ namespace MisakiEQ.Lib.Config
                 using var sw = new StreamWriter(CfgFile, false, Encoding.UTF8);
                 for(int i = 0; i < Configs.Connections.Count; i++)
                 {
-                    sw.WriteLine($"{Configs.Connections[i].GetName()}={Configs.Connections[i].ConfigWrite()}");
+                    if(Configs.Connections[i].GetManageType()!="function")sw.WriteLine($"{Configs.Connections[i].GetName()}={Configs.Connections[i].ConfigWrite()}");
                 }
                 for (int i = 0; i < Configs.UserSetting.Count; i++)
                 {
-                    sw.WriteLine($"{Configs.UserSetting[i].GetName()}={Configs.UserSetting[i].ConfigWrite()}");
+                    if (Configs.UserSetting[i].GetManageType() != "function")sw.WriteLine($"{Configs.UserSetting[i].GetName()}={Configs.UserSetting[i].ConfigWrite()}");
                 }
                 for (int i = 0; i < Configs.SNSSetting.Count; i++)
                 {
-                    sw.WriteLine($"{Configs.SNSSetting[i].GetName()}={Configs.SNSSetting[i].ConfigWrite()}");
+                    if (Configs.SNSSetting[i].GetManageType() != "function") sw.WriteLine($"{Configs.SNSSetting[i].GetName()}={Configs.SNSSetting[i].ConfigWrite()}");
                 }
                 sw.Close();
 
@@ -126,7 +126,7 @@ namespace MisakiEQ.Lib.Config
             Twitter.APIs.GetInstance().Config.TweetEnabled = (GetConfigValue("Twitter_Enable_Tweet") as bool? ?? false);
 #endif
         }
-        IndexData? GetConfigClass(string name)
+        public IndexData? GetConfigClass(string name)
         {
             for(int i = 0; i<Configs.Connections.Count; i++)
             {
@@ -196,6 +196,7 @@ namespace MisakiEQ.Lib.Config
                 UserSetting.Add(new IndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
                 UserSetting.Add(new IndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示","強震モニタに非表示"));   //取得時の配列の数
 #if ADMIN||DEBUG
+                SNSSetting.Add(new IndexData("Twitter_Auth", "Twitter認証", "アカウント認証します","認証",WorkingTitle:"認証中..."));
                 SNSSetting.Add(new IndexData("Twitter_Enable_Tweet", "自動ツイートの有効化", "自動でユーザーに地震情報をツイートします", def: false, "自動ツイートが有効", "自動ツイートが無効"));
 #endif
                 SoundSetting.Add(new IndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
@@ -242,6 +243,22 @@ namespace MisakiEQ.Lib.Config
                 Type = "bool";
                 BoolToggleOn = ToggleOnText;
                 BoolToggleOff = ToggleOffText;
+            }
+            public IndexData(string name, string title, string description, string ReadyTitle, Action? action=null,string? WorkingTitle = null)
+            {
+                Description = description;
+                Name = name;
+                Title = title;
+                Type = "function";
+                FunctionAction = action;
+                FunctionReady = ReadyTitle;
+                FunctionWorking = WorkingTitle;
+
+            }
+            public void SetAction(Action act)
+            {
+                if (Type != "function") throw new InvalidOperationException($"{Type}型は関数設定できません！");
+                FunctionAction = act;
             }
             public void SetValue(long val)
             {
@@ -310,6 +327,42 @@ namespace MisakiEQ.Lib.Config
                         }
                         break;
                 }
+            }
+            public void ExecuteAction()
+            {
+                if (Type != "function") throw new InvalidCastException($"{Type}型は実行できません。");
+                Task.Run(() => { FunctionAction?.Invoke(); });
+            }
+            bool __buttonEnable = true;
+            public bool ButtonEnable
+            {
+                get
+                {
+                    if (Type != "function") throw new InvalidCastException($"{Type}型は実行できません。");
+                    return __buttonEnable;
+                }
+                set
+                {
+                    if(Type!="function") throw new InvalidCastException($"{Type}型は実行できません。");
+                    if (__buttonEnable != value)
+                    {
+                        __buttonEnable = value;
+                        try
+                        {
+                            ButtonChanged?.Invoke(this, EventArgs.Empty);
+                        }catch(Exception ex)
+                        {
+                            Log.Logger.GetInstance().Warn(ex.Message);
+                        }
+                    }
+                }
+            }
+            public EventHandler<EventArgs>? ButtonChanged = null;
+            public string GetButton(bool IsWorking)
+            {
+                if (Type != "function") throw new InvalidCastException($"{Type}型は実行できません。");
+                if (IsWorking) return FunctionWorking?? FunctionReady;
+                else return FunctionReady;
             }
             public string GetName()
             {
@@ -404,6 +457,9 @@ namespace MisakiEQ.Lib.Config
             readonly bool BooleanDefault = false;
             readonly string BoolToggleOn = "";
             readonly string BoolToggleOff = "";
+            Action? FunctionAction = null;
+            readonly string FunctionReady = "";
+            readonly string? FunctionWorking = null;
 
         }
     }

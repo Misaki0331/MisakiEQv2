@@ -39,6 +39,33 @@ namespace MisakiEQ.GUI
 #endif
 #if ADMIN || DEBUG
             SNSSetting = new Lib.ConfigController.Controller(groupBox3, config.SNSSetting);
+            var fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth");
+            fc?.SetAction(() =>
+            {
+                fc.ButtonEnable = false;
+                Process.Start(new ProcessStartInfo(Lib.Twitter.APIs.GetInstance().GetAuthURL().Result)
+                {
+                    UseShellExecute = true
+                });
+                this.Invoke(() =>
+                {
+                    try
+                    {
+
+                        if (TwitterAuthGUI != null && TwitterAuthGUI.Visible) TwitterAuthGUI.Close();
+                        TwitterAuthGUI = new();
+                        TwitterAuthGUI.ShowDialog();
+
+                        TwitterAuthInfo.Text = $"@{Lib.Twitter.APIs.GetInstance().GetUserScreenID()} - {Lib.Twitter.APIs.GetInstance().GetUserName()} " +
+                        $"(Follower:{Lib.Twitter.APIs.GetInstance().GetUserFollowers()} Tweet:{Lib.Twitter.APIs.GetInstance().GetUserTweets()})";
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Logger.GetInstance().Error(ex);
+                    }
+                });
+                fc.ButtonEnable = true;
+            });
             TwitterAuthInfo.Text = $"@{Lib.Twitter.APIs.GetInstance().GetUserScreenID()} - {Lib.Twitter.APIs.GetInstance().GetUserName()} " +
             $"(Follower:{Lib.Twitter.APIs.GetInstance().GetUserFollowers()} Tweet:{Lib.Twitter.APIs.GetInstance().GetUserTweets()})";
             AuthTwitter.Visible = true;

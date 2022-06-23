@@ -27,6 +27,7 @@ namespace MisakiEQ.Lib.ConfigController
         public NumericUpDown ToolNumUD = new();
         public TextBox ToolTextBox = new();
         public CheckBox ToolCheckBox = new();
+        public Button ToolButton = new();
         readonly Config.Funcs.IndexData cl;
         void LongInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
         {
@@ -90,6 +91,16 @@ namespace MisakiEQ.Lib.ConfigController
             ToolCheckBox.CheckedChanged += new EventHandler(CheckBoxChanged);
             ToolCheckBox.TextAlign = ContentAlignment.MiddleCenter;
         }
+        void FunctionInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
+        {
+            gb.Controls.Add(ToolButton);
+            ToolButton.Location = new Point(122, 22 + pos * 23);
+            ToolButton.Size = new Size(189, 23);
+            ToolButton.Click += ButtonClick;
+            ToolButton.Text = data.GetButton(!data.ButtonEnable);
+            ToolButton.Enabled = data.ButtonEnable;
+            data.ButtonChanged += ButtonChanged;
+        }
         public ToolBox(GroupBox gb, Config.Funcs.IndexData data, int pos)//,)
         {
             cl = data;
@@ -104,9 +115,22 @@ namespace MisakiEQ.Lib.ConfigController
                 case "long":LongInit(gb,data, pos);break;
                 case "string":StringInit(gb, data, pos); break;
                 case "bool":BoolInit(gb, data, pos);break;
+                case "function":FunctionInit(gb, data, pos);break;
             }
 
             
+        }
+        void ButtonClick(object? sender, EventArgs e)
+        {
+            cl.ExecuteAction();
+        }
+        void ButtonChanged(object? sender, EventArgs e)
+        {
+            ToolButton.Invoke(() =>
+            {
+                ToolButton.Enabled = cl.ButtonEnable;
+                ToolButton.Text = cl.GetButton(!cl.ButtonEnable);
+            });
         }
         void TrackChanged(object? sender, EventArgs e)
         {
