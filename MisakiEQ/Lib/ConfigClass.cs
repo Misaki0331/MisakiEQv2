@@ -13,6 +13,10 @@ namespace MisakiEQ.Lib.Config
     public class Funcs
     {
         static Funcs? singleton = null;
+        /// <summary>
+        /// インスタンスを取得します。
+        /// </summary>
+        /// <returns>Configのインスタンス</returns>
         public static Funcs GetInstance()
         {
             if (singleton == null)
@@ -26,7 +30,10 @@ namespace MisakiEQ.Lib.Config
 
         }
         private const string CfgFile = "Config.cfg";
-
+        /// <summary>
+        /// 現在のコンフィグ情報を保存します。
+        /// </summary>
+        /// <returns>保存が成功したかどうかのbool値</returns>
         public bool SaveConfig()
         {
             try
@@ -55,6 +62,10 @@ namespace MisakiEQ.Lib.Config
                 return false;
             }
         }
+        /// <summary>
+        /// ファイルからコンフィグ情報を読み込みます。
+        /// </summary>
+        /// <returns>読込が成功したかどうかのbool値</returns>
         public bool ReadConfig()
         {
             var sw = new Stopwatch();
@@ -101,6 +112,9 @@ namespace MisakiEQ.Lib.Config
                 return false;
             }
         }
+        /// <summary>
+        /// コンフィグをそれぞれの機能に変数の値を上書きします。
+        /// </summary>
         public void ApplyConfig()
         {
             var api = APIs.GetInstance();
@@ -124,26 +138,46 @@ namespace MisakiEQ.Lib.Config
             Twitter.APIs.GetInstance().Config.TweetEnabled = (GetConfigValue("Twitter_Enable_Tweet") as bool? ?? false);
 #endif
         }
+        /// <summary>
+        /// 名前からコンフィグのクラスを取得します。<br/>
+        /// 一致する名前がなければnullが返ります。
+        /// </summary>
+        /// <param name="name">登録されている名前</param>
+        /// <returns>一致するコンフィグクラス<br/>
+        /// 存在しない場合はnullが返ります</returns>
         public IndexData? GetConfigClass(string name)
         {
-            for(int i = 0; i < Configs.Data.Count; i++)
-            {
-                var config = Configs.Data[i].Setting;
-                for(int j = 0; j < config.Count; j++)
+                for (int i = 0; i < Configs.Data.Count; i++)
                 {
-                    if (config[j].Name==name) return config[j];
+                    var config = Configs.Data[i].Setting;
+                    for (int j = 0; j < config.Count; j++)
+                    {
+                        if (config[j].Name == name) return config[j];
+                    }
                 }
-            }
-            return null;
+                return null;
+                
+            
         }
-        object GetConfigValue(string name)
+        /// <summary>
+        /// nameからコンフィグの値を取得します。
+        /// </summary>
+        /// <param name="name">取得するコンフィグの名前</param>
+        /// <returns>名前に対応する値<br/>無ければnullが返ります。</returns>
+        object? GetConfigValue(string name)
         {
             var cls = GetConfigClass(name);
-            if (cls == null) return 0;
+            if (cls == null) return null;
             return cls.Value;
         }
 
-
+        /// <summary>
+        /// 対応する名前のコンフィグに値を書き込みます。
+        /// </summary>
+        /// <param name="name">値を設定したい名前</param>
+        /// <param name="value">設定する値</param>
+        /// <param name="IsThrow">存在しない時に例外をスローするか</param>
+        /// <exception cref="ArgumentNullException"></exception>
         void SetConfigValue(string name, string value, bool IsThrow=true)
         {
             var cls = GetConfigClass(name);
@@ -185,10 +219,21 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("SoundSetting",true)?.Add(new IndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
                 GetGroup("SoundSetting",true)?.Add(new IndexData("Sound_Volume_Tsunami", "津波情報の通知音量", "津波情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
             }
+            /// <summary>
+            /// 値リストをコピーします。
+            /// </summary>
+            /// <returns>クローンされたコンフィグクラス</returns>
             public Cfg Clone()
             {
                 return (Cfg)MemberwiseClone();
             }
+            /// <summary>
+            /// グループを取得します。
+            /// 存在しない場合はnullを返すか、新しいグループを返します。
+            /// </summary>
+            /// <param name="name">グループ名</param>
+            /// <param name="Create">存在しない時にグループを作成するか</param>
+            /// <returns>対応するグループ</returns>
             public List<IndexData>? GetGroup(string name, bool Create = false)
             {
                 for(int i = 0; i < Data.Count; i++)
@@ -260,11 +305,21 @@ namespace MisakiEQ.Lib.Config
                 FunctionWorking = WorkingTitle;
 
             }
+            /// <summary>
+            /// ラムダ式を設定します。
+            /// IndexDataのタイプが Function である必要があります。
+            /// そうでない場合は例外がスローされます。
+            /// </summary>
+            /// <param name="act">実行関数</param>
+            /// <exception cref="InvalidOperationException"></exception>
             public void SetAction(Action act)
             {
                 if (Type != "function") throw new InvalidOperationException($"{Type}型は関数設定できません！");
                 FunctionAction = act;
             }
+            /// <summary>
+            /// 値を設定または取得します。
+            /// </summary>
             public object Value
             {
                 get
@@ -319,6 +374,9 @@ namespace MisakiEQ.Lib.Config
                     }
                 }
             }
+            /// <summary>
+            /// コンフィグファイルの読書き用に使用されます。
+            /// </summary>
             public string Config
             {
                 get
@@ -364,12 +422,21 @@ namespace MisakiEQ.Lib.Config
                     }
                 }
             }
+            /// <summary>
+            /// Function関数の場合は関数が実行されます。<br/>
+            /// そうでない場合は例外がスローされます。
+            /// </summary>
+            /// <exception cref="InvalidCastException"></exception>
             public void ExecuteAction()
             {
                 if (Type != "function") throw new InvalidCastException($"{Type}型は実行できません。");
                 Task.Run(() => { FunctionAction?.Invoke(); });
             }
             bool __buttonEnable = true;
+            /// <summary>
+            /// ボタンが使用できるかどうかを設定します。<br/>
+            /// Function 型では無い場合は例外がスローされます。
+            /// </summary>
             public bool ButtonEnable
             {
                 get
@@ -393,7 +460,17 @@ namespace MisakiEQ.Lib.Config
                     }
                 }
             }
+            /// <summary>
+            /// ボタンの有効状態が変更された際に実行されるイベントです。
+            /// </summary>
             public EventHandler<EventArgs>? ButtonChanged = null;
+            /// <summary>
+            /// 有効中かそれ以外でボタンのテキストに設定する文字列を取得します。
+            /// Function型以外は例外がスローされます。
+            /// </summary>
+            /// <param name="IsWorking">有効中かどうか</param>
+            /// <returns>対応する文字列型</returns>
+            /// <exception cref="InvalidCastException"></exception>
             public string GetButton(bool IsWorking)
             {
                 if (Type != "function") throw new InvalidCastException($"{Type}型は実行できません。");
@@ -432,27 +509,43 @@ namespace MisakiEQ.Lib.Config
             string _unitName = "";
             string _description = "";
 
+            /// <summary>
+            /// 関数の型名
+            /// </summary>
             public string Type
             {
                 get => _type; 
                 private set => _type = value; 
             }
+            /// <summary>
+            /// 関数の名前
+            /// </summary>
             public string Name
             {
                 get => _name; 
                 private set => _name = value;
             }
+            /// <summary>
+            /// 関数の表示する文字列
+            /// </summary>
             public string Title
             {
                 get => _title;
                 private set => _title = value;
             }
+            /// <summary>
+            /// 数量名の設定<br/>
+            /// long型以外は例外がスローされます。
+            /// </summary>
             public string UnitName
             {
                 get { if (Type != "long") throw new InvalidCastException($"\"{Type}\"longに変換できません。");
                     return _unitName; } 
                 private set => _unitName = value; 
             }
+            /// <summary>
+            /// 説明
+            /// </summary>
             public string Description
             {
                 get => _description;
@@ -525,6 +618,9 @@ namespace MisakiEQ.Lib.Config
                     }
                 }
             }
+            /// <summary>
+            /// デフォルト値の取得
+            /// </summary>
             public object Default
             {
                 get

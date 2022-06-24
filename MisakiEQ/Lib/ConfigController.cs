@@ -66,6 +66,7 @@ namespace MisakiEQ.Lib.ConfigController
                 controllGroups[i].Location = new Point((Tab.Width - 15) / cnt * pos+5, sizelist[pos]);
                 sizelist[pos] += controllGroups[i].Height+5;
             }
+            Tab.Update();
         }
         
     }

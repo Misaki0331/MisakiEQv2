@@ -50,6 +50,7 @@
             this.ButtonApply = new System.Windows.Forms.Button();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOK = new System.Windows.Forms.Button();
+            this.SizeChange = new System.Windows.Forms.Timer(this.components);
             this.SettingTabs.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
@@ -270,6 +271,11 @@
             this.ButtonOK.UseVisualStyleBackColor = true;
             this.ButtonOK.Click += new System.EventHandler(this.ButtonOK_Click);
             // 
+            // SizeChange
+            // 
+            this.SizeChange.Interval = 500;
+            this.SizeChange.Tick += new System.EventHandler(this.SizeChange_Tick);
+            // 
             // Config_Menu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -320,5 +326,6 @@
         private Button LinkToDevTwitter;
         private Button LinkToKoFi;
         private Label LabelVersion;
+        private System.Windows.Forms.Timer SizeChange;
     }
 }

@@ -16,7 +16,6 @@ namespace MisakiEQ.GUI
 #pragma warning disable IDE0052 // 読み取られていないプライベート メンバーを削除
         readonly Lib.ConfigController.Controller? ConfigSetting;
 #if DEBUG || ADMIN
-        readonly Lib.ConfigController.Controller? SNSSetting;
 #endif
 #pragma warning restore IDE0052 // 読み取られていないプライベート メンバーを削除
 
@@ -174,14 +173,27 @@ namespace MisakiEQ.GUI
 
         private void Config_Menu_SizeChanged(object sender, EventArgs e)
         {
-
+            SizeChange.Stop();
+            SizeChange.Start();
             //796,596
-            SettingTabs.Size=new Size(Width-7, Height-121);
             LabelTime.Location = new Point(Width - 140, 27);
             LabelDate.Location = new Point(Width - 203, 0);
             ButtonOK.Location = new Point(Width - 255, Height-64);
             ButtonCancel.Location = new Point(Width - 175, Height - 64);
             ButtonApply.Location = new Point(Width-95, Height - 64);
+        }
+
+        private void SizeChange_Tick(object sender, EventArgs e)
+        {
+            Stopwatch st = new();
+            st.Start();
+            Log.Logger.GetInstance().Debug($"リサイズ開始");
+            SettingTabs.Size = new Size(Width - 7, Height - 122);
+            Log.Logger.GetInstance().Debug($"再リサイズ中 : {st.Elapsed}");
+            SettingTabs.Size = new Size(Width - 7, Height - 121);
+            st.Stop();
+            Log.Logger.GetInstance().Debug($"リサイズ完了 : {st.Elapsed}");
+            SizeChange.Stop();
         }
     }
 }
