@@ -116,11 +116,17 @@ namespace MisakiEQ.Funcs
                                 controll = await ins.GetSound("EEW_shindo7");
                                 break;
                         }
-
-                        if (controll != null)
+                        try
                         {
-                            controll.Volume = ins.Config.EEWVolume / 100f; ;
-                            controll.Replay();
+                            if (controll != null)
+                            {
+                                controll.Volume = ins.Config.EEWVolume / 100f; ;
+                                controll.Replay();
+                            }
+                        }catch(Exception ex)
+                        {
+                            Log.Logger.GetInstance().Error(ex);
+                            Init();
                         }
                     }
                     if (IsNew) eewsound.Add(tmp);
@@ -142,67 +148,84 @@ namespace MisakiEQ.Funcs
 
         public static async void SoundEarthquake(Struct.EarthQuake eq)
         {
-            SoundController? controll = null;
-            var ins = Sounds.GetInstance();
-            switch (eq.Issue.Type)
+            try
             {
-                case Struct.EarthQuake.EarthQuakeType.ScalePrompt:
-                    if (eq.Details.MaxIntensity >= Struct.Common.Intensity.Int5Down)
-                        controll = await ins.GetSound("Earthquake_High");
-                    else
-                        controll = await ins.GetSound("Earthquake_Mid");
-                    break;
-                case Struct.EarthQuake.EarthQuakeType.Destination:
-                case Struct.EarthQuake.EarthQuakeType.ScaleAndDestination:
-                    controll = await ins.GetSound("Earthquake_Prompt");
-                    break;
-                case Struct.EarthQuake.EarthQuakeType.DetailScale:
-                    controll = await ins.GetSound("Earthquake_Low");
-                    break;
+                SoundController? controll = null;
+                var ins = Sounds.GetInstance();
+                switch (eq.Issue.Type)
+                {
+                    case Struct.EarthQuake.EarthQuakeType.ScalePrompt:
+                        if (eq.Details.MaxIntensity >= Struct.Common.Intensity.Int5Down)
+                            controll = await ins.GetSound("Earthquake_High");
+                        else
+                            controll = await ins.GetSound("Earthquake_Mid");
+                        break;
+                    case Struct.EarthQuake.EarthQuakeType.Destination:
+                    case Struct.EarthQuake.EarthQuakeType.ScaleAndDestination:
+                        controll = await ins.GetSound("Earthquake_Prompt");
+                        break;
+                    case Struct.EarthQuake.EarthQuakeType.DetailScale:
+                        controll = await ins.GetSound("Earthquake_Low");
+                        break;
+                }
+                if (controll != null)
+                {
+                    controll.Volume = ins.Config.EarthquakeVolume / 100f; ;
+                    controll.Replay();
+
+                }
             }
-            if (controll != null)
+            catch (Exception ex)
             {
-                controll.Volume = ins.Config.EarthquakeVolume / 100f; ;
-                controll.Replay();
+                Log.Logger.GetInstance().Error(ex);
+                Init();
             }
         }
         public static async void SoundTsunami(Struct.Tsunami data)
         {
-            SoundController? controll = null;
-            var ins = Sounds.GetInstance();
-            if (data.Cancelled)
+            try
             {
-                controll = await ins.GetSound("Tsunami_Cancel");
-            }
-            else
-            {
-                int watch = 0, warn = 0, mwarn = 0;
-                for (int i = 0; i < data.Areas.Count; i++)
+                SoundController? controll = null;
+                var ins = Sounds.GetInstance();
+                if (data.Cancelled)
                 {
-                    switch (data.Areas[i].Grade)
-                    {
-                        case Tsunami.TsunamiGrade.Watch:
-                            watch++;
-                            break;
-                        case Tsunami.TsunamiGrade.Warning:
-                            warn++;
-                            break;
-                        case Tsunami.TsunamiGrade.MajorWarning:
-                            mwarn++;
-                            break;
-                    }
+                    controll = await ins.GetSound("Tsunami_Cancel");
                 }
-                if (mwarn > 0)
-                    controll = await ins.GetSound("Tsunami_MajorWarn");
-                else if (warn > 0)
-                    controll = await ins.GetSound("Tsunami_Warn");
-                else if (watch > 0)
-                    controll = await ins.GetSound("Tsunami_Watch");
+                else
+                {
+                    int watch = 0, warn = 0, mwarn = 0;
+                    for (int i = 0; i < data.Areas.Count; i++)
+                    {
+                        switch (data.Areas[i].Grade)
+                        {
+                            case Tsunami.TsunamiGrade.Watch:
+                                watch++;
+                                break;
+                            case Tsunami.TsunamiGrade.Warning:
+                                warn++;
+                                break;
+                            case Tsunami.TsunamiGrade.MajorWarning:
+                                mwarn++;
+                                break;
+                        }
+                    }
+                    if (mwarn > 0)
+                        controll = await ins.GetSound("Tsunami_MajorWarn");
+                    else if (warn > 0)
+                        controll = await ins.GetSound("Tsunami_Warn");
+                    else if (watch > 0)
+                        controll = await ins.GetSound("Tsunami_Watch");
+                }
+                if (controll != null)
+                {
+                    controll.Volume = ins.Config.TsunamiVolume / 100f;
+                    controll.Replay();
+                }
             }
-            if (controll != null)
+            catch(Exception ex)
             {
-                controll.Volume = ins.Config.TsunamiVolume/100f;
-                controll.Replay();
+                Log.Logger.GetInstance().Error(ex);
+                Init();
             }
         }
     }
