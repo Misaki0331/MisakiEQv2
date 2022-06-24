@@ -26,7 +26,7 @@ namespace MisakiEQ.Lib.ConfigController
             {
                 Groups.Add(new GroupBox());
                 tab.Controls.Add(Groups[^1]);
-                Groups[^1].Size = new Size(tab.Width / cnt-10, 32);
+                Groups[^1].Size = new Size((tab.Width-15) / cnt-10, 32);
                 controllGroups.Add(new(Groups[^1], list[i].Setting, list[i].Name)) ;
                 int pos = 0;
                 int min = int.MaxValue;
@@ -38,7 +38,7 @@ namespace MisakiEQ.Lib.ConfigController
                         pos = j;
                     }
                 }
-                controllGroups[^1].Location = new Point(tab.Width / cnt * pos+5, sizelist[pos]);
+                controllGroups[^1].Location = new Point((tab.Width - 15) / cnt * pos+5, sizelist[pos]);
                 sizelist[pos] += controllGroups[^1].Height+5;
             }
         }
@@ -52,7 +52,7 @@ namespace MisakiEQ.Lib.ConfigController
             for (int i = 0; i < cnt; i++) sizelist.Add(0);
             for (int i = 0; i < list.Count; i++)
             {
-                Groups[i].Size = new Size(Tab.Width / cnt-10, Groups[i].Size.Height);
+                Groups[i].Size = new Size((Tab.Width - 15) / cnt-10, Groups[i].Size.Height);
                 int pos = 0;
                 int min = int.MaxValue;
                 for (int j = 0; j < sizelist.Count; j++)
@@ -63,7 +63,7 @@ namespace MisakiEQ.Lib.ConfigController
                         pos = j;
                     }
                 }
-                controllGroups[i].Location = new Point(Tab.Width / cnt * pos+5, sizelist[pos]);
+                controllGroups[i].Location = new Point((Tab.Width - 15) / cnt * pos+5, sizelist[pos]);
                 sizelist[pos] += controllGroups[i].Height+5;
             }
         }

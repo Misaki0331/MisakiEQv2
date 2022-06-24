@@ -62,7 +62,7 @@
             this.SettingTabs.Controls.Add(this.tabPage2);
             this.SettingTabs.Controls.Add(this.tabPage3);
             this.SettingTabs.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.SettingTabs.Location = new System.Drawing.Point(-5, 53);
+            this.SettingTabs.Location = new System.Drawing.Point(-4, 53);
             this.SettingTabs.Name = "SettingTabs";
             this.SettingTabs.SelectedIndex = 0;
             this.SettingTabs.Size = new System.Drawing.Size(791, 475);
@@ -70,6 +70,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.AutoScroll = true;
             this.tabPage1.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tabPage1.Location = new System.Drawing.Point(4, 24);
             this.tabPage1.Name = "tabPage1";
@@ -90,7 +91,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(787, 447);
+            this.tabPage2.Size = new System.Drawing.Size(783, 447);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "調整";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -151,7 +152,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 24);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(787, 447);
+            this.tabPage3.Size = new System.Drawing.Size(783, 447);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "About";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -251,7 +252,7 @@
             // 
             // ButtonCancel
             // 
-            this.ButtonCancel.Location = new System.Drawing.Point(620, 532);
+            this.ButtonCancel.Location = new System.Drawing.Point(621, 532);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
             this.ButtonCancel.TabIndex = 3;
@@ -261,7 +262,7 @@
             // 
             // ButtonOK
             // 
-            this.ButtonOK.Location = new System.Drawing.Point(539, 532);
+            this.ButtonOK.Location = new System.Drawing.Point(541, 532);
             this.ButtonOK.Name = "ButtonOK";
             this.ButtonOK.Size = new System.Drawing.Size(75, 23);
             this.ButtonOK.TabIndex = 4;
@@ -281,7 +282,6 @@
             this.Controls.Add(this.LabelDate);
             this.Controls.Add(this.LabelTime);
             this.Controls.Add(this.SettingTabs);
-            this.MaximizeBox = false;
             this.Name = "Config_Menu";
             this.Text = "設定 - MisakIEQ";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Config_Menu_FormClosed);

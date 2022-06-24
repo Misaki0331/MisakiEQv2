@@ -14,9 +14,7 @@ namespace MisakiEQ.GUI
     public partial class Config_Menu : Form
     {
 #pragma warning disable IDE0052 // 読み取られていないプライベート メンバーを削除
-        readonly Lib.ConfigController.Controller? ConnectionSetting;
-        readonly Lib.ConfigController.Controller? UserSetting;
-        readonly Lib.ConfigController.Controller? SoundSetting;
+        readonly Lib.ConfigController.Controller? ConfigSetting;
 #if DEBUG || ADMIN
         readonly Lib.ConfigController.Controller? SNSSetting;
 #endif
@@ -27,7 +25,7 @@ namespace MisakiEQ.GUI
         {
             InitializeComponent();
             var config = Lib.Config.Funcs.GetInstance().Configs;
-            ConnectionSetting = new Lib.ConfigController.Controller(tabPage1);
+            ConfigSetting = new Lib.ConfigController.Controller(tabPage1);
             LabelVersion.Text = $"バージョン : {Properties.Version.Name}";
             Icon = Properties.Resources.Logo_MainIcon;
 #if ADMIN
@@ -69,7 +67,6 @@ namespace MisakiEQ.GUI
             TweetBox.Visible = true;
             TweetButton.Visible = true;
 #else
-            groupBox3.Visible=false;
             AuthTwitter.Visible = false;
             TweetBox.Visible = false;
             TweetButton.Visible = false;
@@ -177,7 +174,14 @@ namespace MisakiEQ.GUI
 
         private void Config_Menu_SizeChanged(object sender, EventArgs e)
         {
-            SettingTabs.Size=new Size(Width-17, Height-153);
+
+            //796,596
+            SettingTabs.Size=new Size(Width-7, Height-121);
+            LabelTime.Location = new Point(Width - 140, 27);
+            LabelDate.Location = new Point(Width - 203, 0);
+            ButtonOK.Location = new Point(Width - 255, Height-64);
+            ButtonCancel.Location = new Point(Width - 175, Height - 64);
+            ButtonApply.Location = new Point(Width-95, Height - 64);
         }
     }
 }
