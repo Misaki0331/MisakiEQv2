@@ -10,14 +10,51 @@ namespace MisakiEQ.Lib.ConfigController
     internal class Controller
     {
         readonly List<ToolBox> tools = new();
+        readonly GroupBox group;
         public Controller(GroupBox gb,List<Config.Funcs.IndexData> list)
         {
+            group = gb;
+            gb.SizeChanged += SizeChanged;
             for(int i=0;i< list.Count; i++)
             {
                 tools.Add(new ToolBox(gb, list[i], i));
             }
         }
-        
+        public Controller(GroupBox gb, string listName)
+        {
+            group = gb;
+            gb.SizeChanged += SizeChanged;
+            var config = Config.Funcs.GetInstance().Configs.GetGroup(listName);
+            if (config == null) return;
+            for (int i = 0; i < config.Count; i++)
+            {
+                tools.Add(new ToolBox(gb, config[i], i));
+            }
+        }
+        public void SizeChanged(object? sender, EventArgs e)
+        {
+            for(int i = 0; i < tools.Count; i++)
+            {
+                int w = group.Width;
+                switch (tools[i].Type)
+                {
+                    case "long":
+                        tools[i].ToolUnitLabel.Location = new Point(w - 28, 22 + i * 23);
+                        tools[i].ToolNumUD.Location = new Point(w - 108, 22 + i * 23);
+                        tools[i].ToolTrack.Size = new Size(w - 234, 23);
+                        break;
+                    case "string":
+                        tools[i].ToolTextBox.Size = new Size(w - 138, 23);
+                        break;
+                    case "bool":
+                        tools[i].ToolCheckBox.Size = new Size(w - 149, 23);
+                        break;
+                    case "function":
+                        tools[i].ToolButton.Size = new Size(w - 149, 23);
+                        break;
+                }
+            }
+        }
     }
     class ToolBox
     {
@@ -29,24 +66,26 @@ namespace MisakiEQ.Lib.ConfigController
         public CheckBox ToolCheckBox = new();
         public Button ToolButton = new();
         readonly Config.Funcs.IndexData cl;
+        public string Type { get => cl.Type; }
         void LongInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
         {
-
+            //338
+            var w = gb.Width;
             ((ISupportInitialize)(ToolNumUD)).BeginInit();
             ((ISupportInitialize)(ToolTrack)).BeginInit();
             gb.Controls.Add(ToolUnitLabel);
             gb.Controls.Add(ToolTrack);
             gb.Controls.Add(ToolNumUD);
-            ToolUnitLabel.Location = new Point(310, 22 + pos * 23);
+            ToolUnitLabel.Location = new Point(w-28, 22 + pos * 23);
             ToolUnitLabel.Size = new Size(60, 23);
             ToolUnitLabel.Text = data.UnitName;
             ToolUnitLabel.TextAlign = ContentAlignment.MiddleLeft;
-            ToolNumUD.Location = new Point(230, 22 + pos * 23);
+            ToolNumUD.Location = new Point(w-108, 22 + pos * 23);
             ToolNumUD.Size = new Size(80, 23);
             ToolTrack.AutoSize = false;
             ToolTrack.BackColor = Color.White;
             ToolTrack.Location = new Point(122, 22 + pos * 23);
-            ToolTrack.Size = new Size(104, 23);
+            ToolTrack.Size = new Size(w-234, 23);
             ToolTrack.TickStyle = TickStyle.None;
             ToolTrack.LargeChange = (int)data.GetDisplayMag();
             ToolTrack.AccessibleDescription = data.Description;
@@ -71,18 +110,22 @@ namespace MisakiEQ.Lib.ConfigController
         }
         void StringInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
         {
+            //338
+            var w = gb.Width;
             gb.Controls.Add(ToolTextBox); 
             ToolTextBox.Location = new Point(122, 22 + pos * 23);
-            ToolTextBox.Size = new Size(200, 23);
+            ToolTextBox.Size = new Size(w-138, 23);
             ToolTextBox.MaxLength = 255;
             ToolTextBox.Text = (string)data.Value;
             ToolTextBox.TextChanged += new EventHandler(TextBoxChanged);
         }
         void BoolInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
         {
+            //338
+            var w = gb.Width;
             gb.Controls.Add(ToolCheckBox);
             ToolCheckBox.Location = new Point(122, 22 + pos * 23);
-            ToolCheckBox.Size = new Size(189, 23);
+            ToolCheckBox.Size = new Size(w-149, 23);
             ToolCheckBox.Checked = (bool)data.Value;
             if (ToolCheckBox.Checked)
                 ToolCheckBox.Text = cl.GetToggleOnText();
@@ -93,9 +136,11 @@ namespace MisakiEQ.Lib.ConfigController
         }
         void FunctionInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
         {
+            //338
+            var w = gb.Width;
             gb.Controls.Add(ToolButton);
             ToolButton.Location = new Point(122, 22 + pos * 23);
-            ToolButton.Size = new Size(189, 23);
+            ToolButton.Size = new Size(w-149, 23);
             ToolButton.Click += ButtonClick;
             ToolButton.Text = data.GetButton(!data.ButtonEnable);
             ToolButton.Enabled = data.ButtonEnable;

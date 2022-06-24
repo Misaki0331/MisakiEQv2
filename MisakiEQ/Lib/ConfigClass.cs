@@ -33,10 +33,11 @@ namespace MisakiEQ.Lib.Config
             {
                 System.Reflection.FieldInfo[] fields = Configs.GetType().GetFields();
                 using var sw = new StreamWriter(CfgFile, false, Encoding.UTF8);
-                for(int i = 0; i < Configs.Connections.Count; i++)sw.Write($"{Configs.Connections[i].Config}");
-                for (int i = 0; i < Configs.UserSetting.Count; i++)sw.Write($"{Configs.UserSetting[i].Config}");
-                for (int i = 0; i < Configs.SNSSetting.Count; i++)sw.Write($"{Configs.SNSSetting[i].Config}");
-                for (int i = 0; i < Configs.SoundSetting.Count; i++)sw.Write($"{Configs.SoundSetting[i].Config}");
+                for(int i = 0; i < Configs.Data.Count; i++)
+                {
+                    var config=Configs.Data[i].Setting;
+                    for (int j = 0; j < config.Count; j++) sw.Write($"{config[j].Config}");
+                }
                 sw.Close();
 
                 TmpConfigs = Configs.Clone();
@@ -69,7 +70,7 @@ namespace MisakiEQ.Lib.Config
                         {
                             SetConfigValue(lines[0],lines[1]);
 
-                            Log.Logger.GetInstance().Debug($"{line}");
+                            Logger.GetInstance().Debug($"{line}");
                             PASS++;
                         }catch(Exception ex)
                         {
@@ -120,18 +121,14 @@ namespace MisakiEQ.Lib.Config
         }
         public IndexData? GetConfigClass(string name)
         {
-            for(int i = 0; i<Configs.Connections.Count; i++)
-                if(Configs.Connections[i].Name == name)
-                    return Configs.Connections[i];
-            for (int i = 0; i < Configs.UserSetting.Count; i++)
-                if (Configs.UserSetting[i].Name == name)
-                    return Configs.UserSetting[i];
-            for (int i = 0; i < Configs.SNSSetting.Count; i++)
-                if (Configs.SNSSetting[i].Name == name)
-                    return Configs.SNSSetting[i];
-            for (int i = 0; i < Configs.SoundSetting.Count; i++)
-                if (Configs.SoundSetting[i].Name == name)
-                    return Configs.SoundSetting[i];
+            for(int i = 0; i < Configs.Data.Count; i++)
+            {
+                var config = Configs.Data[i].Setting;
+                for(int j = 0; j < config.Count; j++)
+                {
+                    if (config[j].Name==name) return config[j];
+                }
+            }
             return null;
         }
         object GetConfigValue(string name)
@@ -160,35 +157,55 @@ namespace MisakiEQ.Lib.Config
         public Cfg TmpConfigs=new();
         public class Cfg
         {
-            public readonly List<IndexData> Connections=new();
-            public readonly List<IndexData> UserSetting=new();
-            public readonly List<IndexData> SNSSetting = new();
-            public readonly List<IndexData> SoundSetting = new();
+            public readonly List<ConfigGroup> Data = new();
             public Cfg()
             {
-                Connections.Add(new IndexData("API_EEW_Delay","EEW標準遅延",unitName:"秒",displayMag:1000, description:"標準状態の緊急地震速報の遅延時間です。", min:1000, max:5000, def:1000));   //通常時の遅延(ms)
-                Connections.Add(new IndexData("API_EEW_DelayDetectMode", "EEW検知遅延", unitName: "秒", displayMag: 1000, description: "検知状態の緊急地震速報の遅延時間です。", min:150, max:5000, def:200));     //検出時の遅延(ms)
-                Connections.Add(new IndexData("API_EEW_DelayDetectCoolDown", "EEWモード移行時間", unitName: "秒", displayMag: 1000, description: "検知状態から標準状態に回復する時間です。", min:1000, max:10000, def:4000));     //検出から通常時に戻る時間(ms)
-                Connections.Add(new IndexData("API_EQInfo_Delay", "地震情報遅延", unitName: "秒", displayMag: 1000, description: "地震情報全般の取得遅延時間です。\n地震と津波情報共通でリクエスト多過ぎるとエラー出ます。", min:2000, max:30000, def:3000));   //通常時の遅延(ms)
-                Connections.Add(new IndexData("API_EQInfo_Limit", "地震情報取得項目数", description: "1回で地震情報を取得する数です。\n値を大きくすると1回あたりより多くの情報が更新されますが、その分遅くなります。", min:1, max:100, def:10));   //取得時の配列の数
-                Connections.Add(new IndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:10000, def:1,unitName:"秒"));   //取得時の配列の数
-                Connections.Add(new IndexData("API_K-moni_Frequency", "強震モニタ更新間隔", description: "強震モニタの更新間隔です。データ消費量を抑えたい時にお使いください。", min:1, max:5, def:1,unitName:"秒"));   //取得時の配列の数
-                Connections.Add(new IndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
-                UserSetting.Add(new IndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数
-                UserSetting.Add(new IndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
-                UserSetting.Add(new IndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示","強震モニタに非表示"));   //取得時の配列の数
-                Connections.Add(new IndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", WorkingTitle: "時刻調整中...", action:new Action(async() => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
+                GetGroup("Connections",true)?.Add(new IndexData("API_EEW_Delay","EEW標準遅延",unitName:"秒",displayMag:1000, description:"標準状態の緊急地震速報の遅延時間です。", min:1000, max:5000, def:1000));   //通常時の遅延(ms)
+                GetGroup("Connections",true)?.Add(new IndexData("API_EEW_DelayDetectMode", "EEW検知遅延", unitName: "秒", displayMag: 1000, description: "検知状態の緊急地震速報の遅延時間です。", min:150, max:5000, def:200));     //検出時の遅延(ms)
+                GetGroup("Connections",true)?.Add(new IndexData("API_EEW_DelayDetectCoolDown", "EEWモード移行時間", unitName: "秒", displayMag: 1000, description: "検知状態から標準状態に回復する時間です。", min:1000, max:10000, def:4000));     //検出から通常時に戻る時間(ms)
+                GetGroup("Connections",true)?.Add(new IndexData("API_EQInfo_Delay", "地震情報遅延", unitName: "秒", displayMag: 1000, description: "地震情報全般の取得遅延時間です。\n地震と津波情報共通でリクエスト多過ぎるとエラー出ます。", min:2000, max:30000, def:3000));   //通常時の遅延(ms)
+                GetGroup("Connections",true)?.Add(new IndexData("API_EQInfo_Limit", "地震情報取得項目数", description: "1回で地震情報を取得する数です。\n値を大きくすると1回あたりより多くの情報が更新されますが、その分遅くなります。", min:1, max:100, def:10));   //取得時の配列の数
+                GetGroup("Connections",true)?.Add(new IndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:10000, def:1,unitName:"秒"));   //取得時の配列の数
+                GetGroup("Connections",true)?.Add(new IndexData("API_K-moni_Frequency", "強震モニタ更新間隔", description: "強震モニタの更新間隔です。データ消費量を抑えたい時にお使いください。", min:1, max:5, def:1,unitName:"秒"));   //取得時の配列の数
+                GetGroup("Connections",true)?.Add(new IndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
+                GetGroup("UserSetting",true)?.Add(new IndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数
+                GetGroup("UserSetting",true)?.Add(new IndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
+                GetGroup("UserSetting",true)?.Add(new IndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示","強震モニタに非表示"));   //取得時の配列の数
+                GetGroup("Connections",true)?.Add(new IndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", WorkingTitle: "時刻調整中...", action:new Action(async() => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
 #if ADMIN||DEBUG
-                SNSSetting.Add(new IndexData("Twitter_Auth", "Twitter認証", "アカウント認証します","認証",WorkingTitle:"認証中..."));
-                SNSSetting.Add(new IndexData("Twitter_Enable_Tweet", "自動ツイートの有効化", "自動でユーザーに地震情報をツイートします", def: false, "自動ツイートが有効", "自動ツイートが無効"));
+                GetGroup("SNSSetting",true)?.Add(new IndexData("Twitter_Auth", "Twitter認証", "アカウント認証します","認証",WorkingTitle:"認証中..."));
+                GetGroup("SNSSetting",true)?.Add(new IndexData("Twitter_Enable_Tweet", "自動ツイートの有効化", "自動でユーザーに地震情報をツイートします", def: false, "自動ツイートが有効", "自動ツイートが無効"));
 #endif
-                SoundSetting.Add(new IndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
-                SoundSetting.Add(new IndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
-                SoundSetting.Add(new IndexData("Sound_Volume_Tsunami", "津波情報の通知音量", "津波情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
+                GetGroup("SoundSetting",true)?.Add(new IndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
+                GetGroup("SoundSetting",true)?.Add(new IndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
+                GetGroup("SoundSetting",true)?.Add(new IndexData("Sound_Volume_Tsunami", "津波情報の通知音量", "津波情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
             }
             public Cfg Clone()
             {
                 return (Cfg)MemberwiseClone();
+            }
+            public List<IndexData>? GetGroup(string name, bool Create = false)
+            {
+                for(int i = 0; i < Data.Count; i++)
+                {
+                    if (Data[i].Name==name)return Data[i].Setting;
+                }
+                if (Create)
+                {
+                    Data.Add(new(name));
+                    return Data[^1].Setting;
+                }
+                return null;
+            }
+            public class ConfigGroup
+            {
+                public ConfigGroup(string name){
+                    _name = name;
+                }
+                
+                readonly string _name="";
+                public string Name { get => _name; }
+                public readonly List<IndexData> Setting=new();
             }
         }
         public class IndexData

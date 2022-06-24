@@ -27,9 +27,9 @@ namespace MisakiEQ.GUI
         {
             InitializeComponent();
             var config = Lib.Config.Funcs.GetInstance().Configs;
-            ConnectionSetting = new Lib.ConfigController.Controller(groupBox1, config.Connections);
-            UserSetting = new Lib.ConfigController.Controller(groupBox2, config.UserSetting);
-            SoundSetting = new Lib.ConfigController.Controller(groupBox4, config.SoundSetting);
+            ConnectionSetting = new Lib.ConfigController.Controller(groupBox1, "Connections");
+            UserSetting = new Lib.ConfigController.Controller(groupBox2, "UserSetting");
+            SoundSetting = new Lib.ConfigController.Controller(groupBox4, "SoundSetting");
             LabelVersion.Text = $"バージョン : {Properties.Version.Name}";
             Icon = Properties.Resources.Logo_MainIcon;
 #if ADMIN
@@ -38,7 +38,7 @@ namespace MisakiEQ.GUI
             LabelVersion.Text += "(Debug)";
 #endif
 #if ADMIN || DEBUG
-            SNSSetting = new Lib.ConfigController.Controller(groupBox3, config.SNSSetting);
+            SNSSetting = new Lib.ConfigController.Controller(groupBox3, "SNSSetting");
             var fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth");
             fc?.SetAction(() =>
             {
@@ -176,6 +176,11 @@ namespace MisakiEQ.GUI
                 UseShellExecute = true,
             };
             Process.Start(pi);
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            groupBox1.Size = new((int)numericUpDown1.Value, groupBox1.Size.Height);
         }
     }
 }
