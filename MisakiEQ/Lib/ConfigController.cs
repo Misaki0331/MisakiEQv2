@@ -9,20 +9,88 @@ namespace MisakiEQ.Lib.ConfigController
 {
     internal class Controller
     {
-        readonly List<ToolBox> tools = new();
-        readonly GroupBox group;
-        public Controller(GroupBox gb,List<Config.Funcs.IndexData> list)
+        readonly TabPage Tab;
+        readonly List<GroupBox> Groups = new();
+        readonly List<ControllGroup> controllGroups = new();
+        public Controller(TabPage tab)
         {
-            group = gb;
+            Tab = tab;
+            var list = Config.Funcs.GetInstance().Configs.Data;
+            tab.SizeChanged += SizeChanged;
+            int cnt = 1;
+            List<int> sizelist = new();
+            while (tab.Width / cnt > 450) cnt++;
+            if (cnt > 1) while (tab.Width / cnt < 300) cnt--;
+            for (int i = 0; i < cnt; i++) sizelist.Add(0);
+            for(int i = 0; i < list.Count; i++)
+            {
+                Groups.Add(new GroupBox());
+                tab.Controls.Add(Groups[^1]);
+                Groups[^1].Size = new Size(tab.Width / cnt-10, 32);
+                controllGroups.Add(new(Groups[^1], list[i].Setting, list[i].Name)) ;
+                int pos = 0;
+                int min = int.MaxValue;
+                for(int j=0;j<sizelist.Count; j++)
+                {
+                    if (min > sizelist[j])
+                    {
+                        min = sizelist[j];
+                        pos = j;
+                    }
+                }
+                controllGroups[^1].Location = new Point(tab.Width / cnt * pos+5, sizelist[pos]);
+                sizelist[pos] += controllGroups[^1].Height+5;
+            }
+        }
+        void SizeChanged(object? sender, EventArgs e)
+        {
+            var list = Config.Funcs.GetInstance().Configs.Data;
+            int cnt = 1;
+            List<int> sizelist = new();
+            while (Tab.Width / cnt > 450) cnt++;
+            if(cnt>1)while (Tab.Width / cnt < 300) cnt--;
+            for (int i = 0; i < cnt; i++) sizelist.Add(0);
+            for (int i = 0; i < list.Count; i++)
+            {
+                Groups[i].Size = new Size(Tab.Width / cnt-10, Groups[i].Size.Height);
+                int pos = 0;
+                int min = int.MaxValue;
+                for (int j = 0; j < sizelist.Count; j++)
+                {
+                    if (min > sizelist[j])
+                    {
+                        min = sizelist[j];
+                        pos = j;
+                    }
+                }
+                controllGroups[i].Location = new Point(Tab.Width / cnt * pos+5, sizelist[pos]);
+                sizelist[pos] += controllGroups[i].Height+5;
+            }
+        }
+        
+    }
+
+    class ControllGroup
+    {
+        public readonly GroupBox Box;
+        readonly List<ToolBox> tools = new(); 
+        public ControllGroup(GroupBox gb, List<Config.Funcs.IndexData> list,string name)
+        {
+            Box = gb;
+            Box.Text = name;
+            gb.Size=new Size(gb.Width, 22+23*list.Count+12);
             gb.SizeChanged += SizeChanged;
-            for(int i=0;i< list.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
                 tools.Add(new ToolBox(gb, list[i], i));
             }
         }
-        public Controller(GroupBox gb, string listName)
+        public int Width { get => Box.Width; set => Box.Width = value; }
+        public int Height { get => Box.Height; }
+        public Point Location { get => Box.Location; set => Box.Location = value; }
+        public ControllGroup(GroupBox gb, string listName)
         {
-            group = gb;
+            Box = gb;
             gb.SizeChanged += SizeChanged;
             var config = Config.Funcs.GetInstance().Configs.GetGroup(listName);
             if (config == null) return;
@@ -33,9 +101,9 @@ namespace MisakiEQ.Lib.ConfigController
         }
         public void SizeChanged(object? sender, EventArgs e)
         {
-            for(int i = 0; i < tools.Count; i++)
+            for (int i = 0; i < tools.Count; i++)
             {
-                int w = group.Width;
+                int w = Box.Width;
                 switch (tools[i].Type)
                 {
                     case "long":

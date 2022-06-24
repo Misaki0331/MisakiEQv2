@@ -31,10 +31,6 @@
             this.components = new System.ComponentModel.Container();
             this.SettingTabs = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.FixKyoshinTime = new System.Windows.Forms.Button();
             this.TwitterAuthInfo = new System.Windows.Forms.Label();
@@ -55,7 +51,6 @@
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOK = new System.Windows.Forms.Button();
             this.SettingTabs.SuspendLayout();
-            this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -70,59 +65,19 @@
             this.SettingTabs.Location = new System.Drawing.Point(-5, 53);
             this.SettingTabs.Name = "SettingTabs";
             this.SettingTabs.SelectedIndex = 0;
-            this.SettingTabs.Size = new System.Drawing.Size(795, 475);
+            this.SettingTabs.Size = new System.Drawing.Size(791, 475);
             this.SettingTabs.TabIndex = 0;
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.groupBox4);
-            this.tabPage1.Controls.Add(this.groupBox3);
-            this.tabPage1.Controls.Add(this.groupBox2);
-            this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tabPage1.Location = new System.Drawing.Point(4, 24);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(787, 447);
+            this.tabPage1.Size = new System.Drawing.Size(783, 447);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "一般";
             this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.Location = new System.Drawing.Point(351, 289);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(338, 155);
-            this.groupBox4.TabIndex = 7;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "サウンド設定";
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Location = new System.Drawing.Point(351, 6);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(338, 100);
-            this.groupBox3.TabIndex = 6;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "SNS関連投稿の設定";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Location = new System.Drawing.Point(6, 347);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(339, 97);
-            this.groupBox2.TabIndex = 6;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "ユーザー設定";
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Location = new System.Drawing.Point(7, 6);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(338, 335);
-            this.groupBox1.TabIndex = 5;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "通信設定";
             // 
             // tabPage2
             // 
@@ -326,16 +281,13 @@
             this.Controls.Add(this.LabelDate);
             this.Controls.Add(this.LabelTime);
             this.Controls.Add(this.SettingTabs);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(800, 600);
-            this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "Config_Menu";
             this.Text = "設定 - MisakIEQ";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Config_Menu_FormClosed);
             this.Load += new System.EventHandler(this.Config_Menu_Load);
+            this.SizeChanged += new System.EventHandler(this.Config_Menu_SizeChanged);
             this.SettingTabs.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             this.tabPage3.ResumeLayout(false);
@@ -356,13 +308,10 @@
         private Button ButtonApply;
         private Button ButtonCancel;
         private Button ButtonOK;
-        private GroupBox groupBox1;
         private Button AuthTwitter;
         private Button TweetButton;
         private TextBox TweetBox;
         private Label TwitterAuthInfo;
-        private GroupBox groupBox2;
-        private GroupBox groupBox3;
         private Button FixKyoshinTime;
         private TabPage tabPage3;
         private PictureBox pictureBox1;
@@ -371,6 +320,5 @@
         private Button LinkToDevTwitter;
         private Button LinkToKoFi;
         private Label LabelVersion;
-        private GroupBox groupBox4;
     }
 }

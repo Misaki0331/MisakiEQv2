@@ -31,6 +31,9 @@ namespace MisakiEQ.Lib.Config
         {
             try
             {
+                var sr = new Stopwatch();
+                sr.Start();
+                Logger.GetInstance().Info("Config書込開始");
                 System.Reflection.FieldInfo[] fields = Configs.GetType().GetFields();
                 using var sw = new StreamWriter(CfgFile, false, Encoding.UTF8);
                 for(int i = 0; i < Configs.Data.Count; i++)
@@ -41,6 +44,8 @@ namespace MisakiEQ.Lib.Config
                 sw.Close();
 
                 TmpConfigs = Configs.Clone();
+                sr.Stop();
+                Logger.GetInstance().Debug($"Config書込完了 計測時間:{(sr.ElapsedTicks / 10000.0):#,##0.0000}ms");
                 return true;
             }
             catch (Exception ex)
