@@ -13,11 +13,7 @@ namespace MisakiEQ.GUI
 {
     public partial class Config_Menu : Form
     {
-#pragma warning disable IDE0052 // 読み取られていないプライベート メンバーを削除
         readonly Lib.ConfigController.Controller? ConfigSetting;
-#if DEBUG || ADMIN
-#endif
-#pragma warning restore IDE0052 // 読み取られていないプライベート メンバーを削除
 
         Twitter.Auth? TwitterAuthGUI = null;
         public Config_Menu()
@@ -45,13 +41,35 @@ namespace MisakiEQ.GUI
                 {
                     try
                     {
-
                         if (TwitterAuthGUI != null && TwitterAuthGUI.Visible) TwitterAuthGUI.Close();
                         TwitterAuthGUI = new();
                         TwitterAuthGUI.ShowDialog();
-
-                        TwitterAuthInfo.Text = $"@{Lib.Twitter.APIs.GetInstance().GetUserScreenID()} - {Lib.Twitter.APIs.GetInstance().GetUserName()} " +
-                        $"(Follower:{Lib.Twitter.APIs.GetInstance().GetUserFollowers()} Tweet:{Lib.Twitter.APIs.GetInstance().GetUserTweets()})";
+                        var twi = Lib.Twitter.APIs.GetInstance();
+                        fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Info");
+                        if (twi.GetUserScreenID() != null)
+                        {
+                            if (fc != null) fc.Value = "認証済";
+                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserID");
+                            if (fc != null) fc.Value = $"@{twi.GetUserScreenID()}";
+                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserName");
+                            if (fc != null) fc.Value = $"{twi.GetUserName()}";
+                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Tweet");
+                            if (fc != null) fc.Value = $"{twi.GetUserTweets()}";
+                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Follower");
+                            if (fc != null) fc.Value = $"{twi.GetUserFollowers()}";
+                        }
+                        else
+                        {
+                            if (fc != null) fc.Value = "認証失敗";
+                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserID");
+                            if (fc != null) fc.Value = $"";
+                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserName");
+                            if (fc != null) fc.Value = $"";
+                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Tweet");
+                            if (fc != null) fc.Value = $"";
+                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Follower");
+                            if (fc != null) fc.Value = $"";
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -65,6 +83,32 @@ namespace MisakiEQ.GUI
             AuthTwitter.Visible = true;
             TweetBox.Visible = true;
             TweetButton.Visible = true;
+            var twi = Lib.Twitter.APIs.GetInstance();
+            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Info");
+            if (twi.GetUserScreenID() != null)
+            {
+                if(fc!=null)fc.Value = "認証済";
+                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserID");
+                if (fc != null) fc.Value = $"@{twi.GetUserScreenID()}";
+                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserName");
+                if (fc != null) fc.Value = $"{twi.GetUserName()}";
+                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Tweet");
+                if (fc != null) fc.Value = $"{twi.GetUserTweets()}";
+                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Follower");
+                if (fc != null) fc.Value = $"{twi.GetUserFollowers()}";
+            }
+            else
+            {
+                if (fc != null) fc.Value = "未認証"; 
+                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserID");
+                if (fc != null) fc.Value = $"";
+                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserName");
+                if (fc != null) fc.Value = $"";
+                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Tweet");
+                if (fc != null) fc.Value = $"";
+                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Follower");
+                if (fc != null) fc.Value = $"";
+            }
 #else
             AuthTwitter.Visible = false;
             TweetBox.Visible = false;
@@ -106,6 +150,8 @@ namespace MisakiEQ.GUI
         }
         private void Config_Menu_FormClosed(object sender, FormClosedEventArgs e)
         {
+            Lib.Config.Funcs.GetInstance().DiscardConfig();
+            ConfigSetting?.FormEventDispose();
         }
 
         private async void OpenAuthTwitter(object sender, EventArgs e)
@@ -188,9 +234,11 @@ namespace MisakiEQ.GUI
             Stopwatch st = new();
             st.Start();
             Log.Logger.GetInstance().Debug($"リサイズ開始");
-            SettingTabs.Size = new Size(Width - 7, Height - 122);
+            tabPage1.AutoScroll = false;
+            tabPage1.AutoScrollOffset = new Point(0, 0);
             Log.Logger.GetInstance().Debug($"再リサイズ中 : {st.Elapsed}");
             SettingTabs.Size = new Size(Width - 7, Height - 121);
+            tabPage1.AutoScroll = true;
             st.Stop();
             Log.Logger.GetInstance().Debug($"リサイズ完了 : {st.Elapsed}");
             SizeChange.Stop();

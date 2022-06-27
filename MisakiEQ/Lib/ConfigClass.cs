@@ -213,7 +213,12 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("Connections",true)?.Add(new IndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", WorkingTitle: "時刻調整中...", action:new Action(async() => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
 #if ADMIN||DEBUG
                 GetGroup("SNSSetting",true)?.Add(new IndexData("Twitter_Auth", "Twitter認証", "アカウント認証します","認証",WorkingTitle:"認証中..."));
-                GetGroup("SNSSetting",true)?.Add(new IndexData("Twitter_Enable_Tweet", "自動ツイートの有効化", "自動でユーザーに地震情報をツイートします", def: false, "自動ツイートが有効", "自動ツイートが無効"));
+                GetGroup("SNSSetting", true)?.Add(new IndexData("Twitter_Auth_Info", "Twitter認証情報", ""));
+                GetGroup("SNSSetting", true)?.Add(new IndexData("Twitter_Auth_UserID", "ユーザーID", ""));
+                GetGroup("SNSSetting", true)?.Add(new IndexData("Twitter_Auth_UserName", "ユーザー名", ""));
+                GetGroup("SNSSetting", true)?.Add(new IndexData("Twitter_Auth_Tweet", "ツイート数", ""));
+                GetGroup("SNSSetting", true)?.Add(new IndexData("Twitter_Auth_Follower", "フォロワー数", ""));
+                GetGroup("SNSSetting", true)?.Add(new IndexData("Twitter_Enable_Tweet", "自動ツイートの有効化", "自動でユーザーに地震情報をツイートします", def: false, "自動ツイートが有効", "自動ツイートが無効"));
 #endif
                 GetGroup("SoundSetting",true)?.Add(new IndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
                 GetGroup("SoundSetting",true)?.Add(new IndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
@@ -305,6 +310,14 @@ namespace MisakiEQ.Lib.Config
                 FunctionWorking = WorkingTitle;
 
             }
+            public IndexData(string name, string title, string description)
+            {
+                Description = description;
+                Name = name;
+                Title = title;
+                Type = "readonly";
+
+            }
             /// <summary>
             /// ラムダ式を設定します。
             /// IndexDataのタイプが Function である必要があります。
@@ -317,6 +330,8 @@ namespace MisakiEQ.Lib.Config
                 if (Type != "function") throw new InvalidOperationException($"{Type}型は関数設定できません！");
                 FunctionAction = act;
             }
+            public EventHandler? ValueChanged = null;
+
             /// <summary>
             /// 値を設定または取得します。
             /// </summary>
@@ -329,6 +344,7 @@ namespace MisakiEQ.Lib.Config
                         "long" => LongValue,
                         "string" => StringValue,
                         "bool" => BooleanValue,
+                        "readonly" => StringValue,
                         _ => throw new InvalidDataException($"[{Name}]は値がありません。"),
                     };
                 }
@@ -363,11 +379,23 @@ namespace MisakiEQ.Lib.Config
                             break;
                         case "string":
                             if (value.GetType() != typeof(string)) throw new InvalidCastException($"[{Name}]はstring型しか対応していませんが、{value.GetType()}で変更しようとしました。");
-                            StringValue = (string)value;
+                            if ((string)value!=StringValue)
+                            {
+                                StringValue = (string)value;
+                                try { ValueChanged?.Invoke(this, EventArgs.Empty); } catch(Exception ex) { Logger.GetInstance().Warn(ex.Message); }
+                            }
                             break;
                         case "bool":
                             if(value.GetType()!=typeof(bool)) throw new InvalidCastException($"[{Name}]はbool型しか対応していませんが、{value.GetType()}で変更しようとしました。");
                             BooleanValue = (bool)value;
+                            break;
+                        case "readonly":
+                            if (value.GetType() != typeof(string)) throw new InvalidCastException($"[{Name}]はstring型しか対応していませんが、{value.GetType()}で変更しようとしました。");
+                            if ((string)value != StringValue)
+                            {
+                                StringValue = (string)value;
+                                try { ValueChanged?.Invoke(this, EventArgs.Empty); } catch (Exception ex) { Logger.GetInstance().Warn(ex.Message); }
+                            }
                             break;
                         default:
                             throw new InvalidDataException($"[{Name}は値を設定することができません。");
@@ -381,7 +409,7 @@ namespace MisakiEQ.Lib.Config
             {
                 get
                 {
-                    if (Type == "function") return string.Empty;
+                    if (Type == "function"||Type== "readonly") return string.Empty;
                     return Name+"="+Type switch
                     {
                         "long" => LongValue.ToString(),

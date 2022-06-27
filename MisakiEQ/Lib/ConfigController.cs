@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,11 +11,13 @@ namespace MisakiEQ.Lib.ConfigController
     internal class Controller
     {
         readonly TabPage Tab;
+        Size NowSize;
         readonly List<GroupBox> Groups = new();
         readonly List<ControllGroup> controllGroups = new();
         public Controller(TabPage tab)
         {
             Tab = tab;
+            NowSize = tab.Size;
             var list = Config.Funcs.GetInstance().Configs.Data;
             tab.SizeChanged += SizeChanged;
             int cnt = 1;
@@ -42,29 +45,54 @@ namespace MisakiEQ.Lib.ConfigController
                 sizelist[pos] += controllGroups[^1].Height+5;
             }
         }
-        void SizeChanged(object? sender, EventArgs e)
+        public void FormEventDispose()
         {
+            Stopwatch sw = new();
+            sw.Start();
             var list = Config.Funcs.GetInstance().Configs.Data;
-            int cnt = 1;
-            List<int> sizelist = new();
-            while (Tab.Width / cnt > 450) cnt++;
-            if(cnt>1)while (Tab.Width / cnt < 300) cnt--;
-            for (int i = 0; i < cnt; i++) sizelist.Add(0);
+            
             for (int i = 0; i < list.Count; i++)
             {
-                Groups[i].Size = new Size((Tab.Width - 15) / cnt-10, Groups[i].Size.Height);
-                int pos = 0;
-                int min = int.MaxValue;
-                for (int j = 0; j < sizelist.Count; j++)
+                var list2 = list[i].Setting;
+                for(int j = 0; j < list2.Count; j++)
                 {
-                    if (min > sizelist[j])
-                    {
-                        min = sizelist[j];
-                        pos = j;
-                    }
+                    if (list2[j].Type == "readonly") list2[j].Value = string.Empty;
                 }
-                controllGroups[i].Location = new Point((Tab.Width - 15) / cnt * pos+5, sizelist[pos]);
-                sizelist[pos] += controllGroups[i].Height+5;
+            }
+            for (int i = 0; i < controllGroups.Count; i++)
+            {
+                controllGroups[i].Dispose();
+            }
+            sw.Stop();
+            Log.Logger.GetInstance().Info($"フォームイベントを破棄しました。計測:{sw.Elapsed}");
+        }
+        void SizeChanged(object? sender, EventArgs e)
+        {
+            if (NowSize.Width != Tab.Size.Width)
+            {
+                NowSize = Tab.Size;
+                var list = Config.Funcs.GetInstance().Configs.Data;
+                int cnt = 1;
+                List<int> sizelist = new();
+                while (Tab.Width / cnt > 450) cnt++;
+                if (cnt > 1) while (Tab.Width / cnt < 300) cnt--;
+                for (int i = 0; i < cnt; i++) sizelist.Add(0);
+                for (int i = 0; i < list.Count; i++)
+                {
+                    Groups[i].Size = new Size((Tab.Width - 15) / cnt - 10, Groups[i].Size.Height);
+                    int pos = 0;
+                    int min = int.MaxValue;
+                    for (int j = 0; j < sizelist.Count; j++)
+                    {
+                        if (min > sizelist[j])
+                        {
+                            min = sizelist[j];
+                            pos = j;
+                        }
+                    }
+                    controllGroups[i].Location = new Point((Tab.Width - 15) / cnt * pos + 5, sizelist[pos]);
+                    sizelist[pos] += controllGroups[i].Height + 5;
+                }
             }
             Tab.Update();
         }
@@ -100,6 +128,13 @@ namespace MisakiEQ.Lib.ConfigController
                 tools.Add(new ToolBox(gb, config[i], i));
             }
         }
+        public void Dispose()
+        {
+            for (int i = 0; i < tools.Count; i++)
+            {
+                tools[i].Dispose();
+            }
+        }
         public void SizeChanged(object? sender, EventArgs e)
         {
             for (int i = 0; i < tools.Count; i++)
@@ -113,13 +148,16 @@ namespace MisakiEQ.Lib.ConfigController
                         tools[i].ToolTrack.Size = new Size(w - 234, 23);
                         break;
                     case "string":
-                        tools[i].ToolTextBox.Size = new Size(w - 138, 23);
+                        tools[i].ToolTextBox.Size = new Size(w - 151, 23);
                         break;
                     case "bool":
                         tools[i].ToolCheckBox.Size = new Size(w - 149, 23);
                         break;
                     case "function":
                         tools[i].ToolButton.Size = new Size(w - 149, 23);
+                        break;
+                    case "readonly":
+                        tools[i].ToolTextBox.Size = new Size(w - 151, 23);
                         break;
                 }
             }
@@ -134,6 +172,7 @@ namespace MisakiEQ.Lib.ConfigController
         public TextBox ToolTextBox = new();
         public CheckBox ToolCheckBox = new();
         public Button ToolButton = new();
+        readonly GroupBox gp;
         readonly Config.Funcs.IndexData cl;
         public string Type { get => cl.Type; }
         void LongInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
@@ -182,8 +221,8 @@ namespace MisakiEQ.Lib.ConfigController
             //338
             var w = gb.Width;
             gb.Controls.Add(ToolTextBox); 
-            ToolTextBox.Location = new Point(122, 22 + pos * 23);
-            ToolTextBox.Size = new Size(w-138, 23);
+            ToolTextBox.Location = new Point(127, 22 + pos * 23);
+            ToolTextBox.Size = new Size(w-151, 23);
             ToolTextBox.MaxLength = 255;
             ToolTextBox.Text = (string)data.Value;
             ToolTextBox.TextChanged += new EventHandler(TextBoxChanged);
@@ -215,8 +254,40 @@ namespace MisakiEQ.Lib.ConfigController
             ToolButton.Enabled = data.ButtonEnable;
             data.ButtonChanged += ButtonChanged;
         }
+        void ReadOnlyInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
+        {
+            var w = gb.Width;
+            gb.Controls.Add(ToolTextBox);
+            ToolTextBox.Location = new Point(123, 22 + pos * 23);
+            ToolTextBox.Size = new Size(w - 151, 23);
+            ToolTextBox.MaxLength = 300;
+            ToolTextBox.TextAlign = HorizontalAlignment.Right;
+            ToolTextBox.Text = (string)data.Value;
+            ToolTextBox.ReadOnly = true;
+            data.ValueChanged += new EventHandler(UpdateText);
+        }
+        public void Dispose()
+        {
+            try
+            {
+                switch (cl.Type)
+                {
+                    case "readonly":
+                        cl.ValueChanged -= UpdateText;
+                        break;
+                    case "function":
+                        cl.ButtonChanged -= ButtonChanged;
+                        break;
+                }
+            }
+            catch(Exception ex)
+            {
+                Log.Logger.GetInstance().Warn(ex.Message);
+            }
+        }
         public ToolBox(GroupBox gb, Config.Funcs.IndexData data, int pos)//,)
         {
+            gp = gb;
             cl = data;
 
             gb.Controls.Add(ToolLabel);
@@ -230,9 +301,24 @@ namespace MisakiEQ.Lib.ConfigController
                 case "string":StringInit(gb, data, pos); break;
                 case "bool":BoolInit(gb, data, pos);break;
                 case "function":FunctionInit(gb, data, pos);break;
+                case "readonly":ReadOnlyInit(gb, data, pos);break;
             }
 
             
+        }
+        void UpdateText(object? sender, EventArgs e)
+        {
+            if (gp.InvokeRequired)
+            {
+                gp.Invoke(() =>
+                {
+                    ToolTextBox.Text = (string)cl.Value;
+                });
+            }
+            else
+            {
+                ToolTextBox.Text = (string)cl.Value;
+            }
         }
         void ButtonClick(object? sender, EventArgs e)
         {
