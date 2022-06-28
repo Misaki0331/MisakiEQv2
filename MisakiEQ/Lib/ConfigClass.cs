@@ -210,13 +210,14 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("通信設定",true)?.Add(new IndexData("API_EEW_DelayDetectCoolDown", "EEWモード移行時間", unitName: "秒", displayMag: 1000, description: "検知状態から標準状態に回復する時間です。", min:1000, max:10000, def:4000));     //検出から通常時に戻る時間(ms)
                 GetGroup("通信設定",true)?.Add(new IndexData("API_EQInfo_Delay", "地震情報遅延", unitName: "秒", displayMag: 1000, description: "地震情報全般の取得遅延時間です。\n地震と津波情報共通でリクエスト多過ぎるとエラー出ます。", min:2000, max:30000, def:3000));   //通常時の遅延(ms)
                 GetGroup("通信設定",true)?.Add(new IndexData("API_EQInfo_Limit", "地震情報取得項目数", description: "1回で地震情報を取得する数です。\n値を大きくすると1回あたりより多くの情報が更新されますが、その分遅くなります。", min:1, max:100, def:10));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:10000, def:1,unitName:"秒"));   //取得時の配列の数
+                GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:5, def:1,unitName:"秒"));   //取得時の配列の数
                 GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Frequency", "強震モニタ更新間隔", description: "強震モニタの更新間隔です。データ消費量を抑えたい時にお使いください。", min:1, max:5, def:1,unitName:"秒"));   //取得時の配列の数
                 GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
                 GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数
                 GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
                 GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示","強震モニタに非表示"));   //取得時の配列の数
                 GetGroup("通信設定",true)?.Add(new IndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", WorkingTitle: "時刻調整中...", action:new Action(async() => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
+                GetGroup("通信設定", true)?.Add(new IndexData("Kyoshin_Time", "強震モニタ時刻", "強震モニタ上の最終更新時刻です。"));
 #if ADMIN||DEBUG
                 GetGroup("SNS設定",true)?.Add(new IndexData("Twitter_Auth", "Twitter認証", "アカウント認証します","認証",WorkingTitle:"認証中..."));
                 GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Auth_Info", "Twitter認証情報", ""));
@@ -232,6 +233,7 @@ namespace MisakiEQ.Lib.Config
 
                 GetGroup("緊急地震速報発表時", true)?.Add(new IndexData("GUI_Popup_EEW_Compact", "簡易情報のポップ表示", "緊急地震速報が発令されると簡易ウィンドウがポップアップされます。", true, "ポップアップ表示", "ポップアップ非表示"));
                 GetGroup("緊急地震速報発表時", true)?.Add(new IndexData("GUI_TopMost_EEW_Compact", "簡易情報の表示モード", "簡易ウィンドウが前面表示されます。", true, "前面表示", "標準表示"));
+                GetGroup("アプリ情報", true)?.Add(new IndexData("AppInfo_Uptime", "アプリ起動時間", "起動してからの経過時間です。"));
             }
             /// <summary>
             /// 値リストをコピーします。

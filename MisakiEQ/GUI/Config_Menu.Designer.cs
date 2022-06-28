@@ -128,8 +128,9 @@
             // 
             // pictureBox1
             // 
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Top;
             this.pictureBox1.Image = global::MisakiEQ.Properties.Images.header_logo;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 6);
+            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(777, 145);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;

@@ -55,32 +55,7 @@ namespace MisakiEQ.GUI
                         if (TwitterAuthGUI != null && TwitterAuthGUI.Visible) TwitterAuthGUI.Close();
                         TwitterAuthGUI = new();
                         TwitterAuthGUI.ShowDialog();
-                        var twi = Lib.Twitter.APIs.GetInstance();
-                        fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Info");
-                        if (twi.GetUserScreenID() != null)
-                        {
-                            if (fc != null) fc.Value = "認証済";
-                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserID");
-                            if (fc != null) fc.Value = $"@{twi.GetUserScreenID()}";
-                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserName");
-                            if (fc != null) fc.Value = $"{twi.GetUserName()}";
-                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Tweet");
-                            if (fc != null) fc.Value = $"{twi.GetUserTweets()}";
-                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Follower");
-                            if (fc != null) fc.Value = $"{twi.GetUserFollowers()}";
-                        }
-                        else
-                        {
-                            if (fc != null) fc.Value = "認証失敗";
-                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserID");
-                            if (fc != null) fc.Value = $"";
-                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserName");
-                            if (fc != null) fc.Value = $"";
-                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Tweet");
-                            if (fc != null) fc.Value = $"";
-                            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Follower");
-                            if (fc != null) fc.Value = $"";
-                        }
+                        Funcs.GUI.TwitterGUI.SetInfotoConfigUI();
                     }
                     catch (Exception ex)
                     {
@@ -89,32 +64,7 @@ namespace MisakiEQ.GUI
                 });
                 fc.ButtonEnable = true;
             });
-            var twi = Lib.Twitter.APIs.GetInstance();
-            fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Info");
-            if (twi.GetUserScreenID() != null)
-            {
-                if(fc!=null)fc.Value = "認証済";
-                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserID");
-                if (fc != null) fc.Value = $"@{twi.GetUserScreenID()}";
-                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserName");
-                if (fc != null) fc.Value = $"{twi.GetUserName()}";
-                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Tweet");
-                if (fc != null) fc.Value = $"{twi.GetUserTweets()}";
-                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Follower");
-                if (fc != null) fc.Value = $"{twi.GetUserFollowers()}";
-            }
-            else
-            {
-                if (fc != null) fc.Value = "未認証"; 
-                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserID");
-                if (fc != null) fc.Value = $"";
-                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserName");
-                if (fc != null) fc.Value = $"";
-                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Tweet");
-                if (fc != null) fc.Value = $"";
-                fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Follower");
-                if (fc != null) fc.Value = $"";
-            }
+            Funcs.GUI.TwitterGUI.SetInfotoConfigUI();
 #endif
         }
 
@@ -143,6 +93,18 @@ namespace MisakiEQ.GUI
         {
             LabelDate.Text = DateTime.Now.ToString("yyyy/MM/dd (ddd)");
             LabelTime.Text = DateTime.Now.ToString("HH:mm:ss");
+            var uptime = Lib.Config.Funcs.GetInstance().GetConfigClass("AppInfo_Uptime");
+            if (uptime != null) uptime.Value = $"{TrayHub.GetInstance()?.AppTimer.ToString(@"dd\.hh\:mm\:ss")}";
+            var kyoshin = Background.APIs.GetInstance().KyoshinAPI;
+            uptime = Lib.Config.Funcs.GetInstance().GetConfigClass("Kyoshin_Time");
+            if (kyoshin.KyoshinLatest.Year > 2000)
+            {
+                if (uptime != null) uptime.Value = $"{kyoshin.KyoshinLatest:yyyy/MM/dd HH:mm:ss}";
+            }
+            else
+            {
+                if (uptime != null) uptime.Value = "不明";
+            }
         }
 
         private void Config_Menu_Load(object sender, EventArgs e)
@@ -154,55 +116,6 @@ namespace MisakiEQ.GUI
         {
             Lib.Config.Funcs.GetInstance().DiscardConfig();
             ConfigSetting?.FormEventDispose();
-        }
-
-        private async void OpenAuthTwitter(object sender, EventArgs e)
-        {
-            try
-            {
-                var task = Lib.Twitter.APIs.GetInstance().GetAuthURL();
-                await task;
-                Process.Start(new ProcessStartInfo(task.Result)
-                {
-                    UseShellExecute = true
-                });
-                if (TwitterAuthGUI != null && TwitterAuthGUI.Visible) TwitterAuthGUI.Close();
-                TwitterAuthGUI = new();
-                TwitterAuthGUI.ShowDialog();
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.GetInstance().Error(ex);
-            }
-        }
-
-        private void LinkToGitHub_Click(object sender, EventArgs e)
-        {
-            OpenLink("https://github.com/Misaki0331/MisakiEQv2");
-        }
-
-        private void LinkToTwitterBot_Click(object sender, EventArgs e)
-        {
-            OpenLink("https://twitter.com/MisakiEQ");
-        }
-
-        private void LinkToDevTwitter_Click(object sender, EventArgs e)
-        {
-            OpenLink("https://twitter.com/0x7FF");
-        }
-
-        private void LinkToKoFi_Click(object sender, EventArgs e)
-        {
-            OpenLink("https://ko-fi.com/misaki0331");
-        }
-        private static void OpenLink(string url)
-        {
-            ProcessStartInfo pi = new()
-            {
-                FileName = url,
-                UseShellExecute = true,
-            };
-            Process.Start(pi);
         }
 
         private void Config_Menu_SizeChanged(object sender, EventArgs e)
@@ -229,7 +142,6 @@ namespace MisakiEQ.GUI
             tabPage1.AutoScroll = true;
             st.Stop();
             Log.Logger.GetInstance().Debug($"リサイズ完了 : {st.Elapsed}");
-            pictureBox1.Size = new Size(tabPage3.Width - 6, 145);
             SizeChange.Stop();
         }
     }

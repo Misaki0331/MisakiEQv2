@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -19,8 +20,11 @@ namespace MisakiEQ.GUI
         ExApp.KyoshinWindow? Kyoshin = null;
         readonly EEW_Compact EEW_Compact = new();
         readonly ExApp.UserESTWindow ESTWindow = new();
+        readonly Stopwatch apptimer = new();
+        public TimeSpan AppTimer { get => apptimer.Elapsed; }
         private TrayHub()
         {
+            apptimer.Start();
             Instance = this;
             InitializeComponent();
             TrayIcon.Icon = Properties.Resources.Logo_MainIcon;
@@ -128,7 +132,7 @@ namespace MisakiEQ.GUI
                     }
                 });
                 Toast.Post(e.eew);
-                EventLog.EEW(e.eew);
+                Funcs.EventLog.EEW(e.eew);
                 Funcs.DiscordRPC.PostEEW(e.eew);
                 ESTWindow.ESTTime = e.eew.UserInfo.ArrivalTime;
                 if (e.eew.UserInfo.LocalIntensity >= Struct.Common.Intensity.Int1)

@@ -23,6 +23,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
         static readonly CancellationTokenSource CancelTokenSource = new();
         static readonly CancellationToken CancelToken = CancelTokenSource.Token;
         DateTime LatestDate = DateTime.MinValue;
+        public DateTime KyoshinLatest { get => LatestDate; }
         public readonly List<KyoshinMap> ImageList = new();
         private readonly Lib.AsyncLock s_lock = new();
         DateTime LatestAdjustTime = DateTime.MinValue;
