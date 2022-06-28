@@ -16,6 +16,7 @@ namespace MisakiEQ.GUI
         readonly Lib.ConfigController.Controller? ConfigSetting;
 
         Twitter.Auth? TwitterAuthGUI = null;
+        readonly List<Funcs.ConfigUI.LinkButton> LinkButtons = new();
         public Config_Menu()
         {
             InitializeComponent();
@@ -23,6 +24,16 @@ namespace MisakiEQ.GUI
             ConfigSetting = new Lib.ConfigController.Controller(tabPage1);
             LabelVersion.Text = $"バージョン : {Properties.Version.Name}";
             Icon = Properties.Resources.Logo_MainIcon;
+            string[] objects = {"GitHub", "https://github.com/Misaki0331/MisakiEQv2",
+            "Twitter Bot","https://twitter.com/MisakiEQ",
+            "Devs Twitter","https://twitter.com/0x7FF",
+            "Ko-Fi","https://ko-fi.com/misaki0331"
+            };
+            for (int i = 0; i < objects.Length; i += 2)
+            {
+                var a = new Funcs.ConfigUI.LinkButton(tabPage3, new(48 * i, 157), objects[i], objects[i + 1]);
+                LinkButtons.Add(a);
+            }
 #if ADMIN
             LabelVersion.Text += "(Admin)";
 #elif DEBUG
@@ -78,11 +89,6 @@ namespace MisakiEQ.GUI
                 });
                 fc.ButtonEnable = true;
             });
-            TwitterAuthInfo.Text = $"@{Lib.Twitter.APIs.GetInstance().GetUserScreenID()} - {Lib.Twitter.APIs.GetInstance().GetUserName()} " +
-            $"(Follower:{Lib.Twitter.APIs.GetInstance().GetUserFollowers()} Tweet:{Lib.Twitter.APIs.GetInstance().GetUserTweets()})";
-            AuthTwitter.Visible = true;
-            TweetBox.Visible = true;
-            TweetButton.Visible = true;
             var twi = Lib.Twitter.APIs.GetInstance();
             fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Info");
             if (twi.GetUserScreenID() != null)
@@ -109,10 +115,6 @@ namespace MisakiEQ.GUI
                 fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Follower");
                 if (fc != null) fc.Value = $"";
             }
-#else
-            AuthTwitter.Visible = false;
-            TweetBox.Visible = false;
-            TweetButton.Visible = false;
 #endif
         }
 
@@ -167,25 +169,11 @@ namespace MisakiEQ.GUI
                 if (TwitterAuthGUI != null && TwitterAuthGUI.Visible) TwitterAuthGUI.Close();
                 TwitterAuthGUI = new();
                 TwitterAuthGUI.ShowDialog();
-
-                TwitterAuthInfo.Text = $"@{Lib.Twitter.APIs.GetInstance().GetUserScreenID()} - {Lib.Twitter.APIs.GetInstance().GetUserName()} " +
-                $"(Follower:{Lib.Twitter.APIs.GetInstance().GetUserFollowers()} Tweet:{Lib.Twitter.APIs.GetInstance().GetUserTweets()})";
             }
             catch (Exception ex)
             {
                 Log.Logger.GetInstance().Error(ex);
             }
-        }
-
-        private async void SendTweet(object sender, EventArgs e)
-        {
-            var id = await Lib.Twitter.APIs.GetInstance().Tweet(TweetBox.Text);
-            Log.Logger.GetInstance().Debug($"Tweet ID : {id}");
-        }
-
-        private async void FixKyoshinTime_Click(object sender, EventArgs e)
-        {
-            await Background.APIs.GetInstance().KyoshinAPI.FixKyoshinTime();
         }
 
         private void LinkToGitHub_Click(object sender, EventArgs e)
@@ -241,6 +229,7 @@ namespace MisakiEQ.GUI
             tabPage1.AutoScroll = true;
             st.Stop();
             Log.Logger.GetInstance().Debug($"リサイズ完了 : {st.Elapsed}");
+            pictureBox1.Size = new Size(tabPage3.Width - 6, 145);
             SizeChange.Stop();
         }
     }

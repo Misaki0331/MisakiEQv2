@@ -57,7 +57,7 @@ namespace MisakiEQ
                 if (args[i].StartsWith("ErrorFlg="))
                     ErrorCount = int.Parse(args[i].Remove(0, 9));
             ApplicationConfiguration.Initialize();
-            TrayHub.GetInstance();
+            TrayHub.GetInstance(true);
             Application.Run();
 #if !DEBUG
             if (hasHandle)

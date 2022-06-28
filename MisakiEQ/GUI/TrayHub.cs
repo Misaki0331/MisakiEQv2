@@ -14,12 +14,14 @@ namespace MisakiEQ.GUI
     public partial class TrayHub : Form
     {
         readonly InitWindow? Init=null;
+        internal readonly Config ConfigData = new();
         Config_Menu? Config = null;
         ExApp.KyoshinWindow? Kyoshin = null;
         readonly EEW_Compact EEW_Compact = new();
         readonly ExApp.UserESTWindow ESTWindow = new();
         private TrayHub()
         {
+            Instance = this;
             InitializeComponent();
             TrayIcon.Icon = Properties.Resources.Logo_MainIcon;
             Init = new();
@@ -34,12 +36,9 @@ namespace MisakiEQ.GUI
         }
         static TrayHub? Instance = null;
 
-        public static TrayHub GetInstance()
+        public static TrayHub? GetInstance(bool IsCreate=false)
         {
-            if (Instance == null || Instance.IsDisposed)
-            {
-                Instance = new TrayHub();
-            }
+            if (IsCreate&&Instance==null) Instance = new();
             return Instance;
         }
 
@@ -92,6 +91,7 @@ namespace MisakiEQ.GUI
 
         private void DisplayEEWInfo_Click(object sender, EventArgs e)
         {
+            EEW_Compact.TopMost = ConfigData.IsTopSimpleEEW;
             EEW_Compact.Show();
             EEW_Compact.SetInfomation(Background.APIs.GetInstance().EEW.GetData());
             EEW_Compact.Activate();
@@ -102,10 +102,11 @@ namespace MisakiEQ.GUI
             {
                 if (e.eew == null) return;
                 double distance = Struct.EEW.GetDistance(e.eew, new(Background.APIs.GetInstance().KyoshinAPI.Config.UserLong, Background.APIs.GetInstance().KyoshinAPI.Config.UserLat));
-                e.eew.UserInfo.ArrivalTime = e.eew.EarthQuake.OriginTime.AddSeconds(distance / 3.5);
+                e.eew.UserInfo.ArrivalTime = e.eew.EarthQuake.OriginTime.AddSeconds(distance / 4.2);
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EEWPost(e.eew);
 #endif
+
                 EEW_Compact.Invoke(() =>
                 {
                     if (!EEW_Compact.Visible && !EEW_Compact.IsShowFromEEW)
@@ -119,8 +120,12 @@ namespace MisakiEQ.GUI
                         EEW_Compact.HideTimer.Start();
                     }
                     EEW_Compact.SetInfomation(e.eew);
-                    EEW_Compact.Show();
-                    EEW_Compact.Activate();
+                    if (ConfigData.IsWakeSimpleEEW)
+                    {
+                        EEW_Compact.TopMost = ConfigData.IsTopSimpleEEW;
+                        EEW_Compact.Show();
+                        EEW_Compact.Activate();
+                    }
                 });
                 Toast.Post(e.eew);
                 EventLog.EEW(e.eew);
