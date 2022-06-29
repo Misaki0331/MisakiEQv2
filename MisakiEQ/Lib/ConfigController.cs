@@ -159,6 +159,9 @@ namespace MisakiEQ.Lib.ConfigController
                     case "readonly":
                         tools[i].ToolTextBox.Size = new Size(w - 151, 23);
                         break;
+                    case "combo":
+                        tools[i].ToolComboBox.Size = new Size(w - 149, 23);
+                        break;
                 }
             }
         }
@@ -172,6 +175,7 @@ namespace MisakiEQ.Lib.ConfigController
         public TextBox ToolTextBox = new();
         public CheckBox ToolCheckBox = new();
         public Button ToolButton = new();
+        public ComboBox ToolComboBox = new();
         readonly GroupBox gp;
         readonly Config.Funcs.IndexData cl;
         public string Type { get => cl.Type; }
@@ -266,6 +270,18 @@ namespace MisakiEQ.Lib.ConfigController
             ToolTextBox.ReadOnly = true;
             data.ValueChanged += new EventHandler(UpdateText);
         }
+        void ComboInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
+        {
+            var w = gb.Width;
+            gb.Controls.Add(ToolComboBox);
+            ToolComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            ToolComboBox.FormattingEnabled = true;
+            ToolComboBox.Items.AddRange(data.Items);
+            ToolComboBox.Location = new Point(123, 22 + pos * 23);
+            ToolComboBox.Size = new Size(w - 151, 23);
+            ToolComboBox.SelectedIndex = (int)(long)data.Value;
+            ToolComboBox.SelectedIndexChanged += ComboBoxChanged;
+        }
         public void Dispose()
         {
             try
@@ -302,6 +318,7 @@ namespace MisakiEQ.Lib.ConfigController
                 case "bool":BoolInit(gb, data, pos);break;
                 case "function":FunctionInit(gb, data, pos);break;
                 case "readonly":ReadOnlyInit(gb, data, pos);break;
+                case "combo":ComboInit(gb, data, pos); break;
             }
 
             
@@ -353,6 +370,10 @@ namespace MisakiEQ.Lib.ConfigController
             if (ToolCheckBox.Checked)
                 ToolCheckBox.Text = cl.GetToggleOnText();
             else ToolCheckBox.Text = cl.GetToggleOffText();
+        }
+        void ComboBoxChanged(object? sender, EventArgs e)
+        {
+            cl.Value = ToolComboBox.SelectedIndex;
         }
     }
 }

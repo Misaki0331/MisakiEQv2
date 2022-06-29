@@ -189,7 +189,7 @@ namespace MisakiEQ.Lib.Config
             var cls = GetConfigClass(name);
             if (cls == null)
             {
-                if (IsThrow) throw new ArgumentNullException($"\"{name}\"はConfig上に存在しません。");
+                if (IsThrow) throw new ArgumentException($"\"{name}\"はConfig上に存在しません。");
                 return;
             }
             cls.Config = value;
@@ -327,6 +327,27 @@ namespace MisakiEQ.Lib.Config
                 Name = name;
                 Title = title;
                 Type = "readonly";
+            }
+            public IndexData(string name, string title, string description, int def, List<string> list)
+            {
+                Type = "combo";
+                Description = description;
+                Name = name;
+                LongDefault = def;
+                LongValue = def;
+                Title = title;
+                for (int i = 0; i < list.Count; i++) ComboStrings.Add(list[i]);
+
+            }
+            public IndexData(string name, string title, string description, int def, string[] list)
+            {
+                Type = "combo";
+                Description = description;
+                Name = name;
+                LongDefault = def;
+                LongValue = def;
+                Title = title;
+                for (int i = 0; i < list.Length; i++) ComboStrings.Add(list[i]);
 
             }
             /// <summary>
@@ -356,6 +377,7 @@ namespace MisakiEQ.Lib.Config
                         "string" => StringValue,
                         "bool" => BooleanValue,
                         "readonly" => StringValue,
+                        "combo" => LongValue,
                         _ => throw new InvalidDataException($"[{Name}]は値がありません。"),
                     };
                 }
@@ -408,6 +430,37 @@ namespace MisakiEQ.Lib.Config
                                 try { ValueChanged?.Invoke(this, EventArgs.Empty); } catch (Exception ex) { Logger.GetInstance().Warn(ex.Message); }
                             }
                             break;
+                        case "combo":
+                            if (value.GetType() == typeof(string))
+                            {
+                                for(int i = 0; i < ComboStrings.Count; i++)
+                                {
+                                    if(ComboStrings[i] == (string)value)
+                                    {
+                                        LongValue = i;
+                                        break;
+                                    }
+                                    if(i == ComboStrings.Count - 1)
+                                        throw new ArgumentException($"\"{value}\"は[{Name}]のコレクションの中には存在しませんでした。", nameof(value));
+                                }
+                            }
+                            else if(value.GetType() == typeof(int))
+                            {
+                                int v = (int)value;
+                                if (v < 0 || v >= ComboStrings.Count) throw new ArgumentOutOfRangeException($"[{Name}]のコレクションに対応する配列が見つかりません。設定した値:{value} 配列数:{ComboStrings.Count}");
+                                LongValue = v;
+                            }
+                            else if (value.GetType() == typeof(long))
+                            {
+                                long v = (long)value;
+                                if (v < 0 || v >= ComboStrings.Count) throw new ArgumentOutOfRangeException($"[{Name}]のコレクションに対応する配列が見つかりません。設定した値:{value} 配列数:{ComboStrings.Count}");
+                                LongValue = v;
+                            }
+                            else
+                            {
+                                throw new InvalidCastException($"[{Name}]はstring型,int型,long型しか対応していませんが、{value.GetType()}で変更しようとしました。");
+                            }
+                            break;
                         default:
                             throw new InvalidDataException($"[{Name}は値を設定することができません。");
                     }
@@ -426,6 +479,7 @@ namespace MisakiEQ.Lib.Config
                         "long" => LongValue.ToString(),
                         "string" => StringValue.Replace("%", "%%").Replace("=", "%3D").Replace("\n", "%0D"),
                         "bool" => BooleanValue.ToString(),
+                        "combo" => ComboStrings[(int)LongValue].Replace("%", "%%").Replace("=", "%3D").Replace("\n", "%0D"),
                         _ => throw new NullReferenceException("タイプが一致しません。"),
                     }+Environment.NewLine;
                 }
@@ -456,6 +510,19 @@ namespace MisakiEQ.Lib.Config
                             else
                             {
                                 throw new ArgumentException($"bool型ではない、もしくは正しく検出できませんでした。val=\"{value}\"", nameof(value));
+                            }
+                            break;
+                        case "combo":
+                            for (int i = 0; i < ComboStrings.Count; i++)
+                            {
+                                string vals = value.Replace("%0D", "\n").Replace("%3D", "=").Replace("%%", "%");
+                                if (ComboStrings[i] == vals)
+                                {
+                                    LongValue = i;
+                                    break;
+                                }
+                                if (i == ComboStrings.Count - 1)
+                                    throw new ArgumentException($"\"{vals}\"は[{Name}]のコレクションの中には存在しませんでした。", nameof(value));
                             }
                             break;
                     }
@@ -669,6 +736,7 @@ namespace MisakiEQ.Lib.Config
                         "long" => LongDefault,
                         "string" => StringDefault,
                         "bool" => BooleanDefault,
+                        "combo"=> LongDefault,
                         _ => throw new ArgumentException("タイプが一致しません。"),
                     };
                 }
@@ -695,6 +763,13 @@ namespace MisakiEQ.Lib.Config
                     }
                 }
             }
+            public string[] Items { get
+                {
+                    if (Type != "combo") throw new ArgumentException("タイプが一致しません");
+                    string[] strings = new string[ComboStrings.Count];
+                    for (int i = 0; i < ComboStrings.Count; i++) strings[i] = ComboStrings[i];
+                    return strings;
+                } }
             long LongValue;
             long LongMin;
             long LongMax;
@@ -709,7 +784,7 @@ namespace MisakiEQ.Lib.Config
             Action? FunctionAction = null;
             readonly string FunctionReady = "";
             readonly string? FunctionWorking = null;
-
+            readonly List<string> ComboStrings = new();
         }
     }
 }
