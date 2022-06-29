@@ -102,7 +102,7 @@
             // 
             // SizeChange
             // 
-            this.SizeChange.Interval = 500;
+            this.SizeChange.Interval = 50;
             this.SizeChange.Tick += new System.EventHandler(this.SizeChange_Tick);
             // 
             // tabPage3

@@ -134,6 +134,7 @@ namespace MisakiEQ.GUI
         {
             Stopwatch st = new();
             st.Start();
+            SettingTabs.Visible = false;
             Log.Logger.GetInstance().Debug($"リサイズ開始");
             tabPage1.AutoScroll = false;
             tabPage1.AutoScrollOffset = new Point(0, 0);
@@ -142,6 +143,7 @@ namespace MisakiEQ.GUI
             tabPage1.AutoScroll = true;
             st.Stop();
             Log.Logger.GetInstance().Debug($"リサイズ完了 : {st.Elapsed}");
+            SettingTabs.Visible = true;
             SizeChange.Stop();
         }
     }
