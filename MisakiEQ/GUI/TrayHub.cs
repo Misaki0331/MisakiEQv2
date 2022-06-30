@@ -126,28 +126,38 @@ namespace MisakiEQ.GUI
                     EEW_Compact.SetInfomation(e.eew);
                     if (ConfigData.IsWakeSimpleEEW)
                     {
-                        EEW_Compact.TopMost = ConfigData.IsTopSimpleEEW;
-                        EEW_Compact.Show();
-                        EEW_Compact.Activate();
+                        if ((int)ConfigData.NoticeNationWide <= (int)e.eew.EarthQuake.MaxIntensity ||
+                    (ConfigData.NoticeNationWide == Struct.ConfigBox.Notification_EEW_Nationwide.Enums.WarnOnly && e.eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning) ||
+                    (int)ConfigData.NoticeArea <= (int)e.eew.UserInfo.LocalIntensity)
+                        {
+                            EEW_Compact.TopMost = ConfigData.IsTopSimpleEEW;
+                            EEW_Compact.Show();
+                            EEW_Compact.Activate();
+                        }
                     }
                 });
-                Toast.Post(e.eew);
                 Funcs.EventLog.EEW(e.eew);
                 Funcs.DiscordRPC.PostEEW(e.eew);
                 ESTWindow.ESTTime = e.eew.UserInfo.ArrivalTime;
-                if (e.eew.UserInfo.LocalIntensity >= Struct.Common.Intensity.Int1)
+                if ((int)ConfigData.NoticeNationWide <= (int)e.eew.EarthQuake.MaxIntensity ||
+                    (ConfigData.NoticeNationWide == Struct.ConfigBox.Notification_EEW_Nationwide.Enums.WarnOnly && e.eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning) ||
+                    (int)ConfigData.NoticeArea <= (int)e.eew.UserInfo.LocalIntensity)
                 {
-                    ESTWindow.Invoke(() =>
+                    Toast.Post(e.eew);
+                    if (e.eew.UserInfo.LocalIntensity >= Struct.Common.Intensity.Int1)
                     {
-                        if (!ESTWindow.Visible)
+                        ESTWindow.Invoke(() =>
                         {
-                            ESTWindow.Show();
-                            ESTWindow.Location = new Point(0,214);
-                        }
-                        ESTWindow.Activate();
-                    });
+                            if (!ESTWindow.Visible)
+                            {
+                                ESTWindow.Show();
+                                ESTWindow.Location = new Point(0, 214);
+                            }
+                            ESTWindow.Activate();
+                        });
+                    }
+                    await SoundCollective.GetInstance().SoundEEW(e.eew);
                 }
-                await SoundCollective.GetInstance().SoundEEW(e.eew);
             }catch(Exception ex)
             {
                 Log.Logger.GetInstance().Error(ex);

@@ -139,6 +139,8 @@ namespace MisakiEQ.Lib.Config
             {
                 tray.IsWakeSimpleEEW = GetConfigValue("GUI_Popup_EEW_Compact") as bool? ?? true;
                 tray.IsTopSimpleEEW = GetConfigValue("GUI_TopMost_EEW_Compact") as bool? ?? true;
+                tray.NoticeNationWide = Struct.ConfigBox.Notification_EEW_Nationwide.GetIndex(GetConfigValue("Notification_EEW_Nationwide") as long? ?? 9);
+                tray.NoticeArea = Struct.ConfigBox.Notification_EEW_Area.GetIndex(GetConfigValue("Notification_EEW_Area") as long? ?? 8);
             }
 #if DEBUG||ADMIN
             Twitter.APIs.GetInstance().Config.TweetEnabled = (GetConfigValue("Twitter_Enable_Tweet") as bool? ?? false);
@@ -234,7 +236,10 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("緊急地震速報発表時", true)?.Add(new IndexData("GUI_Popup_EEW_Compact", "簡易情報のポップ表示", "緊急地震速報が発令されると簡易ウィンドウがポップアップされます。", true, "ポップアップ表示", "ポップアップ非表示"));
                 GetGroup("緊急地震速報発表時", true)?.Add(new IndexData("GUI_TopMost_EEW_Compact", "簡易情報の表示モード", "簡易ウィンドウが前面表示されます。", true, "前面表示", "標準表示"));
                 GetGroup("アプリ情報", true)?.Add(new IndexData("AppInfo_Uptime", "アプリ起動時間", "起動してからの経過時間です。"));
+                GetGroup("通知設定", true)?.Add(new IndexData("Notification_EEW_Nationwide", "EEW全国通知条件", "全国共通で緊急地震速報を通知する条件を設定します", 9,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "ALL","Warning only","None"}));
+                GetGroup("通知設定", true)?.Add(new IndexData("Notification_EEW_Area", "EEW地域通知条件", "お住まいの地域で緊急地震速報を通知する条件を設定します", 8,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "≧0" }));
             }
+
             /// <summary>
             /// 値リストをコピーします。
             /// </summary>
