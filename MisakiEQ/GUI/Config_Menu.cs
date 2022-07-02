@@ -146,10 +146,5 @@ namespace MisakiEQ.GUI
             SettingTabs.Visible = true;
             SizeChange.Stop();
         }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }

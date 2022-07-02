@@ -94,8 +94,11 @@ namespace MisakiEQ
             ErrorString += "【例外が発生したソース】\n" + ex.Source + "\n\n";
             ErrorString += "【エラー内容】\n" + ex.Message + "\n\n";
             ErrorString += "【スタックトレース】\n" + ex.StackTrace;
-            GUI.ErrorInfo.UnhandledException err = new(ErrorString, ErrorCount,$"{ex.TargetSite}");
 #if !DEBUG
+            var crash = GUI.ErrorInfo.UnhandledException.CrashReport(ErrorString);
+            try
+            {
+                GUI.ErrorInfo.UnhandledException err = new(ErrorString, ErrorCount, $"{ex.TargetSite}");
             TrayHub.DisposeInstance();
             if (hasHandle)
             {
@@ -106,8 +109,23 @@ namespace MisakiEQ
                     mutex = null;
                 }
             }
+                err.Show();
+            }catch(Exception ex2)
+            {
+                Log.Logger.GetInstance().Error(ex2);
+                MessageBox.Show("問題が発生した為MisakiEQを終了しました。\n" +
+                    "バグの可能性がある場合はクラッシュレポートを送付もしくはこの画面をスクリーンショットして開発者にお問い合わせください。\n" +
+                    $"{(crash == string.Empty ? "クラッシュレポートが正常に生成できませんでした。" : $"クラッシュレポートを「{crash}」に保存しました。\n")}" +
+                    $"{(ErrorCount>=9?"繰り返しMisakiEQがクラッシュされたようです。これ以上再起動はできません。":"MisakiEQは15秒後に再起動を試みます。")}\n" +
+                    $"\n" +
+                    "OKを押すとアプリケーションは再起動せずに終了します。\n" +
+                    "\n" +
+                    "--- エラー内容 ---\n" +
+                    $"{ErrorString}\n" +
+                    $"\n" +
+                    $"--- エラー内容終了 ---",$"MisakiEQ{(ErrorCount >= 9?"は繰り返し":"が")}異常終了しました。",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
 #endif
-            err.Show();
         }
     }
 

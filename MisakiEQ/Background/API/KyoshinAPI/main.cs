@@ -82,24 +82,31 @@ namespace MisakiEQ.Background.API.KyoshinAPI
         }
         public async Task FixKyoshinTime()
         {
-            var message = Lib.WebAPI.GetString($"http://www.kmoni.bosai.go.jp/webservice/server/pros/latest.json");
-            await message;
-            if (!string.IsNullOrEmpty(message.Result))
+            try
             {
-                Latest = JsonConvert.DeserializeObject<WebService.Latest.JSON.Root>(message.Result);
-                if(Latest!=null&&DateTime.TryParse(Latest.latest_time,out var date)){
-                    if (date.Year > 2000)
+                var message = Lib.WebAPI.GetString($"http://www.kmoni.bosai.go.jp/webservice/server/pros/latest.json");
+                await message;
+                if (!string.IsNullOrEmpty(message.Result))
+                {
+                    Latest = JsonConvert.DeserializeObject<WebService.Latest.JSON.Root>(message.Result);
+                    if (Latest != null && DateTime.TryParse(Latest.latest_time, out var date))
                     {
-                        log.Debug($"強震モニタ時刻取得完了 : {date}");
-                        LatestDate = date;
-                        LatestAdjustTime=DateTime.Now;
-                        TSW.Restart();
-                        return;
+                        if (date.Year > 2000)
+                        {
+                            log.Debug($"強震モニタ時刻取得完了 : {date}");
+                            LatestDate = date;
+                            LatestAdjustTime = DateTime.Now;
+                            TSW.Restart();
+                            return;
+                        }
                     }
                 }
+                LatestAdjustTime = DateTime.Now.AddSeconds(-Config.AutoAdjustKyoshinTime + 10);
+                log.Warn($"強震モニタ時刻取得失敗");
+            }catch(Exception ex)
+            { 
+                log.Error(ex);
             }
-            LatestAdjustTime = DateTime.Now.AddSeconds(-Config.AutoAdjustKyoshinTime + 10);
-            log.Warn($"強震モニタ時刻取得失敗");
         }
         public static async Task<double> GetUserRawIntensity()
         {
@@ -175,6 +182,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
         }
         public void RunThread()
         {
+
             if (Threads == null || Threads.Status != TaskStatus.Running)
             {
                 log.Debug("スレッド開始の準備を開始します。");
@@ -225,7 +233,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
         }
 
 
-        private async Task ThreadFunction(CancellationToken token)
+        private async void ThreadFunction(CancellationToken token)
         {
             log.Info("スレッド開始");
             long TmpTimer = 0;

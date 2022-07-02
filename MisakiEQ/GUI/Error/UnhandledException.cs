@@ -16,11 +16,11 @@ namespace MisakiEQ.GUI.ErrorInfo
 {
     public partial class UnhandledException : Form
     {
-        readonly string index;
-        int ErrCnt;
-        int RestartTimerCount = 20;
-        string SpecText = "";
-        void GetString()
+        static string index="";
+        static int ErrCnt;
+        static int RestartTimerCount = 20;
+        static string SpecText = "";
+        static void GetString()
         {
 
             ManagementClass mc = new("Win32_OperatingSystem");
@@ -82,10 +82,11 @@ namespace MisakiEQ.GUI.ErrorInfo
                 cnt++;
             }
         }
-        private void CrashReport()
+        public static string CrashReport(string index)
         {
             try
             {
+                GetString();
                 var save = $"ErrorLog/{DateTime.Now:yyyyMMdd-HHmmssfff}.txt";
                 var dir = Path.GetDirectoryName(save);
                 if (!Directory.Exists(dir) && dir != null) Directory.CreateDirectory(dir);
@@ -105,13 +106,14 @@ namespace MisakiEQ.GUI.ErrorInfo
                 writer.WriteLine($"OS : {(Environment.Is64BitOperatingSystem ? "64ビット" : "32ビット")} プロセッサ : {(Environment.Is64BitProcess ? "64ビット" : "32ビット")}");
                 writer.WriteLine($"システム起動時間 : {TimeSpan.FromMilliseconds(Environment.TickCount64)}");
                 writer.Close();
-
                 Log.Logger.GetInstance().Info($"「{save}」にクラッシュレポートを保存しました。");
+                return save;
             }
             catch(Exception ex)
             {
                 Log.Logger.GetInstance().Error("クラッシュレポートの保存に失敗しました。");
                 Log.Logger.GetInstance().Error(ex);
+                return String.Empty;
             }
 
         }
@@ -147,9 +149,7 @@ namespace MisakiEQ.GUI.ErrorInfo
                 Log.Logger.GetInstance().Error("強制終了が複数回検出された為自動再起動は無効になりました。");
             }
             GetString();
-            CrashReport();
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
             string UserReportStr = string.Join("\n", UserReport.Text);
