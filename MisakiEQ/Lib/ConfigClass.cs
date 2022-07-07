@@ -146,6 +146,9 @@ namespace MisakiEQ.Lib.Config
             Twitter.APIs.GetInstance().Config.TweetEnabled = (GetConfigValue("Twitter_Enable_Tweet") as bool? ?? true);
 #endif
         }
+        /// <summary>
+        /// 設定中のコンフィグから元に戻すときのクローンを作成する
+        /// </summary>
         private void OverrideTemplates()
         {
             ConfigTemplates.Clear();
@@ -250,6 +253,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
                 GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数
                 GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
+                GetGroup("ユーザー設定", true)?.Add(new IndexData("USER_Pos_Result", "該当地域名", "緯度・経度に対応されるであろう該当地域名です。"));
                 GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示","強震モニタに非表示"));   //取得時の配列の数
                 GetGroup("通信設定",true)?.Add(new IndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", WorkingTitle: "時刻調整中...", action:new Action(async() => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
                 GetGroup("通信設定", true)?.Add(new IndexData("Kyoshin_Time", "強震モニタ時刻", "強震モニタ上の最終更新時刻です。"));
@@ -397,7 +401,7 @@ namespace MisakiEQ.Lib.Config
             /// <exception cref="InvalidOperationException"></exception>
             public void SetAction(Action act)
             {
-                if (Type != "function") throw new InvalidOperationException($"{Type}型は関数設定できません！");
+                //if (Type != "function") throw new InvalidOperationException($"{Type}型は関数設定できません！");
                 FunctionAction = act;
             }
             public EventHandler? ValueChanged = null;
@@ -440,7 +444,11 @@ namespace MisakiEQ.Lib.Config
                                 if (LongMin < short.MinValue || LongMax > short.MaxValue) throw new ArgumentOutOfRangeException($"[{Name}]の設定可能値はshort型からオーバーフローしています。long型で変更してください。");
                                 if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} < {LongMin}");
                                 if ((long)value > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} > {LongMax}");
-                                LongValue = (long)value;
+                                if (LongValue != (long)value)
+                                {
+                                    LongValue = (long)value;
+                                    FunctionAction?.Invoke();
+                                }
                             }
                             else
                             if (value.GetType() == typeof(int))
@@ -448,13 +456,21 @@ namespace MisakiEQ.Lib.Config
                                 if (LongMin < int.MinValue || LongMax > int.MaxValue) throw new ArgumentOutOfRangeException($"[{Name}]の設定可能値はint型オーバーフローしています。long型で変更してください。");
                                 if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} < {LongMin}");
                                 if ((long)value > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} > {LongMax}");
-                                LongValue = (long)value;
+                                if (LongValue != (long)value)
+                                {
+                                    LongValue = (long)value;
+                                    FunctionAction?.Invoke();
+                                }
                             }
                             else if (value.GetType() == typeof(long))
                             {
                                 if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} < {LongMin}");
                                 if ((long)value > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} > {LongMax}");
-                                LongValue = (long)value;
+                                if (LongValue != (long)value)
+                                {
+                                    LongValue = (long)value;
+                                    FunctionAction?.Invoke();
+                                }
                             }
                             else
                                 throw new InvalidCastException($"[{Name}]は整数型しか対応していませんが、{value.GetType()}で変更しようとしました。");

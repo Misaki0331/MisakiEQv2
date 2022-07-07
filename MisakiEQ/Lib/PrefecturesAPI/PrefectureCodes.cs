@@ -6,23 +6,15 @@ using System.Threading.Tasks;
 
 namespace MisakiEQ.Lib.PrefecturesAPI
 {
-    internal class PrefectureCodes
+    public class JSON
     {
-        public static string? GetPrefectures(string? ID)
-        {
-            return ID;
-        }
-        public static Struct.Common.Prefectures GetPrefecture(string? ID)
-        {
-            if (ID == null) return Struct.Common.Prefectures.Unknown;
-            if (ID.Length != 6 & int.TryParse(ID, out int code)) throw new ArgumentException("都道府県コード及び市区町村コードではありません。");
-            code /= 10000;
-            return code switch
-            {
-                1 => Struct.Common.Prefectures.Hokkaido,
-                2 => Struct.Common.Prefectures.Aomori,
-                _ => Struct.Common.Prefectures.Unknown
-            };
-        }
+        public string forecastcode { get; set; } = string.Empty;
+        public string prefname { get; set; } = string.Empty;
+        public string cityname { get; set; } = string.Empty;
+        public string centers { get; set; } = string.Empty;
+        public string offices { get; set; } = string.Empty;
+        public string class10s { get; set; } = string.Empty;
+        public string class15s { get; set; } = string.Empty;
+        public string class20s { get; set; } = string.Empty;
     }
 }

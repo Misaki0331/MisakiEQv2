@@ -66,9 +66,48 @@ namespace MisakiEQ.GUI
             });
             Funcs.GUI.TwitterGUI.SetInfotoConfigUI();
 #endif
+            UpdatePos.Interval = 200;
+            UpdatePos.Tick += UpdateGeo;
+            var lat = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Lat");
+            var lon = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Long");
+            if(lat!=null)lat.SetAction(new Action(() => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } }));
+            if(lon!=null)lon.SetAction(new Action(() => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } }));
+            UpdateGeo(null, EventArgs.Empty);
         }
 
+        System.Windows.Forms.Timer UpdatePos = new();
+        bool IsUpdatePosBusy = false;
+        async void UpdateGeo(object? sender,EventArgs e)
+        {
+            try
+            {
+                IsUpdatePosBusy = true;
+                UpdatePos.Stop();
+                var res = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Result");
+                var lat = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Lat");
+                var lon = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Long");
+                if (lon != null && lat != null)
+                {
+                    if (res != null) res.Value = "地点取得中...";
+                    var index = await Lib.PrefecturesAPI.API.GetReverseGeo(new((long)lon.Value / 10000.0, (long)lat.Value / 10000.0));
+                    var result = index.Prefcity;
+                    if (result == string.Empty)
+                    {
+                        if (res != null) res.Value = "この地点はご利用いただけません。";
+                    }
+                    else
+                    {
+                        if (res != null) res.Value = result;
+                    }
 
+                }
+                IsUpdatePosBusy = false;
+            }
+            catch(Exception ex)
+            {
+                Log.Logger.GetInstance().Error(ex);
+            }
+        }
 
         private void ButtonApply_Click(object sender, EventArgs e)
         {
@@ -114,6 +153,10 @@ namespace MisakiEQ.GUI
         }
         private void Config_Menu_FormClosed(object sender, FormClosedEventArgs e)
         {
+            var lat = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Lat");
+            var lon = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Long");
+            if (lat != null) lat.SetAction(new Action(() => { return; }));
+            if (lon != null) lon.SetAction(new Action(() => { return; }));
             Lib.Config.Funcs.GetInstance().DiscardConfig();
             ConfigSetting?.FormEventDispose();
         }

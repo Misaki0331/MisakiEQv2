@@ -265,7 +265,7 @@ namespace MisakiEQ.Lib.ConfigController
             ToolTextBox.Location = new Point(123, 22 + pos * 23);
             ToolTextBox.Size = new Size(w - 151, 23);
             ToolTextBox.MaxLength = 300;
-            ToolTextBox.TextAlign = HorizontalAlignment.Right;
+            ToolTextBox.TextAlign = HorizontalAlignment.Center;
             ToolTextBox.Text = (string)data.Value;
             ToolTextBox.ReadOnly = true;
             data.ValueChanged += new EventHandler(UpdateText);
