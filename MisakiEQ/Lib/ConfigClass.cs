@@ -49,8 +49,7 @@ namespace MisakiEQ.Lib.Config
                     for (int j = 0; j < config.Count; j++) sw.Write($"{config[j].Config}");
                 }
                 sw.Close();
-
-                TmpConfigs = Configs.Clone();
+                OverrideTemplates();
                 sr.Stop();
                 Logger.GetInstance().Debug($"Config書込完了 計測時間:{(sr.ElapsedTicks / 10000.0):#,##0.0000}ms");
                 return true;
@@ -96,6 +95,7 @@ namespace MisakiEQ.Lib.Config
                     }
                 }
                 sr.Close();
+                OverrideTemplates();
                 sw.Stop();
                 Logger.GetInstance().Debug($"コンフィグの読込に成功 計測時間:{(sw.ElapsedTicks / 10000.0):#,##0.0000}ms 読込数:{PASS}/{TOTAL}");
                 return true;
@@ -145,6 +145,24 @@ namespace MisakiEQ.Lib.Config
 #if DEBUG||ADMIN
             Twitter.APIs.GetInstance().Config.TweetEnabled = (GetConfigValue("Twitter_Enable_Tweet") as bool? ?? true);
 #endif
+        }
+        private void OverrideTemplates()
+        {
+            ConfigTemplates.Clear();
+            for (int i = 0; i < Configs.Data.Count; i++)
+            {
+                var config = Configs.Data[i].Setting;
+                for (int j = 0; j < config.Count; j++)
+                {
+                    if (config[j].Type == "combo")
+                    {
+                        ConfigTemplates.Add(new(config[j].Name, $"={config[j].Value}"));
+                    }
+                    else
+                    if (config[j].ValueDefaultable()) ConfigTemplates.Add(new(config[j].Name, $"{config[j].Value}"));
+                }
+            }
+            for (int i = 0; i < ConfigTemplates.Count; i++) SetConfigValue(ConfigTemplates[i].Key, ConfigTemplates[i].Value, false);
         }
         /// <summary>
         /// 名前からコンフィグのクラスを取得します。<br/>
@@ -196,12 +214,27 @@ namespace MisakiEQ.Lib.Config
             }
             cls.Config = value;
         }
+        private class ConfigTemplate
+        {
+            public ConfigTemplate(string key,string value)
+            {
+                Key = key;
+                Value = value;
+            }
+            public string Key = string.Empty;
+            public string Value=string.Empty;
+        }
+        readonly List<ConfigTemplate> ConfigTemplates=new();
         public void DiscardConfig()
         {
-            Configs = TmpConfigs.Clone();
+            Logger.GetInstance().Debug($"現在の設定が保存せずに破棄された為、コンフィグを前の状態に戻します。");
+            var sw = new Stopwatch();
+            sw.Start();
+            for (int i = 0; i < ConfigTemplates.Count; i++) SetConfigValue(ConfigTemplates[i].Key, ConfigTemplates[i].Value, false);
+            sw.Stop();
+            Logger.GetInstance().Debug($"コンフィグを前の状態に戻しました。処理時間 : {sw.Elapsed}");
         }
         public Cfg Configs=new();
-        public Cfg TmpConfigs=new();
         public class Cfg
         {
             public readonly List<ConfigGroup> Data = new();
@@ -369,6 +402,17 @@ namespace MisakiEQ.Lib.Config
             }
             public EventHandler? ValueChanged = null;
 
+            public bool ValueDefaultable()
+            {
+                return Type switch
+                {
+                    "long" => true,
+                    "string" => true,
+                    "bool" => true,
+                    "combo" => true,
+                    _ => false
+                };
+            }
             /// <summary>
             /// 値を設定または取得します。
             /// </summary>
@@ -518,6 +562,22 @@ namespace MisakiEQ.Lib.Config
                             }
                             break;
                         case "combo":
+                            if (value.StartsWith("="))
+                            {
+                                if(int.TryParse(value.Replace("=",""),out int num))
+                                {
+                                    if (ComboStrings.Count > num && 0 <= num)
+                                    {
+                                        LongValue = num;
+                                        break;
+                                    }
+                                    else throw new ArgumentOutOfRangeException(nameof(value), $"\"{num}\" は \"{ComboStrings.Count}\" の範囲外です。");
+                                }
+                                else
+                                {
+                                    throw new InvalidDataException($"\"{value}\"は数値に変換できませんでした。");
+                                }
+                            }
                             for (int i = 0; i < ComboStrings.Count; i++)
                             {
                                 string vals = value.Replace("%0D", "\n").Replace("%3D", "=").Replace("%%", "%");
@@ -526,6 +586,7 @@ namespace MisakiEQ.Lib.Config
                                     LongValue = i;
                                     break;
                                 }
+
                                 if (i == ComboStrings.Count - 1)
                                     throw new ArgumentException($"\"{vals}\"は[{Name}]のコレクションの中には存在しませんでした。", nameof(value));
                             }
