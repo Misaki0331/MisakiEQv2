@@ -18,6 +18,7 @@
     <Description>地震通知アプリケーション</Description>
     <Company>水咲(みさき)</Company>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ADMIN|AnyCPU'">
@@ -36,6 +37,9 @@
 
   <ItemGroup>
     <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
+    <PackageReference Include="KyoshinMonitorLib" Version="0.4.5" />
+    <PackageReference Include="KyoshinMonitorLib.Images" Version="0.4.3" />
+    <PackageReference Include="KyoshinMonitorLib.SkiaImages" Version="0.4.3" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.2" />
     <PackageReference Include="NAudio" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

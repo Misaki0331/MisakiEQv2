@@ -393,8 +393,12 @@ namespace MisakiEQ.Background.API.KyoshinAPI
             public Image? GetImage()
             {
                 Lifetime = 3;
-                if(Data==null)Log.Logger.GetInstance().Debug($"{ImageType}のデータはnullです");
-                return Data;
+                if (Data == null)
+                {
+                    Log.Logger.GetInstance().Debug($"{ImageType}のデータはnullです");
+                    return null;
+                }
+                return new Bitmap(Data);
             }
         }
     }

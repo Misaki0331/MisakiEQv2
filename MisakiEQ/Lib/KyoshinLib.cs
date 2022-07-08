@@ -70,7 +70,7 @@ namespace MisakiEQ.Lib
         //引用元
         //多項式補間を使用して強震モニタ画像から数値データを決定する - NoneType1
         //https://qiita.com/NoneType1/items/a4d2cf932e20b56ca444
-        private static double GetValue(Color col)
+        public static double GetValue(Color col)
         {
             int max = Math.Max(col.R, Math.Max(col.G, col.B)), min = Math.Min(col.R, Math.Min(col.G, col.B));
             double h = col.GetHue() / 360.0, s = (max == 0) ? 0 : 1d - (1d * min / max), v = max / 255d, p = 0;

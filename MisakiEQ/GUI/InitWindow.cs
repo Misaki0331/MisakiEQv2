@@ -42,6 +42,8 @@ namespace MisakiEQ
             var discord = Lib.Discord.RichPresence.GetInstance();
             discord.Init();
             discord.Update(detail: "MisakiEQは地震監視中です。");
+            InitialTask.ReportProgress(55, "強震モニタのポイントを取得中");
+            Lib.KyoshinAPI.KyoshinObervation.Init();
             InitialTask.ReportProgress(60, "サウンド読込中");
             Funcs.SoundCollective.Init();
 #if ADMIN || DEBUG

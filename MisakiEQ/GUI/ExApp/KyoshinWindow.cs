@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using KyoshinMonitorLib;
+using KyoshinMonitorLib.Images;
 
 namespace MisakiEQ.GUI.ExApp
 {
@@ -69,8 +71,10 @@ namespace MisakiEQ.GUI.ExApp
                     }
                     var km = await api.KyoshinAPI.GetImage(GetEnumType());
                     if (km != null)
-                    {
-                        g.DrawImage(km, x: 0, y: 0);
+                {
+                    var list = await Lib.KyoshinAPI.KyoshinObervation.GetPoints(GetEnumType());
+                    g.DrawImage(km, x: 0, y: 0);
+                        label2.Text = $"{list.NearPoint.Region}\n{list.NearPoint.String}";
                     }
                     if (DisplayEEWCircle.Checked)
                     {
@@ -90,7 +94,7 @@ namespace MisakiEQ.GUI.ExApp
                     var tmp = KyoshinImage.Image;
                     KyoshinImage.Image = img;
                     tmp.Dispose();
-                    GetKyoshinPosText();
+
                 }
                 catch (Exception ex)
                 {
@@ -151,62 +155,8 @@ namespace MisakiEQ.GUI.ExApp
             Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin -= UpdateImage;
         }
 
-        int x0=0, y0=0;
-        private async void GetKyoshinPosText()
-        {
-            try
-            {
-                int x = x0;
-                int y = y0;
-                var a = await Background.APIs.GetInstance().KyoshinAPI.GetImage(GetEnumType());
-                var lal = Lib.KyoshinLib.KyoshinMapToLAL(new Struct.Common.Point(x, y));
-                var pnt = Lib.KyoshinLib.LALtoKyoshinMap(lal);
-                var str = $"{lal.Lon:0.00}E {lal.Lat:0.00}N";
-                if (a == null)
-                {
-                    label1.Text = str;
-                    return;
-                }
-                var b = (Bitmap)a;
-                if (b.Width <= x || b.Height <= y) return;
-                if (b.GetPixel(x, y).ToArgb()==0)
-                {
-                    label1.Text = str;
-                    return;
-                }
-                switch (KyoshinType.SelectedIndex)
-                {
-                    case 0:
-                        label1.Text = $"震度 : {Lib.KyoshinLib.GetIntensity(b.GetPixel(x, y)):0.00}\n{str}";
-                        break;
-                    case 1:
-                        label1.Text = $"PGA : {Lib.KyoshinLib.GetPGA(b.GetPixel(x, y)):0.00}gal\n{str}";
-                        break;
-                    case 2:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
-                        label1.Text = $"PGV : {Lib.KyoshinLib.GetPGV(b.GetPixel(x, y)):0.00}cm/s\n{str}";
-                        break;
-                    case 3:
-                        label1.Text = $"PGD : {Lib.KyoshinLib.GetPGD(b.GetPixel(x, y)):0.00}cm\n{str}";
-                        break;
-
-                }
-            }catch(Exception ex)
-            {
-                Log.Logger.GetInstance().Error(ex);
-            }
-        }
-
         private void KyoshinMapMoved(object sender, MouseEventArgs e)
         {
-            x0 = e.X;
-            y0 = e.Y;
-            GetKyoshinPosText();
         }
 
     }

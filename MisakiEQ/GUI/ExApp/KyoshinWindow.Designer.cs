@@ -33,7 +33,7 @@
             this.Position = new System.Windows.Forms.CheckBox();
             this.DisplayEEWCircle = new System.Windows.Forms.CheckBox();
             this.DisplayEEWShindo = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.KyoshinImage)).BeginInit();
             this.SuspendLayout();
             // 
@@ -108,14 +108,16 @@
             this.DisplayEEWShindo.UseVisualStyleBackColor = true;
             this.DisplayEEWShindo.CheckedChanged += new System.EventHandler(this.DisplayEEWShindo_CheckedChanged);
             // 
-            // label1
+            // label2
             // 
-            this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(86, 354);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(107, 46);
-            this.label1.TabIndex = 5;
-            this.label1.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label2.BackColor = System.Drawing.Color.Black;
+            this.label2.ForeColor = System.Drawing.Color.White;
+            this.label2.Location = new System.Drawing.Point(85, 367);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(107, 31);
+            this.label2.TabIndex = 7;
+            this.label2.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // KyoshinWindow
             // 
@@ -123,7 +125,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(353, 401);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.DisplayEEWShindo);
             this.Controls.Add(this.DisplayEEWCircle);
             this.Controls.Add(this.Position);
@@ -146,6 +148,6 @@
         private CheckBox Position;
         private CheckBox DisplayEEWCircle;
         private CheckBox DisplayEEWShindo;
-        private Label label1;
+        private Label label2;
     }
 }

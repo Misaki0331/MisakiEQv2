@@ -100,6 +100,16 @@ namespace MisakiEQ.Properties {
         }
         
         /// <summary>
+        ///   型 System.Byte[] のローカライズされたリソースを検索します。
+        /// </summary>
+        public static byte[] ShindoObsPoints_mpk {
+            get {
+                object obj = ResourceManager.GetObject("ShindoObsPoints_mpk", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   {
         ///  &quot;ParseStatus&quot;: &quot;Success&quot;,
         ///  &quot;Title&quot;: {
