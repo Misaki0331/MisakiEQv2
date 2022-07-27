@@ -71,7 +71,7 @@ namespace MisakiEQ.Funcs
             }
             if (eew.Serial.Infomation != Struct.EEW.InfomationLevel.Cancelled)
             {
-                TweetIndex += $"{eew.EarthQuake.Hypocenter} 深さ: {Struct.Common.DepthToString(eew.EarthQuake.Depth)} M {eew.EarthQuake.Magnitude}\n";
+                TweetIndex += $"{eew.EarthQuake.Hypocenter} 深さ: {Struct.Common.DepthToString(eew.EarthQuake.Depth)} M {eew.EarthQuake.Magnitude:0.0}\n";
                 TweetIndex += $"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n";
                 TweetIndex += $"発生時刻 : {eew.EarthQuake.OriginTime:M/dd HH:mm:ss}\n";
                 if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
@@ -112,7 +112,7 @@ namespace MisakiEQ.Funcs
                     }
                     var twitter = APIs.GetInstance();
                     LatestID = await twitter.Tweet(reply: LatestID, tweet: TweetIndex);
-                    Log.Logger.GetInstance().Debug($"ツイートしました。 ID:{LatestID}\n" + TweetIndex);
+                    Log.Instance.Debug($"ツイートしました。 ID:{LatestID}\n" + TweetIndex);
                     if (Index != -1)
                     {
                         if (LatestID != 1)
@@ -133,7 +133,7 @@ namespace MisakiEQ.Funcs
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.GetInstance().Warn($"ツイート中にエラー : {ex.Message}");
+                    Log.Instance.Warn($"ツイート中にエラー : {ex.Message}");
                 }
             }
         }
@@ -258,7 +258,7 @@ namespace MisakiEQ.Funcs
                         }
                         else
                         {
-                            Log.Logger.GetInstance().Warn($"ツイートできませんでした。\n{TweetIndexs[i]}");
+                            Log.Instance.Warn($"ツイートできませんでした。\n{TweetIndexs[i]}");
                         }
                     }
                     if (!IsExist)
@@ -271,7 +271,7 @@ namespace MisakiEQ.Funcs
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.GetInstance().Error(ex);
+                    Log.Instance.Error(ex);
                 }
             }
         }
@@ -388,7 +388,7 @@ namespace MisakiEQ.Funcs
                                         text += $"{grades[i][j]}";
                                     }
                                 }
-                                Log.Logger.GetInstance().Debug("2");
+                                Log.Instance.Debug("2");
                                 cnt += APIs.GetLen(text) + 1;
                                 index.Add(text);
                                 if (cnt > 230)
@@ -417,12 +417,12 @@ namespace MisakiEQ.Funcs
                         TweetList[i] += "#MisakiEQ #津波";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
                         Latest = await APIs.GetInstance().Tweet(TweetList[i], Latest);
-                        Log.Logger.GetInstance().Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
+                        Log.Instance.Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.GetInstance().Error(ex);
+                    Log.Instance.Error(ex);
                 }
             }
         }

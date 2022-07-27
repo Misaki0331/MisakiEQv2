@@ -22,7 +22,7 @@ namespace MisakiEQ.Lib.PrefecturesAPI
                 return new PrefData(pref, city);
             }catch(Exception ex)
             {
-                Log.Logger.GetInstance().Error(ex); 
+                Log.Instance.Error(ex); 
                 return new PrefData(Common.Prefectures.Unknown, string.Empty);
             }
         }

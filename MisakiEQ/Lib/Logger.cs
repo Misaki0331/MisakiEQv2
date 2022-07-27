@@ -9,9 +9,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace MisakiEQ.Log
+namespace MisakiEQ
 {
-    class Logger
+    class Log
     {
         const bool IS_LOGFILE = true;
         LogLevel LOG_LEVEL = 0;
@@ -53,7 +53,7 @@ namespace MisakiEQ.Log
             FATAL
         }
 
-        private static Logger? singleton = null;
+        private static Log? singleton = null;
         private readonly string? logFilePath = null;
         private readonly object lockObj = new();
         private StreamWriter? stream = null;
@@ -61,18 +61,19 @@ namespace MisakiEQ.Log
         /// <summary>
         /// インスタンスを生成する
         /// </summary>
-        public static Logger GetInstance()
+        private static Log GetInstance()
         {
             if (singleton == null)
             {
-                singleton = new Logger();
+                singleton = new Log();
             }
             return singleton;
         }
+        public static Log Instance { get { return GetInstance(); } }
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        private Logger()
+        private Log()
         {
             this.logFilePath = LOGDIR_PATH + LOGFILE_NAME + ".log";
 

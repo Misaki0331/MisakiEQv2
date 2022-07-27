@@ -64,19 +64,19 @@ namespace MisakiEQ.Lib.Twitter
                 UserInfo = await client.Users.GetAuthenticatedUserAsync();
                 AccessToken = userCredentials.AccessToken;
                 AccessTokenSecret = userCredentials.AccessTokenSecret;
-                Log.Logger.GetInstance().Info("次のユーザーとしてログインしました: " + UserInfo);
+                Log.Instance.Info("次のユーザーとしてログインしました: " + UserInfo);
                 return true;
 
             }
             catch (Tweetinvi.Exceptions.TwitterException ex)
             {
-                Log.Logger.GetInstance().Error($"Twitterの認証に失敗しました。\n{ex.Message}");
+                Log.Instance.Error($"Twitterの認証に失敗しました。\n{ex.Message}");
                 return false;
 
             }
             catch (Exception ex)
             {
-                Log.Logger.GetInstance().Error($"Twitterの認証ができませんでした。\n{ex.Message}");
+                Log.Instance.Error($"Twitterの認証ができませんでした。\n{ex.Message}");
                 return false;
             }
         }
@@ -89,17 +89,17 @@ namespace MisakiEQ.Lib.Twitter
                 keys[0] = keys[0].Replace("\r", "");
                 client = new TwitterClient(keys[0], keys[1], token, secret);
                 UserInfo = await client.Users.GetAuthenticatedUserAsync();
-                Log.Logger.GetInstance().Info("次のユーザーとしてログインしました: " + UserInfo);
+                Log.Instance.Info("次のユーザーとしてログインしました: " + UserInfo);
                 return true;
             }
             catch (Tweetinvi.Exceptions.TwitterException ex)
             {
-                Log.Logger.GetInstance().Error($"Twitterの認証に失敗しました。\n{ex.Message}");
+                Log.Instance.Error($"Twitterの認証に失敗しました。\n{ex.Message}");
                 return false;
             }
             catch (Exception ex)
             {
-                Log.Logger.GetInstance().Error($"Twitterの認証ができませんでした。\n{ex.Message}");
+                Log.Instance.Error($"Twitterの認証ができませんでした。\n{ex.Message}");
                 return false;
             }
         }
@@ -115,7 +115,7 @@ namespace MisakiEQ.Lib.Twitter
                 return task.Result;
             }catch (Exception ex)
             {
-                Log.Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
                 return false;
             }
         }
@@ -149,7 +149,7 @@ namespace MisakiEQ.Lib.Twitter
             }
             catch(Exception ex)
             {
-                Log.Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
                 return -1;
             }
         }

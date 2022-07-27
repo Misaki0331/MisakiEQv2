@@ -43,14 +43,14 @@ namespace MisakiEQ.Lib.Discord
                 client = new DiscordRpcClient(Properties.Resources.DiscordRPC);
                 client.OnReady += (sender, e) =>
                 {
-                    Log.Logger.GetInstance().Info($"ユーザー名 : {e.User.Username}");
-                    Log.Logger.GetInstance().Info($"会員資格 : {e.User.Premium}");
+                    Log.Instance.Info($"ユーザー名 : {e.User.Username}");
+                    Log.Instance.Info($"会員資格 : {e.User.Premium}");
                 };
 
 
                 client.OnPresenceUpdate += (sender, e) =>
                 {
-                    //Log.Logger.GetInstance().Debug($"更新情報を受信 : {e.Presence.}");
+                    //Log.Instance.Debug($"更新情報を受信 : {e.Presence.}");
                 };
 
                 //Connect to the RPC

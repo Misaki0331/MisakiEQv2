@@ -10,7 +10,6 @@ namespace MisakiEQ.Background.API.KyoshinAPI
 {
     public class KyoshinAPI
     {
-        readonly Log.Logger log = Log.Logger.GetInstance();
         private readonly Stopwatch TSW = new();//thread起動時間
         public Config Config = new();
         public WebService.Latest.JSON.Root? Latest = null;
@@ -93,7 +92,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                     {
                         if (date.Year > 2000)
                         {
-                            log.Debug($"強震モニタ時刻取得完了 : {date}");
+                            Log.Instance.Debug($"強震モニタ時刻取得完了 : {date}");
                             LatestDate = date;
                             LatestAdjustTime = DateTime.Now;
                             TSW.Restart();
@@ -102,10 +101,10 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                     }
                 }
                 LatestAdjustTime = DateTime.Now.AddSeconds(-Config.AutoAdjustKyoshinTime + 10);
-                log.Warn($"強震モニタ時刻取得失敗");
+                Log.Instance.Warn($"強震モニタ時刻取得失敗");
             }catch(Exception ex)
             { 
-                log.Error(ex);
+                Log.Instance.Error(ex);
             }
         }
         public static async Task<double> GetUserRawIntensity()
@@ -115,7 +114,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                 var api = await APIs.GetInstance().KyoshinAPI.GetImage(KyoshinImageType.EstShindoImg);
                 if (api == null)
                 {
-                    Log.Logger.GetInstance().Warn("強震モニタの推定震度マップを取得できませんでした。");
+                    Log.Instance.Warn("強震モニタの推定震度マップを取得できませんでした。");
                     return double.NaN;
                 }
                 Struct.Common.LAL lal = new(APIs.GetInstance().KyoshinAPI.Config.UserLong, APIs.GetInstance().KyoshinAPI.Config.UserLat);
@@ -129,7 +128,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
             }
             catch (Exception ex)
             {
-                Log.Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
                 return double.NaN;
             }
         }
@@ -158,7 +157,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                     }
                 }
                 ImageList.Add(new KyoshinMap(type));
-                log.Debug($"{type}をキューに追加しました。");
+                Log.Instance.Debug($"{type}をキューに追加しました。");
                 for (int i = 0; i < ImageList.Count; i++)
                 {
                     if (ImageList[i].ImageType == type)
@@ -185,24 +184,24 @@ namespace MisakiEQ.Background.API.KyoshinAPI
 
             if (Threads == null || Threads.Status != TaskStatus.Running)
             {
-                log.Debug("スレッド開始の準備を開始します。");
+                Log.Instance.Debug("スレッド開始の準備を開始します。");
                 TSW.Restart();
                 Threads = Task.Run(() => ThreadFunction(CancelToken));
             }
             else
             {
-                log.Error("該当スレッドは動作中の為、起動ができませんでした。");
+                Log.Instance.Error("該当スレッドは動作中の為、起動ができませんでした。");
             }
 
         }
         public void AbortThread()
         {
-            log.Debug("スレッド破棄の準備を開始します。");
+            Log.Instance.Debug("スレッド破棄の準備を開始します。");
             CancelTokenSource.Cancel();
         }
         public async Task AbortAndWait()
         {
-            log.Debug("スレッドを終了しています...");
+            Log.Instance.Debug("スレッドを終了しています...");
             CancelTokenSource.Cancel();
             if (Threads != null && !Threads.IsCompleted) await Threads;
         }
@@ -220,13 +219,13 @@ namespace MisakiEQ.Background.API.KyoshinAPI
             if (from == null) from = new();
             if (KyoshinEEW != null)
             {
-                log.Debug("汎用クラスに変換中...");
+                Log.Instance.Debug("汎用クラスに変換中...");
                 from = Struct.EEW.GetData(KyoshinEEW, from);
-                log.Debug("汎用クラスに変換完了");
+                Log.Instance.Debug("汎用クラスに変換完了");
             }
             else
             {
-                log.Warn("APIの情報がありませんでした。");
+                Log.Instance.Warn("APIの情報がありませんでした。");
             }
             return from;
 
@@ -235,7 +234,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
 
         private async void ThreadFunction(CancellationToken token)
         {
-            log.Info("スレッド開始");
+            Log.Instance.Info("スレッド開始");
             long TmpTimer = 0;
             long TmpErrTimer = 0;
             await FixKyoshinTime();
@@ -261,7 +260,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                                 {
                                     if (ImageList[i].Lifetime < 0)
                                     {
-                                        log.Debug($"{ImageList[i].ImageType}は使われていない為キューから除外します。");
+                                        Log.Instance.Debug($"{ImageList[i].ImageType}は使われていない為キューから除外します。");
                                         ImageList.RemoveAt(i);
                                     }
                                 }
@@ -279,12 +278,12 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                                         UpdatedKyoshin?.Invoke(this, new EventArgs());
                                     }catch(Exception ex)
                                     {
-                                        log.Warn($"イベント送信時にエラーが発生しました。{ex.Message}");
+                                        Log.Instance.Warn($"イベント送信時にエラーが発生しました。{ex.Message}");
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    log.Warn($"取得時にエラーが発生しました。{ex.Message}");
+                                    Log.Instance.Warn($"取得時にエラーが発生しました。{ex.Message}");
                                 }
 
                             }
@@ -323,12 +322,12 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                 }
                 catch (TaskCanceledException ex)
                 {
-                    log.Info($"スレッドの処理を終了します。{ex.Message}");
+                    Log.Instance.Info($"スレッドの処理を終了します。{ex.Message}");
                     return;
                 }
                 catch (Exception ex)
                 {
-                    log.Error(ex);
+                    Log.Instance.Error(ex);
                 }
             }
         }
@@ -366,7 +365,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                 }
                 catch(Exception ex)
                 {
-                    Log.Logger.GetInstance().Error(ex);
+                    Log.Instance.Error(ex);
                 }
             }
             public async Task AccessImage(DateTime time,CancellationToken? cancel=null)
@@ -384,10 +383,10 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                 }
                 catch (TaskCanceledException)
                 {
-                    Log.Logger.GetInstance().Info("タスクが取り消されました。");
+                    Log.Instance.Info("タスクが取り消されました。");
                 }catch(Exception ex)
                 {
-                    Log.Logger.GetInstance().Warn($"{ImageType}のデータ取得中にエラー\n{ex.Message}");
+                    Log.Instance.Warn($"{ImageType}のデータ取得中にエラー\n{ex.Message}");
                 }
             }
             public Image? GetImage()
@@ -395,7 +394,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                 Lifetime = 3;
                 if (Data == null)
                 {
-                    Log.Logger.GetInstance().Debug($"{ImageType}のデータはnullです");
+                    Log.Instance.Debug($"{ImageType}のデータはnullです");
                     return null;
                 }
                 return new Bitmap(Data);

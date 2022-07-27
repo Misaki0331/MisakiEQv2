@@ -4,13 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using MisakiEQ.Log;
 
 namespace MisakiEQ.Lib
 {
     internal static class WebAPI
     {
-        static readonly Logger log = Logger.GetInstance();
 
 
         public static async Task<byte[]> GetBytes(string URL,CancellationToken? token = null)
@@ -49,12 +47,12 @@ namespace MisakiEQ.Lib
             }
             catch (TaskCanceledException ex)
             {
-                log.Info("タスクが取り消されました。");
+                Log.Instance.Info("タスクが取り消されました。");
                 throw ex;
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Log.Instance.Error(ex);
                 await Task.FromException<string>(ex);
                 return Array.Empty<byte>();
             }
@@ -95,12 +93,12 @@ namespace MisakiEQ.Lib
             }
             catch (TaskCanceledException ex)
             {
-                log.Info("タスクが取り消されました。");
+                Log.Instance.Info("タスクが取り消されました。");
                 throw ex;
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Log.Instance.Error(ex);
                 await Task.FromException<string>(ex);
                 return string.Empty;
             }

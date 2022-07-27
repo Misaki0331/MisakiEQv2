@@ -125,7 +125,7 @@ namespace MisakiEQ.Funcs
                             }
                         }catch(Exception ex)
                         {
-                            Log.Logger.GetInstance().Error(ex);
+                            Log.Instance.Error(ex);
                             Init();
                         }
                     }
@@ -139,7 +139,7 @@ namespace MisakiEQ.Funcs
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.GetInstance().Error(ex);
+                    Log.Instance.Error(ex);
                     return false;
                 }
             }
@@ -177,7 +177,7 @@ namespace MisakiEQ.Funcs
             }
             catch (Exception ex)
             {
-                Log.Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
                 Init();
             }
         }
@@ -224,7 +224,7 @@ namespace MisakiEQ.Funcs
             }
             catch(Exception ex)
             {
-                Log.Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
                 Init();
             }
         }

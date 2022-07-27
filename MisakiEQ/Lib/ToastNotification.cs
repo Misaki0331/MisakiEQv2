@@ -86,7 +86,7 @@ namespace MisakiEQ.Lib
                     a.AddAppLogoOverride(uri);
                 }
                 a.Show();
-                Log.Logger.GetInstance().Debug($"トースト送信 : {title}");
+                Log.Instance.Debug($"トースト送信 : {title}");
                 Thread.Sleep(5000);
                 for(int i=0;i<TempFiles.Count;i++) File.Delete(TempFiles[i]);
                 TempFiles.Clear();

@@ -106,13 +106,13 @@ namespace MisakiEQ.GUI.ErrorInfo
                 writer.WriteLine($"OS : {(Environment.Is64BitOperatingSystem ? "64ビット" : "32ビット")} プロセッサ : {(Environment.Is64BitProcess ? "64ビット" : "32ビット")}");
                 writer.WriteLine($"システム起動時間 : {TimeSpan.FromMilliseconds(Environment.TickCount64)}");
                 writer.Close();
-                Log.Logger.GetInstance().Info($"「{save}」にクラッシュレポートを保存しました。");
+                Log.Instance.Info($"「{save}」にクラッシュレポートを保存しました。");
                 return save;
             }
             catch(Exception ex)
             {
-                Log.Logger.GetInstance().Error("クラッシュレポートの保存に失敗しました。");
-                Log.Logger.GetInstance().Error(ex);
+                Log.Instance.Error("クラッシュレポートの保存に失敗しました。");
+                Log.Instance.Error(ex);
                 return String.Empty;
             }
 
@@ -146,7 +146,7 @@ namespace MisakiEQ.GUI.ErrorInfo
             {
                 RestartTimer.Stop();
                 RestartMassage.Text = "繰り返し動作が停止しましたので自動再起動は無効になりました。";
-                Log.Logger.GetInstance().Error("強制終了が複数回検出された為自動再起動は無効になりました。");
+                Log.Instance.Error("強制終了が複数回検出された為自動再起動は無効になりました。");
             }
             GetString();
         }
@@ -168,20 +168,20 @@ namespace MisakiEQ.GUI.ErrorInfo
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Log.Logger.GetInstance().Info("STOP!");
+            Log.Instance.Info("STOP!");
             Environment.Exit(-1);
         }
 
         private void ExceptionMassage_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Log.Logger.GetInstance().Info("STOP!");
+            Log.Instance.Info("STOP!");
             Environment.Exit(-1);
         }
 
         private void RestartButton_Click(object sender, EventArgs e)
         {
             ErrCnt++;
-            Log.Logger.GetInstance().Info("RESTART!");
+            Log.Instance.Info("RESTART!");
             System.Diagnostics.Process.Start(Application.ExecutablePath, "ErrorFlg=" + ErrCnt.ToString());
             Environment.Exit(-1);
         }
@@ -200,7 +200,7 @@ namespace MisakiEQ.GUI.ErrorInfo
             {
                 ErrCnt++;
                 System.Diagnostics.Process.Start(Application.ExecutablePath, "ErrorFlg=" + ErrCnt.ToString());
-                Log.Logger.GetInstance().Info("TRIGGER RESTART!");
+                Log.Instance.Info("TRIGGER RESTART!");
                 Environment.Exit(-1);
             }
             RestartMassage.Text = "MisakiEQは " + RestartTimerCount.ToString() + " 秒後、自動的に再起動します。";

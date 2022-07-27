@@ -64,7 +64,7 @@ namespace MisakiEQ.Lib.ConfigController
                 controllGroups[i].Dispose();
             }
             sw.Stop();
-            Log.Logger.GetInstance().Info($"フォームイベントを破棄しました。計測:{sw.Elapsed}");
+            Log.Instance.Info($"フォームイベントを破棄しました。計測:{sw.Elapsed}");
         }
         void SizeChanged(object? sender, EventArgs e)
         {
@@ -298,7 +298,7 @@ namespace MisakiEQ.Lib.ConfigController
             }
             catch(Exception ex)
             {
-                Log.Logger.GetInstance().Warn(ex.Message);
+                Log.Instance.Warn(ex.Message);
             }
         }
         public ToolBox(GroupBox gb, Config.Funcs.IndexData data, int pos)//,)

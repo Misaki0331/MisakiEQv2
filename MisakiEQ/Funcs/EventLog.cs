@@ -42,7 +42,7 @@ namespace MisakiEQ.Funcs
             }
             catch (Exception ex)
             {
-                Log.Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
             }
         }
     }

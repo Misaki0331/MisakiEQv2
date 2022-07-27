@@ -2,7 +2,6 @@ namespace MisakiEQ
 {
     public partial class InitWindow : Form
     {
-        readonly Log.Logger log = Log.Logger.GetInstance();
         public InitWindow()
         {
             InitializeComponent();
@@ -57,7 +56,7 @@ namespace MisakiEQ
             }
             catch(Exception ex)
             {
-                log.Error(ex.Message);
+                Log.Instance.Error(ex.Message);
             }
 #endif
             e.Result = "OK";
@@ -66,14 +65,14 @@ namespace MisakiEQ
 
         private void InitialTask_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {
-            log.Debug($"起動初期化進捗 : {e.ProgressPercentage}% {e.UserState}");
+            Log.Instance.Debug($"起動初期化進捗 : {e.ProgressPercentage}% {e.UserState}");
             label1.Text = e.UserState as string;
             progressBar1.Value = e.ProgressPercentage;
         }
 
         private async void InitialTask_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
-            log.Info($"起動初期化完了 {e.Result}");
+            Log.Instance.Info($"起動初期化完了 {e.Result}");
             label1.Text = "起動初期化完了";
             progressBar1.Value = 100;
             await Task.Delay(3000);

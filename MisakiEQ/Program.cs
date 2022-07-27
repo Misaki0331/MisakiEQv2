@@ -63,12 +63,12 @@ namespace MisakiEQ
             if (hasHandle)
                 mutex.ReleaseMutex();
 #endif
-            Log.Logger.GetInstance().Info("Application was successfully exited.");
+            Log.Instance.Info("Application was successfully exited.");
         }
         public static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
-            Log.Logger.GetInstance().Fatal("スレッドによる例外エラーが発生");
-            Log.Logger.GetInstance().Fatal(e.Exception);
+            Log.Instance.Fatal("スレッドによる例外エラーが発生");
+            Log.Instance.Fatal(e.Exception);
             ShowErrorMessage(e.Exception, "スレッドによる例外エラー");
         }
 
@@ -78,8 +78,8 @@ namespace MisakiEQ
         {
             if (e.ExceptionObject is Exception ex)
             {
-                Log.Logger.GetInstance().Fatal("想定外のエラーが発生");
-                Log.Logger.GetInstance().Fatal(ex);
+                Log.Instance.Fatal("想定外のエラーが発生");
+                Log.Instance.Fatal(ex);
                 ShowErrorMessage(ex, "ハンドルされていない例外エラー");
             }
         }
@@ -112,7 +112,7 @@ namespace MisakiEQ
                 err.Show();
             }catch(Exception ex2)
             {
-                Log.Logger.GetInstance().Error(ex2);
+                Log.Instance.Error(ex2);
                 MessageBox.Show("問題が発生した為MisakiEQを終了しました。\n" +
                     "バグの可能性がある場合はクラッシュレポートを送付もしくはこの画面をスクリーンショットして開発者にお問い合わせください。\n" +
                     $"{(crash == string.Empty ? "クラッシュレポートが正常に生成できませんでした。" : $"クラッシュレポートを「{crash}」に保存しました。\n")}" +

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NAudio.Wave;
-using MisakiEQ.Log;
 
 namespace MisakiEQ.Lib.Sound
 {
@@ -46,7 +45,7 @@ namespace MisakiEQ.Lib.Sound
                 }
                 catch (Exception ex)
                 {
-                    Logger.GetInstance().Error(ex);
+                    Log.Instance.Error(ex);
                 }
             }
             public double GetPosition()
@@ -90,12 +89,12 @@ namespace MisakiEQ.Lib.Sound
                 var reader = new AudioFileReader(FileName);
                 readers.Init(reader);
                 wav.Init(reader);
-                Logger.GetInstance().Debug($"\"{FileName}\"のwaveファイルを読み込みました。");
+                Log.Instance.Debug($"\"{FileName}\"のwaveファイルを読み込みました。");
                 return true;
             }
             catch (Exception ex)
             {
-                Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
                 return false;
             }
         }
@@ -108,12 +107,12 @@ namespace MisakiEQ.Lib.Sound
                 var reader = new WaveFileReader(streams);
                 readers.Init(reader);
                 wav.Init(reader);
-                Logger.GetInstance().Debug($"waveストリームを読み込みました。");
+                Log.Instance.Debug($"waveストリームを読み込みました。");
                 return true;
             }
             catch (Exception ex)
             {
-                Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
                 return false;
             }
         }
@@ -125,12 +124,12 @@ namespace MisakiEQ.Lib.Sound
                 var reader = new Mp3FileReader(streams);
                 readers.Init(reader);
                 wav.Init(reader);
-                Logger.GetInstance().Debug($"mp3ストリームを読み込みました。");
+                Log.Instance.Debug($"mp3ストリームを読み込みました。");
                 return true;
             }
             catch (Exception ex)
             {
-                Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
                 return false;
             }
         }

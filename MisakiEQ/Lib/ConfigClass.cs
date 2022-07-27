@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MisakiEQ.Background;
-using MisakiEQ.Log;
 using static MisakiEQ.Lib.Config.Funcs;
 
 namespace MisakiEQ.Lib.Config
@@ -40,7 +39,7 @@ namespace MisakiEQ.Lib.Config
             {
                 var sr = new Stopwatch();
                 sr.Start();
-                Logger.GetInstance().Info("Config書込開始");
+                Log.Instance.Info("Config書込開始");
                 System.Reflection.FieldInfo[] fields = Configs.GetType().GetFields();
                 using var sw = new StreamWriter(CfgFile, false, Encoding.UTF8);
                 for(int i = 0; i < Configs.Data.Count; i++)
@@ -51,13 +50,13 @@ namespace MisakiEQ.Lib.Config
                 sw.Close();
                 OverrideTemplates();
                 sr.Stop();
-                Logger.GetInstance().Debug($"Config書込完了 計測時間:{(sr.ElapsedTicks / 10000.0):#,##0.0000}ms");
+                Log.Instance.Debug($"Config書込完了 計測時間:{(sr.ElapsedTicks / 10000.0):#,##0.0000}ms");
                 return true;
             }
             catch (Exception ex)
             {
-                Logger.GetInstance().Error("ファイルの書込中にエラーが発生しました。");
-                Logger.GetInstance().Error(ex);
+                Log.Instance.Error("ファイルの書込中にエラーが発生しました。");
+                Log.Instance.Error(ex);
                 return false;
             }
         }
@@ -72,7 +71,7 @@ namespace MisakiEQ.Lib.Config
             int PASS = 0, TOTAL = 0;
             try
             {
-                Log.Logger.GetInstance().Debug("Config読込開始");
+                Log.Instance.Debug("Config読込開始");
                 using var sr = new StreamReader(CfgFile, Encoding.UTF8);
                 while (true)
                 {
@@ -85,11 +84,11 @@ namespace MisakiEQ.Lib.Config
                         {
                             SetConfigValue(lines[0],lines[1]);
 
-                            Logger.GetInstance().Debug($"{line}");
+                            Log.Instance.Debug($"{line}");
                             PASS++;
                         }catch(Exception ex)
                         {
-                            Logger.GetInstance().Error(ex);
+                            Log.Instance.Error(ex);
                         }
                         TOTAL++;
                     }
@@ -97,18 +96,18 @@ namespace MisakiEQ.Lib.Config
                 sr.Close();
                 OverrideTemplates();
                 sw.Stop();
-                Logger.GetInstance().Debug($"コンフィグの読込に成功 計測時間:{(sw.ElapsedTicks / 10000.0):#,##0.0000}ms 読込数:{PASS}/{TOTAL}");
+                Log.Instance.Debug($"コンフィグの読込に成功 計測時間:{(sw.ElapsedTicks / 10000.0):#,##0.0000}ms 読込数:{PASS}/{TOTAL}");
                 return true;
             }
             catch (FileNotFoundException)
             {
-                Logger.GetInstance().Warn("ファイルが見つかりませんでした。");
+                Log.Instance.Warn("ファイルが見つかりませんでした。");
                 return false;
             }
             catch (Exception ex)
             {
-                Logger.GetInstance().Error($"コンフィグの読込に失敗 計測時間:{(sw.ElapsedTicks / 10000.0):#,##0.0000}ms");
-                Logger.GetInstance().Error(ex);
+                Log.Instance.Error($"コンフィグの読込に失敗 計測時間:{(sw.ElapsedTicks / 10000.0):#,##0.0000}ms");
+                Log.Instance.Error(ex);
                 return false;
             }
         }
@@ -230,12 +229,12 @@ namespace MisakiEQ.Lib.Config
         readonly List<ConfigTemplate> ConfigTemplates=new();
         public void DiscardConfig()
         {
-            Logger.GetInstance().Debug($"現在の設定が保存せずに破棄された為、コンフィグを前の状態に戻します。");
+            Log.Instance.Debug($"現在の設定が保存せずに破棄された為、コンフィグを前の状態に戻します。");
             var sw = new Stopwatch();
             sw.Start();
             for (int i = 0; i < ConfigTemplates.Count; i++) SetConfigValue(ConfigTemplates[i].Key, ConfigTemplates[i].Value, false);
             sw.Stop();
-            Logger.GetInstance().Debug($"コンフィグを前の状態に戻しました。処理時間 : {sw.Elapsed}");
+            Log.Instance.Debug($"コンフィグを前の状態に戻しました。処理時間 : {sw.Elapsed}");
         }
         public Cfg Configs=new();
         public class Cfg
@@ -480,7 +479,7 @@ namespace MisakiEQ.Lib.Config
                             if ((string)value!=StringValue)
                             {
                                 StringValue = (string)value;
-                                try { ValueChanged?.Invoke(this, EventArgs.Empty); } catch(Exception ex) { Logger.GetInstance().Warn(ex.Message); }
+                                try { ValueChanged?.Invoke(this, EventArgs.Empty); } catch(Exception ex) { Log.Instance.Warn(ex.Message); }
                             }
                             break;
                         case "bool":
@@ -492,7 +491,7 @@ namespace MisakiEQ.Lib.Config
                             if ((string)value != StringValue)
                             {
                                 StringValue = (string)value;
-                                try { ValueChanged?.Invoke(this, EventArgs.Empty); } catch (Exception ex) { Logger.GetInstance().Warn(ex.Message); }
+                                try { ValueChanged?.Invoke(this, EventArgs.Empty); } catch (Exception ex) { Log.Instance.Warn(ex.Message); }
                             }
                             break;
                         case "combo":
@@ -643,7 +642,7 @@ namespace MisakiEQ.Lib.Config
                             ButtonChanged?.Invoke(this, EventArgs.Empty);
                         }catch(Exception ex)
                         {
-                            Logger.GetInstance().Warn(ex.Message);
+                            Log.Instance.Warn(ex.Message);
                         }
                     }
                 }

@@ -11,7 +11,6 @@ namespace MisakiEQ.Background.API
     internal class _EEW
 #pragma warning restore IDE1006 // 命名スタイル
     {
-        readonly Log.Logger log = Log.Logger.GetInstance();
         private readonly Stopwatch TSW = new();//thread起動状態兼タイマー
         public EEW.Config Config = new();
         public EEW.JSON.Root? Data = new();
@@ -36,24 +35,24 @@ namespace MisakiEQ.Background.API
         {
             if (Threads == null || Threads.Status != TaskStatus.Running)
             {
-                log.Debug("スレッド開始の準備を開始します。");
+                Log.Instance.Debug("スレッド開始の準備を開始します。");
                 TSW.Restart();
                 Threads = Task.Run(() => ThreadFunction(CancelToken));
             }
             else
             {
-                log.Error("該当スレッドは動作中の為、起動ができませんでした。");
+                Log.Instance.Error("該当スレッドは動作中の為、起動ができませんでした。");
             }
 
         }
         public void AbortThread()
         {
-            log.Debug("スレッド破棄の準備を開始します。");
+            Log.Instance.Debug("スレッド破棄の準備を開始します。");
             CancelTokenSource.Cancel();
         }
         public async Task AbortAndWait()
         {
-            log.Debug("スレッドを終了しています...");
+            Log.Instance.Debug("スレッドを終了しています...");
             CancelTokenSource.Cancel();
             if (Threads != null && !Threads.IsCompleted) await Threads;
         }
@@ -75,7 +74,7 @@ namespace MisakiEQ.Background.API
 
         private async Task ThreadFunction(CancellationToken token)
         {
-            log.Info("スレッド開始");
+            Log.Instance.Info("スレッド開始");
             long TempDelay=0;
             long TempDetect = long.MinValue;
             while (true)
@@ -93,7 +92,7 @@ namespace MisakiEQ.Background.API
                         }
                         catch (Exception ex)
                         {
-                            log.Warn($"取得時にエラーが発生しました。{ex.Message}");
+                            Log.Instance.Warn($"取得時にエラーが発生しました。{ex.Message}");
                         }
                         if (task.IsCompletedSuccessfully&&!string.IsNullOrEmpty(task.Result))
                         {
@@ -139,13 +138,13 @@ namespace MisakiEQ.Background.API
                 }
                 catch (TaskCanceledException ex)
                 {
-                    log.Info($"スレッドの処理を終了します。{ex.Message}");
+                    Log.Instance.Info($"スレッドの処理を終了します。{ex.Message}");
                     return;
                 }
                 catch (Exception ex)
                 {
-                    log.Error($"文字列データ : \"{json}\"");
-                    log.Error(ex);
+                    Log.Instance.Error($"文字列データ : \"{json}\"");
+                    Log.Instance.Error(ex);
                 }
             }
 
@@ -155,13 +154,13 @@ namespace MisakiEQ.Background.API
             if (from == null) from = new();
             if (Data != null)
             {
-                log.Debug("汎用クラスに変換中...");
+                Log.Instance.Debug("汎用クラスに変換中...");
                 from = Struct.EEW.GetData(Data, from);
-                log.Debug("汎用クラスに変換完了");
+                Log.Instance.Debug("汎用クラスに変換完了");
             }
             else
             {
-                log.Warn("APIの情報がありませんでした。");
+                Log.Instance.Warn("APIの情報がありませんでした。");
             }
             return from;
             

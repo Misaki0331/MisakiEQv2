@@ -62,10 +62,10 @@ namespace MisakiEQ.GUI
             if (Kyoshin != null && !Kyoshin.IsDisposed) Kyoshin.Close();
             if (EEW_Compact != null && !EEW_Compact.IsDisposed) EEW_Compact.Close();
             if (Init != null && !Init.IsDisposed) Init.Close();
-            Log.Logger.GetInstance().Debug("APIスレッドを終了中です...");
+            Log.Instance.Debug("APIスレッドを終了中です...");
             var ApiStop = Background.APIs.GetInstance().Abort();
             await ApiStop;
-            Log.Logger.GetInstance().Debug("APIスレッド終了完了");
+            Log.Instance.Debug("APIスレッド終了完了");
         }
         public static bool IsAlliveInstance()
         {
@@ -77,12 +77,12 @@ namespace MisakiEQ.GUI
         private async void ExitApplication_Click(object sender, EventArgs e)
         {
             if (Init != null && !Init.IsDisposed) Init.Close();
-            Log.Logger.GetInstance().Debug("APIスレッドを終了中です...");
+            Log.Instance.Debug("APIスレッドを終了中です...");
             var ApiStop = Background.APIs.GetInstance().Abort();
             await ApiStop;
-            Log.Logger.GetInstance().Debug("APIスレッド終了完了");
+            Log.Instance.Debug("APIスレッド終了完了");
             TrayIcon.Visible = false;
-            Log.Logger.GetInstance().Info("Stop!");
+            Log.Instance.Info("Stop!");
             Environment.Exit(0);
         }
 
@@ -160,7 +160,7 @@ namespace MisakiEQ.GUI
                 }
             }catch(Exception ex)
             {
-                Log.Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
             }
         }
         
@@ -170,7 +170,7 @@ namespace MisakiEQ.GUI
             try
             {
                 if (e.data == null) return;
-                Log.Logger.GetInstance().Debug($"地震情報のイベントが発生: {e.data.Details.OriginTime:d日HH:mm} {Struct.EarthQuake.TypeToString(e.data.Issue.Type)}");
+                Log.Instance.Debug($"地震情報のイベントが発生: {e.data.Details.OriginTime:d日HH:mm} {Struct.EarthQuake.TypeToString(e.data.Issue.Type)}");
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EarthquakePost(e.data);
 #endif
@@ -180,7 +180,7 @@ namespace MisakiEQ.GUI
             }
             catch (Exception ex)
             {
-                Log.Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
             }
         }
         private void EventTsunami(object? sender, Background.API.TsunamiEventArgs e)
@@ -188,7 +188,7 @@ namespace MisakiEQ.GUI
             try
             {
                 if (e.data == null) return;
-                Log.Logger.GetInstance().Debug($"津波情報のイベントが発生: {e.data.CreatedAt:d日HH:mm} 津波発表エリア数:{e.data.Areas.Count}件");
+                Log.Instance.Debug($"津波情報のイベントが発生: {e.data.CreatedAt:d日HH:mm} 津波発表エリア数:{e.data.Areas.Count}件");
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().TsunamiPost(e.data);
 #endif
@@ -197,7 +197,7 @@ namespace MisakiEQ.GUI
             }
             catch (Exception ex)
             {
-                Log.Logger.GetInstance().Error(ex);
+                Log.Instance.Error(ex);
             }
         }
 
