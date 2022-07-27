@@ -71,9 +71,9 @@ namespace MisakiEQ.GUI.ExApp
                     }
                     var km = await api.KyoshinAPI.GetImage(GetEnumType());
                     if (km != null)
-                {
-                    var list = await Lib.KyoshinAPI.KyoshinObervation.GetPoints(GetEnumType());
-                    g.DrawImage(km, x: 0, y: 0);
+                    {
+                        var list = await Lib.KyoshinAPI.KyoshinObervation.GetPoints(GetEnumType());
+                        g.DrawImage(km, x: 0, y: 0);
                         label2.Text = $"{list.NearPoint.Region}\n{list.NearPoint.String}";
                     }
                     if (DisplayEEWCircle.Checked)
@@ -140,7 +140,7 @@ namespace MisakiEQ.GUI.ExApp
             }
             if (Position.Checked) type += "_b";
             else type += "_s";
-            if(Enum.TryParse<Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType>(type,out var t))
+            if (Enum.TryParse<Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType>(type, out var t))
             {
                 return t;
             }

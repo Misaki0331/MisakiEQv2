@@ -88,7 +88,6 @@ namespace MisakiEQ.Lib.KyoshinAPI
             re.Count = result.Count;
             re.Point = result;
             sw.Stop();
-
             return re;
         }
         public class AnalysisResult

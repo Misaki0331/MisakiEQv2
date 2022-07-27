@@ -18,6 +18,7 @@ namespace MisakiEQ.GUI
         internal readonly Config ConfigData = new();
         Config_Menu? Config = null;
         ExApp.KyoshinWindow? Kyoshin = null;
+        ExApp.KyoshinResponseGraph? KyoshinResponseGraph = null;
         readonly EEW_Compact EEW_Compact = new();
         readonly ExApp.UserESTWindow ESTWindow = new();
         readonly Stopwatch apptimer = new();
@@ -229,5 +230,12 @@ namespace MisakiEQ.GUI
             ESTWindow.Activate();
         }
 
+        private void 速度応答グラフToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (KyoshinResponseGraph == null || KyoshinResponseGraph.IsDisposed) KyoshinResponseGraph = new();
+            KyoshinResponseGraph.Show();
+            KyoshinResponseGraph.Activate();
+        }
     }
 }
