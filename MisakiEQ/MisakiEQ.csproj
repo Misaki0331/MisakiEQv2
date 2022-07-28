@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
+    <PackageReference Include="DmdataSharp" Version="0.5.4" />
     <PackageReference Include="KyoshinMonitorLib" Version="0.4.5" />
     <PackageReference Include="KyoshinMonitorLib.Images" Version="0.4.3" />
     <PackageReference Include="KyoshinMonitorLib.SkiaImages" Version="0.4.3" />
@@ -94,6 +95,10 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Background\API\EEW\dmdata\" />
   </ItemGroup>
 
 </Project>

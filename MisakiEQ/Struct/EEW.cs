@@ -52,7 +52,7 @@ namespace MisakiEQ.Struct
         /// <para>nullの場合は新規クラスを返します。</para></param>
         /// <returns>緊急地震速報汎用クラス</returns>
         /// <exception cref="ArgumentNullException">jsonデータの中身がnullの場合に発生します。</exception>
-        public static EEW GetData(Background.API.EEW.JSON.Root Data, EEW? from = null)
+        public static EEW GetData(Background.API.EEW.OLD.JSON.Root Data, EEW? from = null)
         {
             if (Data == null) throw new ArgumentNullException(nameof(Data), "Jsonデータがnullです。");
             if (from == null) from = new EEW();

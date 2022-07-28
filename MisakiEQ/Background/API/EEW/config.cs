@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 namespace MisakiEQ.Background.API.EEW
 {
-    internal class Config
+    public class Config
     {
         ///<summary>通常時の遅延(ms)/summary>
         public uint Delay;

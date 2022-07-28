@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 #pragma warning disable IDE1006 // 命名スタイル
 
-namespace MisakiEQ.Background.API.EEW.JSON
+namespace MisakiEQ.Background.API.EEW.OLD.JSON
 {
     public class Title
     {
@@ -287,7 +287,7 @@ namespace MisakiEQ.Background.API.EEW.JSON
         /// </summary>
         public bool isSea { get; set; }
     }
-    
+
     public class MaxIntensity
     {
         /// <summary>
@@ -325,7 +325,7 @@ namespace MisakiEQ.Background.API.EEW.JSON
         /// </summary>
         public string String { get; set; } = string.Empty;
     }
-        public class WarnForecast
+    public class WarnForecast
     {
         /// <summary>
         /// <para>1回出現</para>
