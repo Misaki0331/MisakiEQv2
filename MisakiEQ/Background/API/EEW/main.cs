@@ -13,6 +13,7 @@ namespace MisakiEQ.Background.API
     {
         private readonly Stopwatch TSW = new();//thread起動状態兼タイマー
         public EEW.OLD.Analysis OldAPI = new();//古いAPI(削除する予定)
+        public EEW.dmdata.Analysis DMData = new();
         public enum APIServer
         {
             OldAPI,
@@ -85,7 +86,7 @@ namespace MisakiEQ.Background.API
                     Log.Instance.Error("目的のAPIが存在しません");
                     break;
             }
-
+            Log.Instance.Info("スレッド終了");
         }
         public Struct.EEW GetData(Struct.EEW? from=null)
         {
@@ -94,6 +95,7 @@ namespace MisakiEQ.Background.API
                 case APIServer.OldAPI:
                     return OldAPI.GetData(from);
                 default:
+                    Log.Instance.Error("目的のAPIが存在しません");
                     from = new();
                     return from;
             }

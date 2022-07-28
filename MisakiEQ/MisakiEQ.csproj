@@ -97,8 +97,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Background\API\EEW\dmdata\" />
-  </ItemGroup>
-
 </Project>

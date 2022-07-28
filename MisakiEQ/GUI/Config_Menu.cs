@@ -73,6 +73,14 @@ namespace MisakiEQ.GUI
             if(lat!=null)lat.SetAction(new Action(() => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } }));
             if(lon!=null)lon.SetAction(new Action(() => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } }));
             UpdateGeo(null, EventArgs.Empty);
+#if DEBUG
+            var function = Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Function");
+            function?.SetAction(async () =>
+            {
+                await Background.APIs.GetInstance().EEW.DMData.Authentication(null);
+                Background.APIs.GetInstance().EEW.DMData.Init();
+            });
+#endif
         }
 
         System.Windows.Forms.Timer UpdatePos = new();
