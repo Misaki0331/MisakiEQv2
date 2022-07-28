@@ -61,11 +61,20 @@ namespace MisakiEQ.Properties {
         }
         
         /// <summary>
-        ///   843881865634250752 に類似しているローカライズされた文字列を検索します。
+        ///   Unpublished に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string DiscordRPC {
             get {
                 return ResourceManager.GetString("DiscordRPC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Unpublished に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string dmdata {
+            get {
+                return ResourceManager.GetString("dmdata", resourceCulture);
             }
         }
         
@@ -141,8 +150,7 @@ namespace MisakiEQ.Properties {
         }
         
         /// <summary>
-        ///   LsJ5tDiMeLhg0pczmv9SNzUcE
-        ///8S6cTD3ZH6a2kCvmKMIVBdbqhihhl0oFJoF8DKcWFGQYTuxYQx に類似しているローカライズされた文字列を検索します。
+        ///   Unpublished に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TwitterAPI {
             get {
