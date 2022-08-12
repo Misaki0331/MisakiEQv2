@@ -275,6 +275,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("通知設定", true)?.Add(new IndexData("Notification_EEW_Nationwide", "EEW全国通知条件", "全国共通で緊急地震速報を通知する条件を設定します", 9,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "ALL","Warning only","None"}));
                 GetGroup("通知設定", true)?.Add(new IndexData("Notification_EEW_Area", "EEW地域通知条件", "お住まいの地域で緊急地震速報を通知する条件を設定します", 8,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "≧0" }));
 #if DEBUG
+                GetGroup("Debug Mode", true)?.Add(new IndexData("Debug_Input", "コマンド入力", "デバック用",""));
                 GetGroup("Debug Mode", true)?.Add(new IndexData("Debug_Function", "デバッグ実行関数", "デバック用", "Execute", WorkingTitle: "Working..."));
 #endif
             }

@@ -325,12 +325,13 @@ namespace MisakiEQ.Struct
         /// <summary>
         /// <para>文字列から列挙型震度情報に変換します</para>
         /// <para>どのフォーマットでもOK<br/>例:<br/>
-        /// 5+→OK 6弱→OK ５＋→OK ６強→OK</para>
+        /// 5+→OK<br/>6弱→OK<br/>５＋→OK<br/>６強→OK</para>
         /// </summary>
         /// <param name="value">任意の変換したい文字列</param>
         /// <returns>列挙型の震度情報が返されます。</returns>
-        public static Intensity StringToInt(string value)
+        public static Intensity StringToInt(string? value)
         {
+            if (value == null) return Intensity.Unknown;
             string from = "０１２３４５６７８９強弱＋－";
             string to = "0123456789+-+-";
             for(int i = 0; i < from.Length; i++)

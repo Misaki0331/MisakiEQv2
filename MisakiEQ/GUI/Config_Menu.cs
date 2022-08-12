@@ -77,8 +77,7 @@ namespace MisakiEQ.GUI
             var function = Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Function");
             function?.SetAction(async () =>
             {
-                await Background.APIs.GetInstance().EEW.DMData.Authentication(null);
-                Background.APIs.GetInstance().EEW.DMData.Init();
+                Background.APIs.GetInstance().EEW.DMData.GetData(new FileStream(path:Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.Value.ToString()??"", FileMode.Open,FileAccess.Read));
             });
 #endif
         }

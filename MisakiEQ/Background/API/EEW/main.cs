@@ -20,7 +20,7 @@ namespace MisakiEQ.Background.API
             K_Moni,
             Dmdata
         }
-        public APIServer CurrentAPI = APIServer.OldAPI;
+        public APIServer CurrentAPI = APIServer.Dmdata;
         public EEW.Config Config = new();
         public EEW.OLD.JSON.Root? Data = new();
         public event EventHandler<EEWEventArgs>? UpdateHandler;
@@ -81,6 +81,12 @@ namespace MisakiEQ.Background.API
             {
                 case APIServer.OldAPI:
                     await OldAPI.Loop(Config, UpdateHandler, token);
+                    break;
+                case APIServer.Dmdata:
+                    await DMData.Authentication(token);
+                    DMData.Init();
+                    await DMData.Loop(UpdateHandler,token);
+                    DMData.APIClose();
                     break;
                 default:
                     Log.Instance.Error("目的のAPIが存在しません");
