@@ -20,6 +20,10 @@ namespace MisakiEQ
         const long LOGFILE_MAXSIZE = 1024*256;
         const int LOGFILE_PERIOD = 90;
         const int STACKLEN = 30;
+        const int LOG_DATA_LEN = 100;
+        List<string> Logdata = new();
+
+        public event EventHandler? LogUpdateHandler;
 
         /// <summary>
         /// 出力ログの変更
@@ -56,6 +60,7 @@ namespace MisakiEQ
         private static Log? singleton = null;
         private readonly string? logFilePath = null;
         private readonly object lockObj = new();
+        private readonly object lockListObj = new();
         private StreamWriter? stream = null;
 
         /// <summary>
@@ -212,7 +217,20 @@ namespace MisakiEQ
                 para=para.PadLeft(STACKLEN);
             }
             string trace = msg.Replace("\n", "\n"+"".PadLeft(44+STACKLEN, ' '));
-            Trace.WriteLine($"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [{para}]: {trace}");
+            string logs = $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [{para}]: {trace}";
+            Trace.WriteLine(logs);
+            var splitstrings = logs.Split('\n');
+            lock (lockListObj)
+            {
+                for (int i = 0; i < splitstrings.Length; i++)
+                {
+                    Logdata.Add(splitstrings[i]);
+                }
+                while(Logdata.Count > LOG_DATA_LEN)
+                {
+                    Logdata.RemoveAt(0);
+                }
+            }
             if (IS_LOGFILE)
             {
                 msg = msg.Replace("\n", "\n\t");
@@ -220,6 +238,7 @@ namespace MisakiEQ
 
                 lock (lockObj)
                 {
+
                     if (stream != null) stream.WriteLine(fullMsg);
                     if (logFilePath == null) return;
 
@@ -234,8 +253,24 @@ namespace MisakiEQ
                     }
                 }
             }
+            try
+            {
+                //イベントの発生
+                if (LogUpdateHandler != null)
+                    LogUpdateHandler(null, EventArgs.Empty);
+            }catch{}
         }
 
+        /// <summary>
+        /// ログのString出力
+        /// </summary>
+        public string GetLogData()
+        {
+            lock (lockListObj)
+            {
+                return string.Join("\n", Logdata);
+            }
+        }
         /// <summary>
         /// ログファイルを生成する
         /// </summary>

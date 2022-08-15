@@ -33,12 +33,13 @@
             this.ApplicationMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.DisplayEEWInfo = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenKmoni = new System.Windows.Forms.ToolStripMenuItem();
-            this.OpenAreaESTMonitor = new System.Windows.Forms.ToolStripMenuItem();
             this.速度応答グラフToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.OpenAreaESTMonitor = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.OpenConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.ExitApplication = new System.Windows.Forms.ToolStripMenuItem();
+            this.実行ログToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ApplicationMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,12 +57,13 @@
             this.OpenKmoni,
             this.速度応答グラフToolStripMenuItem,
             this.OpenAreaESTMonitor,
+            this.実行ログToolStripMenuItem,
             this.toolStripSeparator1,
             this.OpenConfig,
             this.toolStripSeparator2,
             this.ExitApplication});
             this.ApplicationMenu.Name = "ApplicationMenu";
-            this.ApplicationMenu.Size = new System.Drawing.Size(208, 148);
+            this.ApplicationMenu.Size = new System.Drawing.Size(208, 192);
             this.ApplicationMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ApplicationMenu_Opening);
             // 
             // DisplayEEWInfo
@@ -78,6 +80,13 @@
             this.OpenKmoni.Text = "強震モニタ";
             this.OpenKmoni.Click += new System.EventHandler(this.OpenKmoni_Click);
             // 
+            // 速度応答グラフToolStripMenuItem
+            // 
+            this.速度応答グラフToolStripMenuItem.Name = "速度応答グラフToolStripMenuItem";
+            this.速度応答グラフToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.速度応答グラフToolStripMenuItem.Text = "速度応答グラフ";
+            this.速度応答グラフToolStripMenuItem.Click += new System.EventHandler(this.速度応答グラフToolStripMenuItem_Click);
+            // 
             // OpenAreaESTMonitor
             // 
             this.OpenAreaESTMonitor.Enabled = false;
@@ -85,13 +94,6 @@
             this.OpenAreaESTMonitor.Size = new System.Drawing.Size(207, 22);
             this.OpenAreaESTMonitor.Text = "エリア到達モニタ(利用不可)";
             this.OpenAreaESTMonitor.Click += new System.EventHandler(this.OpenAreaESTMonitor_Click);
-            // 
-            // 速度応答グラフToolStripMenuItem
-            // 
-            this.速度応答グラフToolStripMenuItem.Name = "速度応答グラフToolStripMenuItem";
-            this.速度応答グラフToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.速度応答グラフToolStripMenuItem.Text = "速度応答グラフ";
-            this.速度応答グラフToolStripMenuItem.Click += new System.EventHandler(this.速度応答グラフToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -116,6 +118,13 @@
             this.ExitApplication.Size = new System.Drawing.Size(207, 22);
             this.ExitApplication.Text = "終了";
             this.ExitApplication.Click += new System.EventHandler(this.ExitApplication_Click);
+            // 
+            // 実行ログToolStripMenuItem
+            // 
+            this.実行ログToolStripMenuItem.Name = "実行ログToolStripMenuItem";
+            this.実行ログToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.実行ログToolStripMenuItem.Text = "実行ログ";
+            this.実行ログToolStripMenuItem.Click += new System.EventHandler(this.実行ログToolStripMenuItem_Click);
             // 
             // TrayHub
             // 
@@ -144,5 +153,6 @@
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripMenuItem OpenAreaESTMonitor;
         private ToolStripMenuItem 速度応答グラフToolStripMenuItem;
+        private ToolStripMenuItem 実行ログToolStripMenuItem;
     }
 }

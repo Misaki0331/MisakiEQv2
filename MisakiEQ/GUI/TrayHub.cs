@@ -244,5 +244,16 @@ namespace MisakiEQ.GUI
             KyoshinResponseGraph.Show();
             KyoshinResponseGraph.Activate();
         }
+        LogViewerWindow? LogViewer=null;
+        private void 実行ログToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (LogViewer == null || LogViewer.IsDisposed)
+            {
+                LogViewer = new();
+                LogViewer.Show();
+            }
+            LogViewer.WindowState = FormWindowState.Normal;
+            LogViewer.Activate();
+        }
     }
 }

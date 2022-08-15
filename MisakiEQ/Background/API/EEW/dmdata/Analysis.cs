@@ -150,6 +150,16 @@ namespace MisakiEQ.Background.API.EEW.dmdata
 
                 using var telegramStream = data.GetBodyStream();
                 GetData(telegramStream);
+                try
+                {
+                    if (!Directory.Exists("EEW_History/")) Directory.CreateDirectory("EEW_History");
+                    using var sw = new StreamWriter($"EEW_History/{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fff}.xml");
+                    sw.Write(data.GetBodyString());
+                }catch(Exception ex)
+                {
+                    Log.Instance.Error(ex);
+                }
+                
             }
             else
                 Log.Instance.Error("WebSocketから受信しましたがデータがありませんでした。");
@@ -174,9 +184,6 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                 if (document.Root != null)
                 {
                     var root = document.Root;
-#if DEBUG
-                await root.SaveAsync(new StreamWriter($"logs/{DateTime.Now.Ticks}.xml"), SaveOptions.DisableFormatting, CancellationToken.None);
-#endif
                     Struct.EEW eew = new();
                     //地震識別番号
                     string? tmp = root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("EventID")}", nsManager)?.Value;
