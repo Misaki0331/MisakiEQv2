@@ -98,16 +98,18 @@ namespace MisakiEQ.GUI
         {
             EEW_Compact.TopMost = ConfigData.IsTopSimpleEEW;
             EEW_Compact.Show();
-            EEW_Compact.SetInfomation(Background.APIs.GetInstance().EEW.GetData());
+            //EEW_Compact.SetInfomation(Background.APIs.GetInstance().EEW.GetData());
             EEW_Compact.Activate();
         }
         private async void EventEEW(object? sender,Background.API.EEWEventArgs e)
         {
             try
             {
+                Log.Instance.Debug("EEWイベント受信");
                 if (e.eew == null) return;
                 double distance = Struct.EEW.GetDistance(e.eew, new(Background.APIs.GetInstance().KyoshinAPI.Config.UserLong, Background.APIs.GetInstance().KyoshinAPI.Config.UserLat));
                 e.eew.UserInfo.ArrivalTime = e.eew.EarthQuake.OriginTime.AddSeconds(distance / 4.2);
+                Log.Instance.Debug($"距離 = {distance}");
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EEWPost(e.eew);
 #endif
@@ -137,8 +139,12 @@ namespace MisakiEQ.GUI
                         }
                     }
                 });
+
+                Log.Instance.Debug($"EEW_Compact書き込み完了");
                 Funcs.EventLog.EEW(e.eew);
+                Log.Instance.Debug($"イベントログ書き込み完了");
                 Funcs.DiscordRPC.PostEEW(e.eew);
+                Log.Instance.Debug($"DiscordRPC書き込み完了");
                 ESTWindow.ESTTime = e.eew.UserInfo.ArrivalTime;
                 if ((int)ConfigData.NoticeNationWide <= (int)e.eew.EarthQuake.MaxIntensity ||
                     (ConfigData.NoticeNationWide == Struct.ConfigBox.Notification_EEW_Nationwide.Enums.WarnOnly && e.eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning) ||
@@ -158,6 +164,7 @@ namespace MisakiEQ.GUI
                         });
                     }
                     await SoundCollective.GetInstance().SoundEEW(e.eew);
+                    Log.Instance.Debug($"サウンド再生処理完了");
                 }
             }catch(Exception ex)
             {
