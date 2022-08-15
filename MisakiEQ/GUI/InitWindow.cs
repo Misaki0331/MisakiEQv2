@@ -34,7 +34,7 @@ namespace MisakiEQ
         }
 
 #if ADMIN || DEBUG
-        private void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        private async void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
 #else
         private void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
 #endif
@@ -81,7 +81,7 @@ namespace MisakiEQ
             }), stw);
 #endif
             e.Result = "OK";
-
+            await Task.Delay(2000);
         }
 
         private void InitialTask_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)

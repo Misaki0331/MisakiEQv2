@@ -38,6 +38,9 @@ namespace MisakiEQ.GUI
             EEW_Compact.Hide();
             ESTWindow.Show();
             ESTWindow.Hide();
+#if DEBUG
+            実行ログToolStripMenuItem_Click("debug", EventArgs.Empty);
+#endif
         }
         static TrayHub? Instance = null;
 
@@ -247,13 +250,19 @@ namespace MisakiEQ.GUI
         LogViewerWindow? LogViewer=null;
         private void 実行ログToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (LogViewer == null || LogViewer.IsDisposed)
+            try
             {
-                LogViewer = new();
-                LogViewer.Show();
+                if (LogViewer == null || LogViewer.IsDisposed)
+                {
+                    LogViewer = new();
+                    LogViewer.Show();
+                }
+                LogViewer.WindowState = FormWindowState.Normal;
+                LogViewer.Activate();
+            }catch(Exception ex)
+            {
+                Log.Instance.Error(ex);
             }
-            LogViewer.WindowState = FormWindowState.Normal;
-            LogViewer.Activate();
         }
     }
 }

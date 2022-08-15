@@ -100,6 +100,8 @@ namespace MisakiEQ.Background.API
             {
                 case APIServer.OldAPI:
                     return OldAPI.GetData(from);
+                case APIServer.Dmdata:
+                    return DMData.GetEEW();
                 default:
                     Log.Instance.Error("目的のAPIが存在しません");
                     from = new();

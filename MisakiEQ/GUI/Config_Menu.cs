@@ -75,7 +75,7 @@ namespace MisakiEQ.GUI
             UpdateGeo(null, EventArgs.Empty);
 //#if DEBUG
             var function = Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Function");
-            function?.SetAction(async () =>
+            function?.SetAction(() =>
             {
                 Background.APIs.GetInstance().EEW.DMData.GetData(new FileStream(path:Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.Value.ToString()??"", FileMode.Open,FileAccess.Read));
             });

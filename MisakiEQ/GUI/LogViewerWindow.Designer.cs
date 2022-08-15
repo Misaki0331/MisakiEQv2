@@ -28,41 +28,44 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox1 = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // textBox1
             // 
+            this.textBox1.BackColor = System.Drawing.Color.Black;
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox1.Font = new System.Drawing.Font("ＭＳ ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.textBox1.ForeColor = System.Drawing.Color.Gray;
             this.textBox1.Location = new System.Drawing.Point(0, 0);
-            this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(584, 441);
-            this.textBox1.TabIndex = 0;
+            this.textBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.textBox1.Size = new System.Drawing.Size(984, 439);
+            this.textBox1.TabIndex = 1;
+            this.textBox1.Text = "テキスト見本";
             // 
             // LogViewerWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(584, 441);
+            this.ClientSize = new System.Drawing.Size(984, 439);
             this.Controls.Add(this.textBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "LogViewerWindow";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.Text = "MisakiEQ Log";
+            this.Activated += new System.EventHandler(this.LogViewerWindow_Activated);
+            this.Deactivate += new System.EventHandler(this.LogViewerWindow_Deactivate);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LogViewerWindow_FormClosed);
             this.Load += new System.EventHandler(this.LogViewerWindow_Load);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private TextBox textBox1;
+        private RichTextBox textBox1;
     }
 }

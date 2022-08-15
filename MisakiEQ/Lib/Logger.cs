@@ -23,7 +23,7 @@ namespace MisakiEQ
         const int LOG_DATA_LEN = 100;
         List<string> Logdata = new();
 
-        public event EventHandler? LogUpdateHandler;
+        public event EventHandler<string>? LogUpdateHandler;
 
         /// <summary>
         /// 出力ログの変更
@@ -220,13 +220,35 @@ namespace MisakiEQ
             string logs = $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [{para}]: {trace}";
             Trace.WriteLine(logs);
             var splitstrings = logs.Split('\n');
+            string col = "";
+            switch (level)
+            {
+                case LogLevel.DEBUG:
+                    col = "$D";
+                    break;
+                case LogLevel.INFO:
+                    col = "$I";
+                    break;
+                case LogLevel.WARN:
+                    col = "$W";
+                    break;
+                case LogLevel.ERROR:
+                    col = "$E";
+                    break;
+                case LogLevel.FATAL:
+                    col = "$F";
+                    break;
+            }
+            string addtext = "";
             lock (lockListObj)
             {
                 for (int i = 0; i < splitstrings.Length; i++)
                 {
-                    Logdata.Add(splitstrings[i]);
+                    if (i != 0) addtext += "\n";
+                    addtext+=col+splitstrings[i];
+                    Logdata.Add(col + splitstrings[i]);
                 }
-                while(Logdata.Count > LOG_DATA_LEN)
+                while (Logdata.Count > 100)
                 {
                     Logdata.RemoveAt(0);
                 }
@@ -257,7 +279,7 @@ namespace MisakiEQ
             {
                 //イベントの発生
                 if (LogUpdateHandler != null)
-                    LogUpdateHandler(null, EventArgs.Empty);
+                    LogUpdateHandler(null, addtext);
             }catch{}
         }
 

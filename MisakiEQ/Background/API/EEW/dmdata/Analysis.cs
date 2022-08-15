@@ -18,11 +18,14 @@ namespace MisakiEQ.Background.API.EEW.dmdata
         DmdataV2ApiClient? Client = null;
         DmdataV2Socket? Socket = null;
         string RefreshToken = "";
+        Struct.EEW TempData;
         public Analysis()
         {
             ApiBuilder = DmdataApiClientBuilder.Default
                 .UserAgent("MisakiEQ")
                 .Referrer(new Uri("https://github.com/Misaki0331/MisakiEQv2/"));
+            TempData = new();
+            TempData.Serial.Infomation = Struct.EEW.InfomationLevel.Default;
         }
         public async Task<string?> Authentication(CancellationToken? token)
         {
@@ -85,11 +88,11 @@ namespace MisakiEQ.Background.API.EEW.dmdata
         }
         bool EndTask = false;
         EventHandler<EEWEventArgs>? UpdateHandler = null;
-        public async Task Loop(EventHandler<EEWEventArgs>? updateHandler,CancellationToken token)
+        public async Task Loop(EventHandler<EEWEventArgs>? updateHandler, CancellationToken token)
         {
             try
             {
-                UpdateHandler=updateHandler;
+                UpdateHandler = updateHandler;
                 SocketConnection();
                 while (true)
                 {
@@ -155,11 +158,11 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                     if (!Directory.Exists("EEW_History/")) Directory.CreateDirectory("EEW_History");
                     using var sw = new StreamWriter($"EEW_History/{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fff}.xml");
                     sw.Write(data.GetBodyString());
-                }catch(Exception ex)
+                } catch (Exception ex)
                 {
                     Log.Instance.Error(ex);
                 }
-                
+
             }
             else
                 Log.Instance.Error("WebSocketから受信しましたがデータがありませんでした。");
@@ -286,6 +289,7 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         $"海域 : {(eew.EarthQuake.IsSea ? "はい" : "いいえ")}\n" +
                         $"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n" +
                         $"地域ポイント数 : {eew.AreasInfo.Count}");
+                    TempData = eew;
                     //イベントの発生
                     if (UpdateHandler != null)
                     {
@@ -293,17 +297,21 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         UpdateHandler(null, args);
                     }
                 }
-            }catch(Exception ex)
+            } catch (Exception ex)
             {
                 Log.Instance.Error(ex);
             }
-            
+
         }
-            static string GetName(string name, int? array = null)
-            {
-                if (array != null) return $"*[local-name()=\"{name}\"][{array + 1}]";
-                return $"*[local-name()=\"{name}\"]";
-            }
+        static string GetName(string name, int? array = null)
+        {
+            if (array != null) return $"*[local-name()=\"{name}\"][{array + 1}]";
+            return $"*[local-name()=\"{name}\"]";
+        }
+        public Struct.EEW GetEEW()
+        {
+            return TempData;
+        }
         
         private async void SocketConnection()
         {
