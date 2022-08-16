@@ -85,7 +85,9 @@ namespace MisakiEQ.Background.API
                 case APIServer.Dmdata:
                     await DMData.Authentication(token);
                     DMData.Init();
-                    await DMData.Loop(UpdateHandler,token);
+                    DMData.UpdateHandler += GetEvent;
+                    await DMData.Loop(token);
+                    DMData.UpdateHandler -= GetEvent;
                     DMData.APIClose();
                     break;
                 default:
@@ -94,13 +96,41 @@ namespace MisakiEQ.Background.API
             }
             Log.Instance.Info("スレッド終了");
         }
+        public void GetEvent(object? sender, EEWEventArgs e)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                //イベントの発生
+                if (UpdateHandler != null)
+                {
+                    var args = new EEWEventArgs(null, e.eew);
+                    UpdateHandler(null, args);
+                    break;
+                }
+                else
+                {
+                    Log.Instance.Info("地震イベントを再連携します。");
+                    try
+                    {
+#pragma warning disable CS8602 // null 参照の可能性があるものの逆参照です。
+                        GUI.TrayHub.GetInstance().ResetEventEEW();
+#pragma warning restore CS8602 // null 参照の可能性があるものの逆参照です。
+                    }catch(Exception ex)
+                    {
+                        Log.Instance.Error(ex);
+                    }
+                }
+            }
+        }
         public Struct.EEW GetData(Struct.EEW? from=null)
         {
             switch (CurrentAPI)
             {
                 case APIServer.OldAPI:
+                    Log.Instance.Debug("OldAPI");
                     return OldAPI.GetData(from);
                 case APIServer.Dmdata:
+                    Log.Instance.Debug("DMDATA");
                     return DMData.GetEEW();
                 default:
                     Log.Instance.Error("目的のAPIが存在しません");

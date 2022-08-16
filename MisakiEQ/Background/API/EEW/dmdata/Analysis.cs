@@ -87,12 +87,11 @@ namespace MisakiEQ.Background.API.EEW.dmdata
             Client = null;
         }
         bool EndTask = false;
-        EventHandler<EEWEventArgs>? UpdateHandler = null;
-        public async Task Loop(EventHandler<EEWEventArgs>? updateHandler, CancellationToken token)
+        public event EventHandler<EEWEventArgs>? UpdateHandler = null;
+        public async Task Loop(CancellationToken token)
         {
             try
             {
-                UpdateHandler = updateHandler;
                 SocketConnection();
                 while (true)
                 {
@@ -296,6 +295,8 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         var args = new EEWEventArgs(null, eew);
                         UpdateHandler(null, args);
                     }
+                    else
+                        Log.Instance.Error("UpdateHandlerがnullです");
                 }
             } catch (Exception ex)
             {
@@ -310,6 +311,7 @@ namespace MisakiEQ.Background.API.EEW.dmdata
         }
         public Struct.EEW GetEEW()
         {
+            Log.Instance.Debug("過去の緊急地震速報のデータを取得しました。");
             return TempData;
         }
         

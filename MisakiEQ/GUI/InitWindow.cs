@@ -80,6 +80,12 @@ namespace MisakiEQ
                 }
             }), stw);
 #endif
+            InitialTask_ReportFunction(90, "イベントを設定", new(() =>
+            {
+#pragma warning disable CS8602 // null 参照の可能性があるものの逆参照です。
+                GUI.TrayHub.GetInstance(false).SetEvent();
+#pragma warning restore CS8602 // null 参照の可能性があるものの逆参照です。
+            }),stw);
             e.Result = "OK";
             await Task.Delay(2000);
         }

@@ -31,9 +31,6 @@ namespace MisakiEQ.GUI
             TrayIcon.Icon = Properties.Resources.Logo_MainIcon;
             Init = new();
             Init.Show();
-            Background.APIs.GetInstance().EEW.UpdateHandler += EventEEW;
-            Background.APIs.GetInstance().EQInfo.EarthQuakeUpdateHandler += EventEarthQuake;
-            Background.APIs.GetInstance().EQInfo.TsunamiUpdateHandler += EventTsunami;
             EEW_Compact.Show();
             EEW_Compact.Hide();
             ESTWindow.Show();
@@ -49,7 +46,20 @@ namespace MisakiEQ.GUI
             if (IsCreate&&Instance==null) Instance = new();
             return Instance;
         }
-
+        public void SetEvent()
+        {
+            Background.APIs.GetInstance().EEW.UpdateHandler -= EventEEW;
+            Background.APIs.GetInstance().EQInfo.EarthQuakeUpdateHandler -= EventEarthQuake;
+            Background.APIs.GetInstance().EQInfo.TsunamiUpdateHandler -= EventTsunami;
+            Background.APIs.GetInstance().EEW.UpdateHandler += EventEEW;
+            Background.APIs.GetInstance().EQInfo.EarthQuakeUpdateHandler += EventEarthQuake;
+            Background.APIs.GetInstance().EQInfo.TsunamiUpdateHandler += EventTsunami;
+        }
+        public void ResetEventEEW()
+        {
+            Background.APIs.GetInstance().EEW.UpdateHandler -= EventEEW;
+            Background.APIs.GetInstance().EEW.UpdateHandler += EventEEW;
+        }
         public static void DisposeInstance()
         {
             if (Instance != null && !Instance.IsDisposed)
@@ -101,7 +111,7 @@ namespace MisakiEQ.GUI
         {
             EEW_Compact.TopMost = ConfigData.IsTopSimpleEEW;
             EEW_Compact.Show();
-            //EEW_Compact.SetInfomation(Background.APIs.GetInstance().EEW.GetData());
+            EEW_Compact.SetInfomation(Background.APIs.GetInstance().EEW.GetData());
             EEW_Compact.Activate();
         }
         private async void EventEEW(object? sender,Background.API.EEWEventArgs e)
@@ -154,6 +164,7 @@ namespace MisakiEQ.GUI
                     (int)ConfigData.NoticeArea <= (int)e.eew.UserInfo.LocalIntensity)
                 {
                     Toast.Post(e.eew);
+                    /*
                     if (e.eew.UserInfo.LocalIntensity >= Struct.Common.Intensity.Int1)
                     {
                         ESTWindow.Invoke(() =>
@@ -165,7 +176,7 @@ namespace MisakiEQ.GUI
                             }
                             ESTWindow.Activate();
                         });
-                    }
+                    }*/
                     await SoundCollective.GetInstance().SoundEEW(e.eew);
                     Log.Instance.Debug($"サウンド再生処理完了");
                 }
