@@ -48,7 +48,7 @@ namespace MisakiEQ.GUI.ExApp
             pictureBox1.Image=bitmap;
             if(old!=null)old.Dispose();
             sw.Stop();
-            Log.Instance.Debug($"全ての解析完了:{sw.Elapsed}");
+            //Log.Instance.Debug($"全ての解析完了:{sw.Elapsed}");
         }
 
         private void KyoshinResponseGraph_FormClosed(object sender, FormClosedEventArgs e)

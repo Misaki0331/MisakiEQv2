@@ -219,7 +219,8 @@ namespace MisakiEQ
             string trace = msg.Replace("\n", "\n"+"".PadLeft(44+STACKLEN, ' '));
             string logs = $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [{para}]: {trace}";
             Trace.WriteLine(logs);
-            var splitstrings = logs.Split('\n');
+            var strings = logs.Replace("\r", "");
+            var splitstrings = strings.Split('\n');
             string col = "";
             switch (level)
             {

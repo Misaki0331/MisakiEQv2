@@ -38,7 +38,7 @@ namespace MisakiEQ.Funcs
                 }
                 System.Diagnostics.EventLog.WriteEntry(
                     sourceName, data,
-                    System.Diagnostics.EventLogEntryType.Information, id, -32700);
+                    System.Diagnostics.EventLogEntryType.Information, id, 32767);
             }
             catch (Exception ex)
             {

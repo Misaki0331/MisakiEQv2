@@ -35,8 +35,7 @@ namespace MisakiEQ.Background.API
             Config.DelayDetectCoolDown = 3000;
         }
         public void Init()
-        {
-        }
+        { }
         public void RunThread()
         {
             if (Threads == null || Threads.Status != TaskStatus.Running)
@@ -51,11 +50,11 @@ namespace MisakiEQ.Background.API
             }
 
         }
-        public void AbortThread()
+        /*public void AbortThread()
         {
             Log.Instance.Debug("スレッド破棄の準備を開始します。");
             CancelTokenSource.Cancel();
-        }
+        }*/
         public async Task AbortAndWait()
         {
             Log.Instance.Debug("スレッドを終了しています...");
@@ -77,22 +76,32 @@ namespace MisakiEQ.Background.API
         private async Task ThreadFunction(CancellationToken token)
         {
             Log.Instance.Info("スレッド開始");
-            switch (CurrentAPI)
+            var looping = true;
+            while (looping) 
             {
-                case APIServer.OldAPI:
-                    await OldAPI.Loop(Config, UpdateHandler, token);
-                    break;
-                case APIServer.Dmdata:
-                    await DMData.Authentication(token);
-                    DMData.Init();
-                    DMData.UpdateHandler += GetEvent;
-                    await DMData.Loop(token);
-                    DMData.UpdateHandler -= GetEvent;
-                    DMData.APIClose();
-                    break;
-                default:
-                    Log.Instance.Error("目的のAPIが存在しません");
-                    break;
+                looping = false;
+                switch (CurrentAPI)
+                {
+                    case APIServer.OldAPI:
+                        await OldAPI.Loop(Config, UpdateHandler, token);
+                        break;
+                    case APIServer.Dmdata:
+                        if (!DMData.Init())
+                        {
+                            Log.Instance.Warn("トークンがセットできない為他のAPIを使用します。");
+                            CurrentAPI=APIServer.OldAPI;
+                            looping = true;
+                            continue;
+                        }
+                        DMData.UpdateHandler += GetEvent;
+                        await DMData.Loop(token);
+                        DMData.UpdateHandler -= GetEvent;
+                        DMData.APIClose();
+                        break;
+                    default:
+                        Log.Instance.Error("目的のAPIが存在しません");
+                        break;
+                }
             }
             Log.Instance.Info("スレッド終了");
         }
@@ -112,9 +121,7 @@ namespace MisakiEQ.Background.API
                     Log.Instance.Info("地震イベントを再連携します。");
                     try
                     {
-#pragma warning disable CS8602 // null 参照の可能性があるものの逆参照です。
-                        GUI.TrayHub.GetInstance().ResetEventEEW();
-#pragma warning restore CS8602 // null 参照の可能性があるものの逆参照です。
+                        GUI.TrayHub.GetInstance()?.ResetEventEEW();
                     }catch(Exception ex)
                     {
                         Log.Instance.Error(ex);

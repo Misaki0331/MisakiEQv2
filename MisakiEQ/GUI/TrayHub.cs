@@ -38,6 +38,12 @@ namespace MisakiEQ.GUI
 #if DEBUG
             実行ログToolStripMenuItem_Click("debug", EventArgs.Empty);
 #endif
+            versionName.Text = $"{Properties.Version.Name}";
+#if ADMIN
+            versionName.Text += "(Admin)";
+#elif DEBUG
+            versionName.Text += "(Debug)";
+#endif
         }
         static TrayHub? Instance = null;
 

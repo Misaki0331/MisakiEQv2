@@ -120,6 +120,7 @@ namespace MisakiEQ.Lib.Config
             api.EEW.Config.Delay = (uint)(GetConfigValue("API_EEW_Delay") as long ? ?? long.MaxValue);
             api.EEW.Config.DelayDetectMode = (uint)(GetConfigValue("API_EEW_DelayDetectMode") as long? ?? long.MaxValue);
             api.EEW.Config.DelayDetectCoolDown = (uint)(GetConfigValue("API_EEW_DelayDetectCoolDown") as long? ?? long.MaxValue); 
+            api.EEW.Config.IsWarningOnlyInDMDATA = (GetConfigValue("API_EEW_DMDATA_OnlyWarn") as bool? ?? false); 
             api.EQInfo.Config.Delay = (uint)(GetConfigValue("API_EQInfo_Delay") as long? ?? long.MaxValue);
             api.EQInfo.Config.Limit = (uint)(GetConfigValue("API_EQInfo_Limit") as long? ?? long.MaxValue);
             api.KyoshinAPI.Config.KyoshinDelayTime = (int)(GetConfigValue("API_K-moni_Delay") as long? ?? long.MaxValue);
@@ -245,6 +246,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("通信設定",true)?.Add(new IndexData("API_EEW_Delay","EEW標準遅延",unitName:"秒",displayMag:1000, description:"標準状態の緊急地震速報の遅延時間です。", min:1000, max:5000, def:1000));   //通常時の遅延(ms)
                 GetGroup("通信設定",true)?.Add(new IndexData("API_EEW_DelayDetectMode", "EEW検知遅延", unitName: "秒", displayMag: 1000, description: "検知状態の緊急地震速報の遅延時間です。", min:150, max:5000, def:200));     //検出時の遅延(ms)
                 GetGroup("通信設定",true)?.Add(new IndexData("API_EEW_DelayDetectCoolDown", "EEWモード移行時間", unitName: "秒", displayMag: 1000, description: "検知状態から標準状態に回復する時間です。", min:1000, max:10000, def:4000));     //検出から通常時に戻る時間(ms)
+                GetGroup("通信設定",true)?.Add(new IndexData("API_EEW_DMDATA_OnlyWarn", "DMDATA取得モード", "警報のみ受け取るか、予報も受け取るかを選択できます。", def: false, "警報のみ取得","予報・警報を取得"));   
                 GetGroup("通信設定",true)?.Add(new IndexData("API_EQInfo_Delay", "地震情報遅延", unitName: "秒", displayMag: 1000, description: "地震情報全般の取得遅延時間です。\n地震と津波情報共通でリクエスト多過ぎるとエラー出ます。", min:2000, max:30000, def:3000));   //通常時の遅延(ms)
                 GetGroup("通信設定",true)?.Add(new IndexData("API_EQInfo_Limit", "地震情報取得項目数", description: "1回で地震情報を取得する数です。\n値を大きくすると1回あたりより多くの情報が更新されますが、その分遅くなります。", min:1, max:100, def:10));   //取得時の配列の数
                 GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:5, def:1,unitName:"秒"));   //取得時の配列の数
@@ -256,6 +258,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示","強震モニタに非表示"));   //取得時の配列の数
                 GetGroup("通信設定",true)?.Add(new IndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", WorkingTitle: "時刻調整中...", action:new Action(async() => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
                 GetGroup("通信設定", true)?.Add(new IndexData("Kyoshin_Time", "強震モニタ時刻", "強震モニタ上の最終更新時刻です。"));
+                GetGroup("Project DM-Data Service", true)?.Add(new IndexData("DMDATA_AuthFunction", "アプリ連携", "MisakiEQでDMDATAの緊急地震速報データを取得できるようにします。", "認証", WorkingTitle: "ブラウザで認証中..."));
 #if ADMIN||DEBUG
                 GetGroup("SNS設定",true)?.Add(new IndexData("Twitter_Auth", "Twitter認証", "アカウント認証します","認証",WorkingTitle:"認証中..."));
                 GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Auth_Info", "Twitter認証情報", ""));
@@ -272,12 +275,13 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("緊急地震速報発表時", true)?.Add(new IndexData("GUI_Popup_EEW_Compact", "簡易情報のポップ表示", "緊急地震速報が発令されると簡易ウィンドウがポップアップされます。", true, "ポップアップ表示", "ポップアップ非表示"));
                 GetGroup("緊急地震速報発表時", true)?.Add(new IndexData("GUI_TopMost_EEW_Compact", "簡易情報の表示モード", "簡易ウィンドウが前面表示されます。", true, "前面表示", "標準表示"));
                 GetGroup("アプリ情報", true)?.Add(new IndexData("AppInfo_Uptime", "アプリ起動時間", "起動してからの経過時間です。"));
+                GetGroup("アプリ情報", true)?.Add(new IndexData("AppInfo_UsingAPI", "使用中のEEW API", "EEW APIの使用状況"));
                 GetGroup("通知設定", true)?.Add(new IndexData("Notification_EEW_Nationwide", "EEW全国通知条件", "全国共通で緊急地震速報を通知する条件を設定します", 9,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "ALL","Warning only","None"}));
                 GetGroup("通知設定", true)?.Add(new IndexData("Notification_EEW_Area", "EEW地域通知条件", "お住まいの地域で緊急地震速報を通知する条件を設定します", 8,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "≧0" }));
-//#if DEBUG
+#if DEBUG
                 GetGroup("Debug Mode", true)?.Add(new IndexData("Debug_Input", "コマンド入力", "デバック用",""));
                 GetGroup("Debug Mode", true)?.Add(new IndexData("Debug_Function", "デバッグ実行関数", "デバック用", "Execute", WorkingTitle: "Working..."));
-//#endif
+#endif
             }
 
             /// <summary>

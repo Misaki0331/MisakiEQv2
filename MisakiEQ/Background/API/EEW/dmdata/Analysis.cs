@@ -19,6 +19,7 @@ namespace MisakiEQ.Background.API.EEW.dmdata
         DmdataV2Socket? Socket = null;
         string RefreshToken = "";
         Struct.EEW TempData;
+        public bool IsWarnOnly = false;
         public Analysis()
         {
             ApiBuilder = DmdataApiClientBuilder.Default
@@ -50,12 +51,43 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                 return null;
             }
         }
-        public void Init()
+        private enum LoadInfomation{
+            LoadFailed,
+            NotFound,
+            Found
+        }
+        private LoadInfomation LoadToken()
+        {
+            Log.Instance.Debug("トークンを読み込みます。");
+            if (!File.Exists("DMDataToken.cfg"))
+            {
+                Log.Instance.Warn("トークンファイルが存在しません。");
+                return LoadInfomation.NotFound;
+            }
+            try
+            {
+                using var reader = new StreamReader("DMDataToken.cfg");
+                RefreshToken = reader.ReadToEnd();
+                return LoadInfomation.Found;
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Error($"読込中にエラー : {ex.Message}");
+                return LoadInfomation.LoadFailed;
+            }
+        }
+        public bool Init()
         {
             try
             {
+                if (RefreshToken == string.Empty)
+                {
+                    var res = LoadToken();
+                    if (res != LoadInfomation.Found)
+                        return false;
+                }
                 var clientId = Properties.Resources.dmdata;
-                var scopes = new[] { "contract.list", "telegram.list", "socket.start", "gd.eew", "socket.close", "eew.get.warning", "eew.get.forecast" };
+                var scopes = new[] { "contract.list", "telegram.list", "socket.start", "gd.eew", "socket.close", "eew.get.warning", "eew.get.forecast"};
                 var credential = new OAuthRefreshTokenCredential(ApiBuilder.HttpClient,
                         scopes,
                         clientId,
@@ -65,7 +97,9 @@ namespace MisakiEQ.Background.API.EEW.dmdata
             } catch (Exception e)
             {
                 Log.Instance.Error(e);
+                return false;
             }
+            return true;
             /*var telegramList = await Client.GetEewEventsAsync(limit: 10);
             Log.Instance.Debug($"Status : {telegramList.Status}");
             for(int i=0;i< telegramList.Items.Length; i++)
@@ -116,8 +150,8 @@ namespace MisakiEQ.Background.API.EEW.dmdata
             if (e != null)
             {
                 string types = "";
-                for (int i = 0; i < e.Classifications.Length; i++) types += $"{e.Classifications[i]}, ";
-                Log.Instance.Debug($"ソケット接続完了 {e.Time} 受け取る配信内容:{types}");
+                for (int i = 0; i < e.Classifications.Length; i++) types += $"{e.Classifications[i]} ";
+                Log.Instance.Info($"ソケット接続完了 {e.Time} 受け取る配信内容:{types}");
             }
             else
                 Log.Instance.Warn("ソケットが接続されましたがデータはnullです。");
@@ -329,13 +363,25 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                     Socket.Disconnected += SocketDisconnected;
                     Socket.Error += SocketError;
                     Socket.DataReceived += SocketReceive;
-                    await Socket.ConnectAsync(new DmdataSharp.ApiParameters.V2.SocketStartRequestParameter(
-                        TelegramCategoryV1.EewForecast,
-                        TelegramCategoryV1.EewWarning
-        )
+                    if (IsWarnOnly)
                     {
-                        AppName = "MisakiEQ",
-                    });
+                        await Socket.ConnectAsync(new DmdataSharp.ApiParameters.V2.SocketStartRequestParameter(
+                            TelegramCategoryV1.EewWarning
+            )
+                        {
+                            AppName = "MisakiEQ",
+                        });
+                    }
+                    else
+                    {
+                        await Socket.ConnectAsync(new DmdataSharp.ApiParameters.V2.SocketStartRequestParameter(
+                            TelegramCategoryV1.EewForecast,
+                            TelegramCategoryV1.EewWarning
+            )
+                        {
+                            AppName = "MisakiEQ",
+                        });
+                    }
                     break;
                 }catch(Exception ex)
                 {

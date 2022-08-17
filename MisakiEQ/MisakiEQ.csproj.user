@@ -25,6 +25,9 @@
     <Compile Update="GUI\LogViewerWindow.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="GUI\Sub\AuthDmdata.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="GUI\TrayHub.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -35,11 +35,13 @@
             this.OpenKmoni = new System.Windows.Forms.ToolStripMenuItem();
             this.速度応答グラフToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenAreaESTMonitor = new System.Windows.Forms.ToolStripMenuItem();
+            this.実行ログToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.OpenConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.ExitApplication = new System.Windows.Forms.ToolStripMenuItem();
-            this.実行ログToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.versionName = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.ApplicationMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -53,6 +55,8 @@
             // ApplicationMenu
             // 
             this.ApplicationMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.versionName,
+            this.toolStripSeparator3,
             this.DisplayEEWInfo,
             this.OpenKmoni,
             this.速度応答グラフToolStripMenuItem,
@@ -63,7 +67,7 @@
             this.toolStripSeparator2,
             this.ExitApplication});
             this.ApplicationMenu.Name = "ApplicationMenu";
-            this.ApplicationMenu.Size = new System.Drawing.Size(208, 192);
+            this.ApplicationMenu.Size = new System.Drawing.Size(208, 220);
             this.ApplicationMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ApplicationMenu_Opening);
             // 
             // DisplayEEWInfo
@@ -95,6 +99,13 @@
             this.OpenAreaESTMonitor.Text = "エリア到達モニタ(利用不可)";
             this.OpenAreaESTMonitor.Click += new System.EventHandler(this.OpenAreaESTMonitor_Click);
             // 
+            // 実行ログToolStripMenuItem
+            // 
+            this.実行ログToolStripMenuItem.Name = "実行ログToolStripMenuItem";
+            this.実行ログToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.実行ログToolStripMenuItem.Text = "実行ログ";
+            this.実行ログToolStripMenuItem.Click += new System.EventHandler(this.実行ログToolStripMenuItem_Click);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -119,12 +130,17 @@
             this.ExitApplication.Text = "終了";
             this.ExitApplication.Click += new System.EventHandler(this.ExitApplication_Click);
             // 
-            // 実行ログToolStripMenuItem
+            // versionName
             // 
-            this.実行ログToolStripMenuItem.Name = "実行ログToolStripMenuItem";
-            this.実行ログToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.実行ログToolStripMenuItem.Text = "実行ログ";
-            this.実行ログToolStripMenuItem.Click += new System.EventHandler(this.実行ログToolStripMenuItem_Click);
+            this.versionName.Enabled = false;
+            this.versionName.Name = "versionName";
+            this.versionName.Size = new System.Drawing.Size(207, 22);
+            this.versionName.Text = "Version";
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(204, 6);
             // 
             // TrayHub
             // 
@@ -154,5 +170,7 @@
         private ToolStripMenuItem OpenAreaESTMonitor;
         private ToolStripMenuItem 速度応答グラフToolStripMenuItem;
         private ToolStripMenuItem 実行ログToolStripMenuItem;
+        private ToolStripMenuItem versionName;
+        private ToolStripSeparator toolStripSeparator3;
     }
 }

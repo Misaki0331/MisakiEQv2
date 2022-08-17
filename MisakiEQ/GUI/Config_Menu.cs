@@ -17,12 +17,12 @@ namespace MisakiEQ.GUI
 
         Twitter.Auth? TwitterAuthGUI = null;
         readonly List<Funcs.ConfigUI.LinkButton> LinkButtons = new();
+        Sub.AuthDmdata? dmdataAuth = null;
         public Config_Menu()
         {
             InitializeComponent();
             var config = Lib.Config.Funcs.GetInstance().Configs;
             ConfigSetting = new Lib.ConfigController.Controller(tabPage1);
-            LabelVersion.Text = $"バージョン : {Properties.Version.Name}";
             Icon = Properties.Resources.Logo_MainIcon;
             string[] objects = {"GitHub", "https://github.com/Misaki0331/MisakiEQv2",
             "Twitter Bot","https://twitter.com/MisakiEQ",
@@ -34,6 +34,7 @@ namespace MisakiEQ.GUI
                 var a = new Funcs.ConfigUI.LinkButton(tabPage3, new(48 * i, 157), objects[i], objects[i + 1]);
                 LinkButtons.Add(a);
             }
+            LabelVersion.Text = $"バージョン : {Properties.Version.Name}";
 #if ADMIN
             LabelVersion.Text += "(Admin)";
 #elif DEBUG
@@ -66,6 +67,15 @@ namespace MisakiEQ.GUI
             });
             Funcs.GUI.TwitterGUI.SetInfotoConfigUI();
 #endif
+            var fd = Lib.Config.Funcs.GetInstance().GetConfigClass("DMDATA_AuthFunction");
+            fd?.SetAction(() =>
+            {
+                this.Invoke(() =>
+                {
+                    dmdataAuth = new();
+                    dmdataAuth.ShowDialog(this);
+                });
+            });
             UpdatePos.Interval = 200;
             UpdatePos.Tick += UpdateGeo;
             var lat = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Lat");
@@ -141,6 +151,8 @@ namespace MisakiEQ.GUI
             LabelTime.Text = DateTime.Now.ToString("HH:mm:ss");
             var uptime = Lib.Config.Funcs.GetInstance().GetConfigClass("AppInfo_Uptime");
             if (uptime != null) uptime.Value = $"{TrayHub.GetInstance()?.AppTimer.ToString(@"dd\.hh\:mm\:ss")}";
+            var usingapi = Lib.Config.Funcs.GetInstance().GetConfigClass("AppInfo_UsingAPI");
+            if (usingapi != null) usingapi.Value = $"{Background.APIs.GetInstance().EEW.CurrentAPI}";
             var kyoshin = Background.APIs.GetInstance().KyoshinAPI;
             uptime = Lib.Config.Funcs.GetInstance().GetConfigClass("Kyoshin_Time");
             if (kyoshin.KyoshinLatest.Year > 2000)

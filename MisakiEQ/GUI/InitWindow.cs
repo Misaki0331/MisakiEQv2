@@ -33,11 +33,7 @@ namespace MisakiEQ
             Log.Instance.Debug($"{stopwatch.Elapsed.TotalSeconds} - {percent}% {report}Š®—¹");
         }
 
-#if ADMIN || DEBUG
         private async void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
-#else
-        private void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
-#endif
         {
             var stw = new Stopwatch();
             stw.Start();
