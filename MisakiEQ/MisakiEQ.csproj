@@ -36,8 +36,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
-    <PackageReference Include="DmdataSharp" Version="0.5.4" />
+    <PackageReference Include="DiscordRichPresence" Version="1.1.1.14" />
+    <PackageReference Include="DmdataSharp" Version="0.5.5" />
     <PackageReference Include="KyoshinMonitorLib" Version="0.4.5" />
     <PackageReference Include="KyoshinMonitorLib.Images" Version="0.4.3" />
     <PackageReference Include="KyoshinMonitorLib.SkiaImages" Version="0.4.3" />
@@ -46,6 +46,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Management" Version="6.0.0" />
     <PackageReference Include="TweetinviAPI" Version="5.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MisakiEQWpf\MisakiEQWpf.csproj" />
   </ItemGroup>
 
   <ItemGroup>

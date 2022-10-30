@@ -23,6 +23,7 @@ namespace MisakiEQ
         const int LOG_DATA_LEN = 100;
         List<string> Logdata = new();
 
+
         public event EventHandler<string>? LogUpdateHandler;
 
         /// <summary>

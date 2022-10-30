@@ -24,7 +24,8 @@ namespace MisakiEQ.Lib.Twitter
             }
             return singleton;
         }
-        public static int GetLen(string str)
+        public static int 
+            GetLen(string str)
         {
             var replace = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&'()=~|-^\\@[`{;:]+*},./<>?\n";
             for(int i = 0; i < replace.Length; i++)

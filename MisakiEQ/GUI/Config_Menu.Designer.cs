@@ -41,6 +41,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.SettingTabs = new System.Windows.Forms.TabControl();
+            this.button1 = new System.Windows.Forms.Button();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SettingTabs.SuspendLayout();
@@ -107,6 +108,7 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.button1);
             this.tabPage3.Controls.Add(this.LabelVersion);
             this.tabPage3.Controls.Add(this.pictureBox1);
             this.tabPage3.Location = new System.Drawing.Point(4, 24);
@@ -160,6 +162,16 @@
             this.SettingTabs.Size = new System.Drawing.Size(791, 475);
             this.SettingTabs.TabIndex = 0;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(12, 263);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 5;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Config_Menu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -198,5 +210,6 @@
         private PictureBox pictureBox1;
         private TabPage tabPage1;
         private TabControl SettingTabs;
+        private Button button1;
     }
 }

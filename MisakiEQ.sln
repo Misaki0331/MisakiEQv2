@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MisakiEQ", "MisakiEQ\MisakiEQ.csproj", "{6F3F0D1D-7F07-425B-8FF8-86A2F5F7FD0E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MisakiEQWpf", "MisakiEQWpf\MisakiEQWpf.csproj", "{5D286A9B-E01F-4B5A-9405-6D30FC91DF3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		ADMIN|Any CPU = ADMIN|Any CPU
@@ -18,6 +20,12 @@ Global
 		{6F3F0D1D-7F07-425B-8FF8-86A2F5F7FD0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F3F0D1D-7F07-425B-8FF8-86A2F5F7FD0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F3F0D1D-7F07-425B-8FF8-86A2F5F7FD0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D286A9B-E01F-4B5A-9405-6D30FC91DF3B}.ADMIN|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D286A9B-E01F-4B5A-9405-6D30FC91DF3B}.ADMIN|Any CPU.Build.0 = Debug|Any CPU
+		{5D286A9B-E01F-4B5A-9405-6D30FC91DF3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D286A9B-E01F-4B5A-9405-6D30FC91DF3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D286A9B-E01F-4B5A-9405-6D30FC91DF3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D286A9B-E01F-4B5A-9405-6D30FC91DF3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

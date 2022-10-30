@@ -14,7 +14,7 @@ namespace MisakiEQ.GUI
 {
     public partial class TrayHub : Form
     {
-        readonly InitWindow? Init=null;
+        readonly InitWindow? Init = null;
         internal readonly Config ConfigData = new();
         Config_Menu? Config = null;
         ExApp.KyoshinWindow? Kyoshin = null;
@@ -23,6 +23,9 @@ namespace MisakiEQ.GUI
         readonly ExApp.UserESTWindow ESTWindow = new();
         readonly Stopwatch apptimer = new();
         public TimeSpan AppTimer { get => apptimer.Elapsed; }
+
+        private readonly object WindowLock = new();
+
         private TrayHub()
         {
             apptimer.Start();
@@ -47,9 +50,9 @@ namespace MisakiEQ.GUI
         }
         static TrayHub? Instance = null;
 
-        public static TrayHub? GetInstance(bool IsCreate=false)
+        public static TrayHub? GetInstance(bool IsCreate = false)
         {
-            if (IsCreate&&Instance==null) Instance = new();
+            if (IsCreate && Instance == null) Instance = new();
             return Instance;
         }
         public void SetEvent()
@@ -120,7 +123,8 @@ namespace MisakiEQ.GUI
             EEW_Compact.SetInfomation(Background.APIs.GetInstance().EEW.GetData());
             EEW_Compact.Activate();
         }
-        private async void EventEEW(object? sender,Background.API.EEWEventArgs e)
+
+        private async void EventEEW(object? sender, Background.API.EEWEventArgs e)
         {
             try
             {
@@ -128,38 +132,11 @@ namespace MisakiEQ.GUI
                 if (e.eew == null) return;
                 double distance = Struct.EEW.GetDistance(e.eew, new(Background.APIs.GetInstance().KyoshinAPI.Config.UserLong, Background.APIs.GetInstance().KyoshinAPI.Config.UserLat));
                 e.eew.UserInfo.ArrivalTime = e.eew.EarthQuake.OriginTime.AddSeconds(distance / 4.2);
-                Log.Instance.Debug($"距離 = {distance}");
+                Log.Instance.Debug($"距離 = {distance} km");
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EEWPost(e.eew);
 #endif
-
-                EEW_Compact.Invoke(() =>
-                {
-                    if (!EEW_Compact.Visible && !EEW_Compact.IsShowFromEEW)
-                    {
-                        EEW_Compact.IsShowFromEEW = true;
-                        EEW_Compact.HideTimer.Start();
-                    }
-                    else if (EEW_Compact.IsShowFromEEW)
-                    {
-                        EEW_Compact.HideTimer.Stop();
-                        EEW_Compact.HideTimer.Start();
-                    }
-                    EEW_Compact.SetInfomation(e.eew);
-                    if (ConfigData.IsWakeSimpleEEW)
-                    {
-                        if ((int)ConfigData.NoticeNationWide <= (int)e.eew.EarthQuake.MaxIntensity ||
-                    (ConfigData.NoticeNationWide == Struct.ConfigBox.Notification_EEW_Nationwide.Enums.WarnOnly && e.eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning) ||
-                    (int)ConfigData.NoticeArea <= (int)e.eew.UserInfo.LocalIntensity)
-                        {
-                            EEW_Compact.TopMost = ConfigData.IsTopSimpleEEW;
-                            EEW_Compact.Show();
-                            EEW_Compact.Activate();
-                        }
-                    }
-                });
-
-                Log.Instance.Debug($"EEW_Compact書き込み完了");
+                
                 Funcs.EventLog.EEW(e.eew);
                 Log.Instance.Debug($"イベントログ書き込み完了");
                 Funcs.DiscordRPC.PostEEW(e.eew);
@@ -186,12 +163,44 @@ namespace MisakiEQ.GUI
                     await SoundCollective.GetInstance().SoundEEW(e.eew);
                     Log.Instance.Debug($"サウンド再生処理完了");
                 }
-            }catch(Exception ex)
+
+                lock (WindowLock)
+                {
+                    EEW_Compact.Invoke(() =>
+                    {
+                        if (!EEW_Compact.Visible && !EEW_Compact.IsShowFromEEW)
+                        {
+                            EEW_Compact.IsShowFromEEW = true;
+                            EEW_Compact.HideTimer.Start();
+                        }
+                        else if (EEW_Compact.IsShowFromEEW)
+                        {
+                            EEW_Compact.HideTimer.Stop();
+                            EEW_Compact.HideTimer.Start();
+                        }
+                        EEW_Compact.SetInfomation(e.eew);
+                        if (ConfigData.IsWakeSimpleEEW)
+                        {
+                            if ((int)ConfigData.NoticeNationWide <= (int)e.eew.EarthQuake.MaxIntensity ||
+                        (ConfigData.NoticeNationWide == Struct.ConfigBox.Notification_EEW_Nationwide.Enums.WarnOnly
+                        && e.eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning) ||
+                        (int)ConfigData.NoticeArea <= (int)e.eew.UserInfo.LocalIntensity)
+                            {
+                                EEW_Compact.TopMost = ConfigData.IsTopSimpleEEW;
+                                EEW_Compact.Show();
+                                EEW_Compact.Activate();
+                            }
+                        }
+                    });
+                }
+                Log.Instance.Debug($"EEW_Compact書き込み完了");
+            }
+            catch (Exception ex)
             {
                 Log.Instance.Error(ex);
             }
         }
-        
+
 
         private void EventEarthQuake(object? sender, Background.API.EarthQuakeEventArgs e)
         {
@@ -252,7 +261,7 @@ namespace MisakiEQ.GUI
             if (!ESTWindow.Visible)
             {
                 ESTWindow.Show();
-                ESTWindow.Location = new Point(0,214);
+                ESTWindow.Location = new Point(0, 214);
             }
             ESTWindow.Activate();
         }
@@ -264,7 +273,7 @@ namespace MisakiEQ.GUI
             KyoshinResponseGraph.Show();
             KyoshinResponseGraph.Activate();
         }
-        LogViewerWindow? LogViewer=null;
+        LogViewerWindow? LogViewer = null;
         private void 実行ログToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -276,7 +285,8 @@ namespace MisakiEQ.GUI
                 }
                 LogViewer.WindowState = FormWindowState.Normal;
                 LogViewer.Activate();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Log.Instance.Error(ex);
             }

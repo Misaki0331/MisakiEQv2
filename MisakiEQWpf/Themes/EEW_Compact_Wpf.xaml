@@ -1,0 +1,15 @@
+﻿<Window x:Class="MisakiEQWpf.Themes.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MisakiEQWpf.Themes"
+        mc:Ignorable="d"
+        Title="Window1" Height="210" Width="651">
+    <Grid Margin="0,0,466,294">
+        <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,-466,-40">
+            <TextBlock TextWrapping="Wrap" Text="緊急地震速報(予報)" Margin="0,0,0,0" FontFamily="Meiryo UI" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="30" Name="EEWType"/>
+        </Border>
+
+    </Grid>
+</Window>

@@ -208,5 +208,12 @@ namespace MisakiEQ.GUI
             SettingTabs.Visible = true;
             SizeChange.Stop();
         }
+
+        
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var a = new GUI.Overlay.FullScreenWarning();
+            a.TopShow();
+        }
     }
 }

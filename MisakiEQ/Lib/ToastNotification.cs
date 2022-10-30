@@ -7,8 +7,9 @@ using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace MisakiEQ.Lib
 {
-    internal class ToastNotification
+    public class ToastNotification
     {
+        private static readonly AsyncLock NotificationLock = new();
         public class ToastProgress
         {
             private void Initial(string status, double percent)
@@ -52,44 +53,48 @@ namespace MisakiEQ.Lib
         }
         public static async void PostNotification(string title, string? index=null,string? attribution=null,DateTime? customTime=null,ToastProgress? progress=null,Image? HeroImage=null, Image? IndexImage=null, Image? Icon=null)
         {
-            await Task.Run(() => {
-                List<string> TempFiles = new();
-                var a = new ToastContentBuilder()
-                .AddText(title);
-                if (index != null) a.AddText(index);
-                if(attribution != null) a.AddAttributionText(attribution);
-                if (progress != null) a.AddProgressBar(progress.Title, progress.Percent, progress.IsIndeterminate, progress.ValueString, progress.Status);
-                if (customTime != null) a.AddCustomTimeStamp((DateTime)customTime);
-                if (HeroImage != null)
-                {
-                    string name = Path.GetTempFileName();
-                    TempFiles.Add(name);
-                    HeroImage.Save(name);
-                    Uri uri = new(name);
-                    a.AddHeroImage(uri);
-                }
-                if (IndexImage != null)
-                {
-                    string name = Path.GetTempFileName();
-                    TempFiles.Add(name);
-                    IndexImage.Save(name);
-                    Uri uri = new(name);
-                    a.AddInlineImage(uri);
-                }
+            await Task.Run(async () => {
 
-                if (Icon != null)
+                using (await NotificationLock.LockAsync())
                 {
-                    string name = Path.GetTempFileName();
-                    TempFiles.Add(name);
-                    Icon.Save(name);
-                    Uri uri = new(name);
-                    a.AddAppLogoOverride(uri);
+                    List<string> TempFiles = new();
+                    var a = new ToastContentBuilder()
+                    .AddText(title);
+                    if (index != null) a.AddText(index);
+                    if (attribution != null) a.AddAttributionText(attribution);
+                    if (progress != null) a.AddProgressBar(progress.Title, progress.Percent, progress.IsIndeterminate, progress.ValueString, progress.Status);
+                    if (customTime != null) a.AddCustomTimeStamp((DateTime)customTime);
+                    if (HeroImage != null)
+                    {
+                        string name = Path.GetTempFileName();
+                        TempFiles.Add(name);
+                        HeroImage.Save(name);
+                        Uri uri = new(name);
+                        a.AddHeroImage(uri);
+                    }
+                    if (IndexImage != null)
+                    {
+                        string name = Path.GetTempFileName();
+                        TempFiles.Add(name);
+                        IndexImage.Save(name);
+                        Uri uri = new(name);
+                        a.AddInlineImage(uri);
+                    }
+
+                    if (Icon != null)
+                    {
+                        string name = Path.GetTempFileName();
+                        TempFiles.Add(name);
+                        Icon.Save(name);
+                        Uri uri = new(name);
+                        a.AddAppLogoOverride(uri);
+                    }
+                    a.Show();
+                    Log.Instance.Debug($"トースト送信 : {title}");
+                    Thread.Sleep(5000);
+                    for (int i = 0; i < TempFiles.Count; i++) File.Delete(TempFiles[i]);
+                    TempFiles.Clear();
                 }
-                a.Show();
-                Log.Instance.Debug($"トースト送信 : {title}");
-                Thread.Sleep(5000);
-                for(int i=0;i<TempFiles.Count;i++) File.Delete(TempFiles[i]);
-                TempFiles.Clear();
             });
         }
     }
