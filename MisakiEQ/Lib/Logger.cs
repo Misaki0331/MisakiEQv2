@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 
 namespace MisakiEQ
 {
@@ -82,10 +83,26 @@ namespace MisakiEQ
         private Log()
         {
             this.logFilePath = LOGDIR_PATH + LOGFILE_NAME + ".log";
-
+            //AppDomain.CurrentDomain.
             // ログファイルを生成する
             CreateLogfile(new FileInfo(logFilePath));
         }
+
+        /*static void FirstChanceException(object? sender, FirstChanceExceptionEventArgs e)
+        {
+            string str = $"FirstChanceException\n" +
+                $"例外エラー名 : {e.Exception.GetType()}\n" +
+                $"{e.Exception.Message}\n" +
+                $"{e.Exception.StackTrace}";
+            if (e.Exception.InnerException != null)
+            {
+                str += "\n--- 内部エラーの詳細 ---\n" +
+                    $"例外エラー名 : {e.Exception.InnerException.GetType()}\n" +
+                    $"{e.Exception.InnerException.Message}\n" +
+                    $"{e.Exception.InnerException.StackTrace}";
+            }
+            Instance.Error(str);
+        }*/
 
         /// <summary>
         /// ERRORレベルのログを出力する
