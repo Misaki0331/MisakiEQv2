@@ -15,6 +15,7 @@ namespace MisakiEQ.GUI
 {
     public partial class TrayHub : Form
     {
+        readonly Overlay.FullScreenWarning J_ALERT_Display = new();
         readonly InitWindow? Init = null;
         internal readonly Config ConfigData = new();
         Config_Menu? Config = null;
@@ -39,6 +40,7 @@ namespace MisakiEQ.GUI
             EEW_Compact.Hide();
             ESTWindow.Show();
             ESTWindow.Hide();
+            J_ALERT_Display.Init();
 #if DEBUG
             実行ログToolStripMenuItem_Click("debug", EventArgs.Empty);
 #endif
@@ -64,6 +66,7 @@ namespace MisakiEQ.GUI
             Background.APIs.GetInstance().EEW.UpdateHandler += EventEEW;
             Background.APIs.GetInstance().EQInfo.EarthQuakeUpdateHandler += EventEarthQuake;
             Background.APIs.GetInstance().EQInfo.TsunamiUpdateHandler += EventTsunami;
+            Background.APIs.GetInstance().Jalert.J_AlertUpdateHandler += EventJAlert;
         }
         public void ResetEventEEW()
         {
@@ -124,11 +127,11 @@ namespace MisakiEQ.GUI
             EEW_Compact.SetInfomation(Background.APIs.GetInstance().EEW.GetData());
             EEW_Compact.Activate();
         }
-        private async void EventEEW(object? sender, Background.API.EEWEventArgs e)
+        private void EventEEW(object? sender, Background.API.EEWEventArgs e)
         {
             try
             {
-                Log.Instance.Debug("EEWイベント受信");
+                    Log.Instance.Debug("EEWイベント受信");
                 if (e.eew == null) return;
                 double distance = Struct.EEW.GetDistance(e.eew, new(Background.APIs.GetInstance().KyoshinAPI.Config.UserLong, Background.APIs.GetInstance().KyoshinAPI.Config.UserLat));
                 e.eew.UserInfo.ArrivalTime = e.eew.EarthQuake.OriginTime.AddSeconds(distance / 4.2);
@@ -142,30 +145,30 @@ namespace MisakiEQ.GUI
                 Funcs.DiscordRPC.PostEEW(e.eew);
                 Log.Instance.Debug($"DiscordRPC書き込み完了");
                 ESTWindow.ESTTime = e.eew.UserInfo.ArrivalTime;
-                if ((int)ConfigData.NoticeNationWide <= (int)e.eew.EarthQuake.MaxIntensity ||
-                    (ConfigData.NoticeNationWide == Struct.ConfigBox.Notification_EEW_Nationwide.Enums.WarnOnly && e.eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning) ||
-                    (int)ConfigData.NoticeArea <= (int)e.eew.UserInfo.LocalIntensity)
-                {
-                    Toast.Post(e.eew);
-                    /*
-                    if (e.eew.UserInfo.LocalIntensity >= Struct.Common.Intensity.Int1)
-                    {
-                        ESTWindow.Invoke(() =>
-                        {
-                            if (!ESTWindow.Visible)
-                            {
-                                ESTWindow.Show();
-                                ESTWindow.Location = new Point(0, 214);
-                            }
-                            ESTWindow.Activate();
-                        });
-                    }*/
-                    await SoundCollective.GetInstance().SoundEEW(e.eew);
-                    Log.Instance.Debug($"サウンド再生処理完了");
-                }
-
                 lock (WindowLock)
                 {
+                    if (((int)ConfigData.NoticeNationWide <= (int)e.eew.EarthQuake.MaxIntensity ||
+                    (ConfigData.NoticeNationWide == Struct.ConfigBox.Notification_EEW_Nationwide.Enums.WarnOnly && e.eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning) ||
+                    (int)ConfigData.NoticeArea <= (int)e.eew.UserInfo.LocalIntensity))
+                {
+                    Toast.Post(e.eew);
+                        /*
+                        if (e.eew.UserInfo.LocalIntensity >= Struct.Common.Intensity.Int1)
+                        {
+                            ESTWindow.Invoke(() =>
+                            {
+                                if (!ESTWindow.Visible)
+                                {
+                                    ESTWindow.Show();
+                                    ESTWindow.Location = new Point(0, 214);
+                                }
+                                ESTWindow.Activate();
+                            });
+                        }*/
+                        var a=SoundCollective.GetInstance().SoundEEW(e.eew).Result;
+                        Log.Instance.Debug($"サウンド再生処理完了");
+                    }
+
                     EEW_Compact.Invoke(() =>
                     {
                         if (!EEW_Compact.Visible && !EEW_Compact.IsShowFromEEW)
@@ -201,7 +204,26 @@ namespace MisakiEQ.GUI
             }
         }
 
+        private void EventJAlert(object? sender, Background.API.J_AlertEventArgs e)
+        {
+            try
+            {
+                if (e.data == null||!e.data.IsValid) return;
+                Log.Instance.Debug($"Jアラートのイベントが発生: {e.data.AnnounceTime:d日HH:mm} {e.data.Title}");
+                Funcs.DiscordRPC.PostJAlert(e.data);
 
+                if (Background.APIs.GetInstance().Jalert.Config.IsDisplay)
+                {
+                    Toast.Post(e.data);
+                    J_ALERT_Display.TopShow();
+                }
+
+            }
+            catch(Exception ex)
+            {
+                Log.Instance.Error(ex);
+            }
+        }
         private void EventEarthQuake(object? sender, Background.API.EarthQuakeEventArgs e)
         {
             try

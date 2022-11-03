@@ -8,17 +8,6 @@ namespace MisakiEQ.Struct
 {
     internal class J_Alert
     {
-        /*【発表時間】
-2022年11月3日 8時00分
-政府発表
-
-【内容】
-ミサイル通過。ミサイル通過。先程のミサイルは、7時48分頃、太平洋へ通過したものとみられます。不審な物を発見した場合には、決して近寄らず、直ちに警察や消防などに連絡して下さい。
-
-【対象地域】
-宮城県
-山形県
-新潟県*/
         static public cJAlert.J_Alert GetJAlertData(string Title, string RawText)
         {
             try

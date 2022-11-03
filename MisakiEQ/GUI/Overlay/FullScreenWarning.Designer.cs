@@ -107,6 +107,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FullScreenWarning";
             this.Text = "FullScreenWarning";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FullScreenWarning_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -27,6 +27,7 @@ namespace MisakiEQ.Background.API
         public JAlert()
         {
             Config.Delay = 15000;
+            Config.IsDisplay=true;
         }
         public void Init()
         {

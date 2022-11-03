@@ -39,6 +39,21 @@ namespace MisakiEQ.Funcs
             }
             discord.Update(detail:detail,status:status,LImgKey:img,LImgText:imgtxt,SImgKey:mimg,SImgText:mimgtxt);
         } 
+        public static void PostJAlert(Struct.cJAlert.J_Alert data)
+        {
+            var discord = Lib.Discord.RichPresence.GetInstance();
+            string detail = "", status = "";
+            detail = $"J-ALERT【{data.Title}】";
+            if (data.Detail.Length > 32)
+            {
+                status=data.Detail.Substring(0,32)+"...";
+            }
+            else
+            {
+                status=data.Detail;
+            }
+            discord.Update(detail: detail, status: status);
+        }
         public static void PostEarthquake(EarthQuake eq)
         {
             var discord = Lib.Discord.RichPresence.GetInstance();

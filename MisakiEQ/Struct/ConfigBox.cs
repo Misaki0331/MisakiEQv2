@@ -58,7 +58,8 @@ namespace MisakiEQ.Struct
                 Int3 = Common.Intensity.Int3,
                 Int2 = Common.Intensity.Int2,
                 Int1 = Common.Intensity.Int1,
-                Int0 = Common.Intensity.Int0
+                Int0 = Common.Intensity.Int0,
+                None = int.MaxValue
             }
             public static Enums GetIndex(long i)
             {
@@ -74,6 +75,7 @@ namespace MisakiEQ.Struct
                     7 => Enums.Int2,
                     8 => Enums.Int1,
                     9 => Enums.Int0,
+                    10 => Enums.None,
                     _ => throw new ArgumentOutOfRangeException($"{i} に対応するIndexは存在しません。")
                 };
             }

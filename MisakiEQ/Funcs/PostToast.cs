@@ -97,7 +97,13 @@ namespace MisakiEQ.Funcs
             }
             Lib.ToastNotification.PostNotification(title:title,index:index,attribution:attribution,customTime:data.CreatedAt);
         }
-
+        public static void Post(Struct.cJAlert.J_Alert data)
+        {
+            var attribution = "J-ALERT";
+            var title = data.Title;
+            var index = data.Detail;
+            Lib.ToastNotification.PostNotification(title: title, index: index, attribution: attribution, customTime: data.AnnounceTime);
+        }
         private static void PostEEWForecast(EEW data)
         {
             var attribution = $"緊急地震速報(予報) 第 {data.Serial.Number} 報 {(data.Serial.IsFinal ? "(最終報)" : string.Empty)}";

@@ -9,5 +9,6 @@ namespace MisakiEQ.Background.API.J_Alert
     public class Config
     {
         public uint Delay;   //通常時の遅延(ms)
+        public bool IsDisplay;
     }
 }

@@ -16,13 +16,20 @@ namespace MisakiEQ.GUI.Overlay
         {
             InitializeComponent();
         }
+        public void Init()
+        {
+            Location = new(-10000, -10000);
+            Size = new(1, 1);
+            Show();
+            Hide();
+        }
         public void TopShow()
         {
             Show();
             Activate();
             Size = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
             Location = new Point(Screen.PrimaryScreen.Bounds.X, Screen.PrimaryScreen.Bounds.Y);
-            TopMost = true;
+            //TopMost = true;
             //LabelIndexText.Location= new(0, 120);
             LabelIndexText.Size = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 290);
             var data = Background.APIs.GetInstance().Jalert.LatestJAlert;
@@ -35,7 +42,13 @@ namespace MisakiEQ.GUI.Overlay
 
         private void label2_Click(object sender, EventArgs e)
         {
-            Close();
+            Hide();
+        }
+
+        private void FullScreenWarning_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            Hide();
         }
     }
 }
