@@ -8,6 +8,21 @@ namespace MisakiEQ.Funcs
 {
     public class EventLog
     {
+        public static void J_ALERT(Struct.cJAlert.J_Alert j)
+        {
+            string data = $"J-ALERTが発令されました。\n" +
+                $"発報時刻:{j.AnnounceTime}\n" +
+                $"発信元:{j.SourceName}\n" +
+                $"タイトル:{j.Title}\n" +
+                $"詳細:{j.Detail}\n" +
+                $"配信エリア:{j.Areas.Count}地域\n";
+            for(int i = 0; i < j.Areas.Count; i++)
+            {
+                data += $"{j.Areas[i]}";
+                if (i != j.Areas.Count - 1) data += " ";
+            }
+            EventLogOut(1, data);
+        }
         public static void EEW(Struct.EEW eew)
         {
             string data = $"緊急地震速報が発報されました。\n" +

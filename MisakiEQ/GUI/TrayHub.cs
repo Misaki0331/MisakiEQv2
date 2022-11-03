@@ -211,13 +211,12 @@ namespace MisakiEQ.GUI
                 if (e.data == null||!e.data.IsValid) return;
                 Log.Instance.Debug($"Jアラートのイベントが発生: {e.data.AnnounceTime:d日HH:mm} {e.data.Title}");
                 Funcs.DiscordRPC.PostJAlert(e.data);
-
+                Funcs.EventLog.J_ALERT(e.data);
                 if (Background.APIs.GetInstance().Jalert.Config.IsDisplay)
                 {
                     Toast.Post(e.data);
                     J_ALERT_Display.TopShow();
                 }
-
             }
             catch(Exception ex)
             {
