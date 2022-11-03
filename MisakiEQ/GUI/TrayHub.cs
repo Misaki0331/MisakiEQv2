@@ -215,7 +215,7 @@ namespace MisakiEQ.GUI
                 if (Background.APIs.GetInstance().Jalert.Config.IsDisplay)
                 {
                     Toast.Post(e.data);
-                    J_ALERT_Display.TopShow();
+                    J_ALERT_Display.Invoke(()=> { J_ALERT_Display.TopShow(); });
                 }
             }
             catch(Exception ex)
