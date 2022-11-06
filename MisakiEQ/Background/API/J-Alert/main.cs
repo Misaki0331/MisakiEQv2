@@ -113,7 +113,7 @@ namespace MisakiEQ.Background.API
                             str = str.Replace("<br>", "\n");
                             t = Regex.Replace(t, "<(\"[^\"]*\"|'[^']*'|[^'\">])*>", "").Trim();
                             str = Regex.Replace(str, "<(\"[^\"]*\"|'[^']*'|[^'\">])*>","");
-                            if (string.IsNullOrEmpty(str) || string.IsNullOrEmpty(t)) continue;
+                            if (string.IsNullOrWhiteSpace(str) || string.IsNullOrWhiteSpace(t)) continue;
                             //Log.Instance.Debug($"title: {t}\nIndex: {str}");
                             json = str;
                             if (OldTemp != json)
@@ -125,8 +125,11 @@ namespace MisakiEQ.Background.API
                                     LatestData = data;
                                     if (!IsFirst)
                                     {
-                                        var args = new J_AlertEventArgs(data);
-                                        if(J_AlertUpdateHandler!=null)J_AlertUpdateHandler(this, args);
+                                        if (data.AnnounceTime.AddHours(-9).AddMinutes(5) > DateTime.UtcNow)
+                                        {
+                                            var args = new J_AlertEventArgs(data);
+                                            if (J_AlertUpdateHandler != null) J_AlertUpdateHandler(this, args);
+                                        }
                                     }
                                     IsFirst = false;
                                 }

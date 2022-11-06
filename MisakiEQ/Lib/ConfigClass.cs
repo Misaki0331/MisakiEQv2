@@ -144,8 +144,10 @@ namespace MisakiEQ.Lib.Config
                 tray.NoticeNationWide = Struct.ConfigBox.Notification_EEW_Nationwide.GetIndex(GetConfigValue("Notification_EEW_Nationwide") as long? ?? 9);
                 tray.NoticeArea = Struct.ConfigBox.Notification_EEW_Area.GetIndex(GetConfigValue("Notification_EEW_Area") as long? ?? 8);
             }
+            Lib.ToastNotification.IsNewNotification= (bool)(GetConfigValue("Notification_Popup_Notify") as bool? ?? false);
 #if DEBUG||ADMIN
             Twitter.APIs.GetInstance().Config.TweetEnabled = (GetConfigValue("Twitter_Enable_Tweet") as bool? ?? true);
+            Twitter.APIs.GetInstance().Config.IsTweetJ_ALERT = (GetConfigValue("Twitter_J-ALERT_Tweet") as bool? ?? true);
 #endif
         }
         /// <summary>
@@ -254,7 +256,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:5, def:1,unitName:"秒"));   //取得時の配列の数
                 GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Frequency", "強震モニタ更新間隔", description: "強震モニタの更新間隔です。データ消費量を抑えたい時にお使いください。", min:1, max:5, def:1,unitName:"秒"));   //取得時の配列の数
                 GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new IndexData("API_J-ALERT_Delay", "Jアラート遅延時間", description: "Jアラートの更新間隔です。", min:10, max:60, def:30,unitName:"秒"));   
+                GetGroup("通信設定",true)?.Add(new IndexData("API_J-ALERT_Delay", "Jアラート遅延時間", description: "Jアラートの更新間隔です。", min:3, max:60, def:30,unitName:"秒"));   
                 GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数
                 GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
                 GetGroup("ユーザー設定", true)?.Add(new IndexData("USER_Pos_Result", "該当地域名", "緯度・経度に対応されるであろう該当地域名です。"));
@@ -270,6 +272,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Auth_Tweet", "ツイート数", ""));
                 GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Auth_Follower", "フォロワー数", ""));
                 GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Enable_Tweet", "自動ツイートの有効化", "自動でユーザーに地震情報をツイートします", def: true, "自動ツイートが有効", "自動ツイートが無効"));
+                GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_J-ALERT_Tweet", "J-ALERT配信有効化", "自動でユーザーにJアラートをツイートします", def: false, "自動ツイートが有効", "自動ツイートが無効"));
 #endif
                 GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
                 GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
@@ -282,6 +285,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("アプリ情報", true)?.Add(new IndexData("AppInfo_UsingAPI", "使用中のEEW API", "EEW APIの使用状況"));
                 GetGroup("通知設定", true)?.Add(new IndexData("Notification_EEW_Nationwide", "EEW全国通知条件", "全国共通で緊急地震速報を通知する条件を設定します", 9,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "ALL","Warning only","None"}));
                 GetGroup("通知設定", true)?.Add(new IndexData("Notification_EEW_Area", "EEW地域通知条件", "お住まいの地域で緊急地震速報を通知する条件を設定します", 8,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "≧0", "None"}));
+                GetGroup("通知設定", true)?.Add(new IndexData("Notification_Popup_Notify", "トースト通知タイプ", "通知タイプを設定します。", def:false, "Windows プッシュ通知", "Windows Form標準通知"));
 #if DEBUG
                 GetGroup("Debug Mode", true)?.Add(new IndexData("Debug_Input", "コマンド入力", "デバック用",""));
                 GetGroup("Debug Mode", true)?.Add(new IndexData("Debug_Function", "デバッグ実行関数", "デバック用", "Execute", WorkingTitle: "Working..."));

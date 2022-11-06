@@ -10,6 +10,8 @@ namespace MisakiEQ.Lib
     public class ToastNotification
     {
         private static readonly AsyncLock NotificationLock = new();
+        private static NotifyIcon? OldNotify = null;
+        public static bool IsNewNotification = false;
         public class ToastProgress
         {
             private void Initial(string status, double percent)
@@ -51,51 +53,78 @@ namespace MisakiEQ.Lib
             public bool IsIndeterminate = false;
 
         }
+        public static void InitNotify(NotifyIcon notify)
+        {
+            OldNotify=notify;
+            Log.Instance.Debug("フォームの通知欄を読み込みました。");
+        }
         public static async void PostNotification(string title, string? index=null,string? attribution=null,DateTime? customTime=null,ToastProgress? progress=null,Image? HeroImage=null, Image? IndexImage=null, Image? Icon=null)
         {
-            await Task.Run(async () => {
-
-                using (await NotificationLock.LockAsync())
+            if (IsNewNotification)
+            {
+                await Task.Run(async () =>
                 {
-                    List<string> TempFiles = new();
-                    var a = new ToastContentBuilder()
-                    .AddText(title);
-                    if (index != null) a.AddText(index);
-                    if (attribution != null) a.AddAttributionText(attribution);
-                    if (progress != null) a.AddProgressBar(progress.Title, progress.Percent, progress.IsIndeterminate, progress.ValueString, progress.Status);
-                    if (customTime != null) a.AddCustomTimeStamp((DateTime)customTime);
-                    if (HeroImage != null)
-                    {
-                        string name = Path.GetTempFileName();
-                        TempFiles.Add(name);
-                        HeroImage.Save(name);
-                        Uri uri = new(name);
-                        a.AddHeroImage(uri);
-                    }
-                    if (IndexImage != null)
-                    {
-                        string name = Path.GetTempFileName();
-                        TempFiles.Add(name);
-                        IndexImage.Save(name);
-                        Uri uri = new(name);
-                        a.AddInlineImage(uri);
-                    }
 
-                    if (Icon != null)
+                    using (await NotificationLock.LockAsync())
                     {
-                        string name = Path.GetTempFileName();
-                        TempFiles.Add(name);
-                        Icon.Save(name);
-                        Uri uri = new(name);
-                        a.AddAppLogoOverride(uri);
+
+                        List<string> TempFiles = new();
+                        var a = new ToastContentBuilder()
+                        .AddText(title);
+                        if (index != null) a.AddText(index);
+                        if (attribution != null) a.AddAttributionText(attribution);
+                        if (progress != null) a.AddProgressBar(progress.Title, progress.Percent, progress.IsIndeterminate, progress.ValueString, progress.Status);
+                        if (customTime != null) a.AddCustomTimeStamp((DateTime)customTime);
+                        if (HeroImage != null)
+                        {
+                            string name = Path.GetTempFileName();
+                            TempFiles.Add(name);
+                            HeroImage.Save(name);
+                            Uri uri = new(name);
+                            a.AddHeroImage(uri);
+                        }
+                        if (IndexImage != null)
+                        {
+                            string name = Path.GetTempFileName();
+                            TempFiles.Add(name);
+                            IndexImage.Save(name);
+                            Uri uri = new(name);
+                            a.AddInlineImage(uri);
+                        }
+
+                        if (Icon != null)
+                        {
+                            string name = Path.GetTempFileName();
+                            TempFiles.Add(name);
+                            Icon.Save(name);
+                            Uri uri = new(name);
+                            a.AddAppLogoOverride(uri);
+                        }
+                        a.Show();
+                        Log.Instance.Debug($"トースト送信 : {title}");
+                        Thread.Sleep(5000);
+                        for (int i = 0; i < TempFiles.Count; i++) File.Delete(TempFiles[i]);
+                        TempFiles.Clear();
                     }
-                    a.Show();
-                    Log.Instance.Debug($"トースト送信 : {title}");
-                    Thread.Sleep(5000);
-                    for (int i = 0; i < TempFiles.Count; i++) File.Delete(TempFiles[i]);
-                    TempFiles.Clear();
+                });
+            }
+            else
+            {
+                if (OldNotify != null)
+                {
+                    string a = "";
+                    if (index != null)
+                    {
+                        a = index;
+                        if (!string.IsNullOrWhiteSpace(attribution)) a = $"{attribution}\n{index}";
+                    }
+                    OldNotify.ShowBalloonTip(3600000,title,a,ToolTipIcon.None);
                 }
-            });
+                else
+                {
+                    Log.Instance.Error("Formの通知がnullです。");
+                }
+            }
         }
     }
 }

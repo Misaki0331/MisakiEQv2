@@ -52,6 +52,7 @@ namespace MisakiEQ.Funcs
         private readonly AsyncLock EEW_Lock = new();
         private readonly AsyncLock EQ_Lock = new();
         private readonly AsyncLock Tsunami_Lock = new();
+        private readonly AsyncLock JALERT_Lock = new();
         public async void EEWPost(Struct.EEW eew)
         {
             string TweetIndex = string.Empty;
@@ -219,14 +220,14 @@ namespace MisakiEQ.Funcs
                     }
                     bool IsExist = false;
                     long LatestTweet = 0;
-                    EarthquakeTweet eqdata = new(eq.Details.OriginTime,0);
+                    EarthquakeTweet eqdata = new(eq.Details.OriginTime, 0);
                     for (int i = 0; i < EQReplyList.Count; i++)
                     {
                         if (eq.Details.OriginTime == EQReplyList[i].OriginTime)
                         {
                             IsExist = true;
                             LatestTweet = EQReplyList[i].LatestTweet;
-                            eqdata=EQReplyList[i];
+                            eqdata = EQReplyList[i];
                             break;
                         }
                     }
@@ -251,7 +252,7 @@ namespace MisakiEQ.Funcs
                     }
                     for (int i = 0; i < TweetIndexs.Count; i++)
                     {
-                        long id= await APIs.GetInstance().Tweet(TweetIndexs[i], eqdata.LatestTweet);
+                        long id = await APIs.GetInstance().Tweet(TweetIndexs[i], eqdata.LatestTweet);
                         if (id != -1)
                         {
                             eqdata.LatestTweet = id;
@@ -388,7 +389,6 @@ namespace MisakiEQ.Funcs
                                         text += $"{grades[i][j]}";
                                     }
                                 }
-                                Log.Instance.Debug("2");
                                 cnt += APIs.GetLen(text) + 1;
                                 index.Add(text);
                                 if (cnt > 230)
@@ -421,6 +421,78 @@ namespace MisakiEQ.Funcs
                     }
                 }
                 catch (Exception ex)
+                {
+                    Log.Instance.Error(ex);
+                }
+            }
+        }
+        public async void JALERTPost(Struct.cJAlert.J_Alert data)
+        {
+
+            using (await JALERT_Lock.LockAsync())
+            {
+                try
+                {
+                    List<string> TweetList = new();
+                    List<string> index = new()
+                    {
+                        $"🔺J-ALERT🔺【{data.Title}】",
+                        $"{data.AnnounceTime:M/dd H:mm}受信"
+                    };
+                    for(int i = 0; i < data.Detail.Length; i += (220-APIs.GetLen(data.Title))/2)
+                    {
+                        if (i + 90 > data.Detail.Length)
+                        {
+                            index.Add(data.Detail.Substring(i));
+                        }
+                        else
+                        {
+                            index.Add(data.Detail.Substring(i, (220 - APIs.GetLen(data.Title)) / 2));
+                        }
+                    }
+                    
+                    string areas = ""; 
+                    if (data.Areas.Count != 0) areas="発令地区: ";
+                    for (int i = 0; i < data.Areas.Count; i++)
+                    {
+                        areas += data.Areas[i];
+                        if (areas.Length > 18)
+                        {
+                            index.Add(areas);
+                            areas = "";
+                        }
+                        else
+                        if (i != data.Areas.Count - 1) areas += " ";
+                    }
+                    if (areas != "") index.Add(areas);
+                    int cnt = 0;
+                    string tweet = "";
+                    for(int i = 0; i < index.Count; i++)
+                    {
+                        if(cnt+APIs.GetLen(index[i] + 1) > 256)
+                        {
+                            TweetList.Add(tweet);
+                            cnt = 0;
+                            tweet = "";
+                        }
+                        cnt += APIs.GetLen(index[i] + 1);
+                        tweet += $"{index[i]}\n";
+
+                    }
+                    if (tweet != "")
+                    {
+                        TweetList.Add(tweet);
+                    }
+                    long Latest = 0;
+                    for (int i = 0; i < TweetList.Count; i++)
+                    {
+                        TweetList[i] += "#MisakiEQ #Jアラート";
+                        if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
+                        Latest = await APIs.GetInstance().Tweet(TweetList[i], Latest);
+                        Log.Instance.Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
+                    }
+                }
+                catch(Exception ex)
                 {
                     Log.Instance.Error(ex);
                 }

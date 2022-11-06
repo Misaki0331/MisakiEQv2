@@ -41,6 +41,7 @@ namespace MisakiEQ.GUI
             ESTWindow.Show();
             ESTWindow.Hide();
             J_ALERT_Display.Init();
+            Lib.ToastNotification.InitNotify(TrayIcon);
 #if DEBUG
             実行ログToolStripMenuItem_Click("debug", EventArgs.Empty);
 #endif
@@ -210,6 +211,9 @@ namespace MisakiEQ.GUI
             {
                 if (e.data == null||!e.data.IsValid) return;
                 Log.Instance.Debug($"Jアラートのイベントが発生: {e.data.AnnounceTime:d日HH:mm} {e.data.Title}");
+                #if DEBUG||ADMIN
+                if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled&& Lib.Twitter.APIs.GetInstance().Config.IsTweetJ_ALERT) Tweets.GetInstance().JALERTPost(e.data);
+#endif
                 Funcs.DiscordRPC.PostJAlert(e.data);
                 Funcs.EventLog.J_ALERT(e.data);
                 if (Background.APIs.GetInstance().Jalert.Config.IsDisplay)

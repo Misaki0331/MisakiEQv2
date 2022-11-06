@@ -87,7 +87,7 @@ namespace MisakiEQ.GUI
             var function = Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Function");
             function?.SetAction(() =>
             {
-                Background.APIs.GetInstance().EEW.DMData.GetData(new FileStream(path:Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.Value.ToString()??"", FileMode.Open,FileAccess.Read));
+               Lib.ToastNotification.PostNotification("テスト通知です。",Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.Value.ToString()??"");
             });
 //#endif
         }

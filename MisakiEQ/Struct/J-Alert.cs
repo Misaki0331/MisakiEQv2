@@ -13,6 +13,10 @@ namespace MisakiEQ.Struct
             try
             {
                 var alertdata = new cJAlert.J_Alert();
+                if (string.IsNullOrWhiteSpace(Title)||string.IsNullOrWhiteSpace(RawText))
+                {
+                    return new();
+                }
                 alertdata.Title = Title;
                 var texts = RawText.Split('\n');
                 int len1 = -1, len2 = -1, len3 = -1; //【】内の情報
