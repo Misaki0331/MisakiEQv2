@@ -24,6 +24,7 @@ namespace MisakiEQ.GUI
         readonly EEW_Compact EEW_Compact = new();
         readonly ExApp.UserESTWindow ESTWindow = new();
         readonly Stopwatch apptimer = new();
+        ExApp.J_ALERTDataWindow? JAlert = null;
         public TimeSpan AppTimer { get => apptimer.Elapsed; }
 
         private readonly object WindowLock = new();
@@ -221,6 +222,7 @@ namespace MisakiEQ.GUI
                     Toast.Post(e.data);
                     J_ALERT_Display.Invoke(()=> { J_ALERT_Display.TopShow(); });
                 }
+                if (JAlert != null && !JAlert.IsDisposed) JAlert.Invoke(() => { JAlert.UpdateData(); });
             }
             catch(Exception ex)
             {
@@ -314,6 +316,22 @@ namespace MisakiEQ.GUI
             catch (Exception ex)
             {
                 Log.Instance.Error(ex);
+            }
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (JAlert == null || JAlert.IsDisposed)
+            {
+                JAlert = new();
+                JAlert.Show();
+                JAlert.Activate();
+            }
+            else
+            {
+                JAlert.Show();
+                JAlert.WindowState=FormWindowState.Normal;
+                JAlert.Activate();
             }
         }
     }

@@ -31,6 +31,8 @@
             this.components = new System.ComponentModel.Container();
             this.TrayIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.ApplicationMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.versionName = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.DisplayEEWInfo = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenKmoni = new System.Windows.Forms.ToolStripMenuItem();
             this.速度応答グラフToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -40,8 +42,7 @@
             this.OpenConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.ExitApplication = new System.Windows.Forms.ToolStripMenuItem();
-            this.versionName = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.ApplicationMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -61,14 +62,27 @@
             this.OpenKmoni,
             this.速度応答グラフToolStripMenuItem,
             this.OpenAreaESTMonitor,
+            this.toolStripMenuItem1,
             this.実行ログToolStripMenuItem,
             this.toolStripSeparator1,
             this.OpenConfig,
             this.toolStripSeparator2,
             this.ExitApplication});
             this.ApplicationMenu.Name = "ApplicationMenu";
-            this.ApplicationMenu.Size = new System.Drawing.Size(208, 220);
+            this.ApplicationMenu.Size = new System.Drawing.Size(208, 242);
             this.ApplicationMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ApplicationMenu_Opening);
+            // 
+            // versionName
+            // 
+            this.versionName.Enabled = false;
+            this.versionName.Name = "versionName";
+            this.versionName.Size = new System.Drawing.Size(207, 22);
+            this.versionName.Text = "Version";
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(204, 6);
             // 
             // DisplayEEWInfo
             // 
@@ -97,6 +111,7 @@
             this.OpenAreaESTMonitor.Name = "OpenAreaESTMonitor";
             this.OpenAreaESTMonitor.Size = new System.Drawing.Size(207, 22);
             this.OpenAreaESTMonitor.Text = "エリア到達モニタ(利用不可)";
+            this.OpenAreaESTMonitor.Visible = false;
             this.OpenAreaESTMonitor.Click += new System.EventHandler(this.OpenAreaESTMonitor_Click);
             // 
             // 実行ログToolStripMenuItem
@@ -130,17 +145,12 @@
             this.ExitApplication.Text = "終了";
             this.ExitApplication.Click += new System.EventHandler(this.ExitApplication_Click);
             // 
-            // versionName
+            // toolStripMenuItem1
             // 
-            this.versionName.Enabled = false;
-            this.versionName.Name = "versionName";
-            this.versionName.Size = new System.Drawing.Size(207, 22);
-            this.versionName.Text = "Version";
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(204, 6);
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(207, 22);
+            this.toolStripMenuItem1.Text = "J-ALERT情報";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // TrayHub
             // 
@@ -172,5 +182,6 @@
         private ToolStripMenuItem 実行ログToolStripMenuItem;
         private ToolStripMenuItem versionName;
         private ToolStripSeparator toolStripSeparator3;
+        private ToolStripMenuItem toolStripMenuItem1;
     }
 }

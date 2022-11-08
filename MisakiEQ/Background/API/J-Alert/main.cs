@@ -99,7 +99,8 @@ namespace MisakiEQ.Background.API
                                 int index = m.Index; // 発見した文字列の開始位置
                                 string value = m.Value; // 発見した文字列
                             }
-                            var str = results[0].Value;
+                            var str = "";
+                            if(results.Count>0)str=results[0].Value;
                             a = "<div class=\\\"header large title\\\">[\\s]*<h1>(.*)?</h1>";
                             results = Regex.Matches(task.Result, a);
                             foreach (Match m in results) // Matchと型を明示（varは不可）
@@ -107,16 +108,24 @@ namespace MisakiEQ.Background.API
                                 int index = m.Index; // 発見した文字列の開始位置
                                 string value = m.Value; // 発見した文字列
                             }
-                            var t = results[0].Value;
+                            var t = "";
+                            if (results.Count > 0) t = results[0].Value;
                             str = str.Replace("<p class=\"jalertInfo-item\">", "").Replace("</p>", "").Trim();
                             str = str.Replace("\r", "").Replace("\n", "");
                             str = str.Replace("<br>", "\n");
                             t = Regex.Replace(t, "<(\"[^\"]*\"|'[^']*'|[^'\">])*>", "").Trim();
                             str = Regex.Replace(str, "<(\"[^\"]*\"|'[^']*'|[^'\">])*>","");
-                            if (string.IsNullOrWhiteSpace(str) || string.IsNullOrWhiteSpace(t)) continue;
-                            //Log.Instance.Debug($"title: {t}\nIndex: {str}");
+                            if (string.IsNullOrWhiteSpace(str) || string.IsNullOrWhiteSpace(t))
+                            {
+                                if (!string.IsNullOrWhiteSpace(t))
+                                {
+                                    if(IsFirst)Log.Instance.Info($"J-ALERTの取得に成功しました。72時間以内の発表はありません。値={t}");
+                                    IsFirst = false;
+                                }
+                                continue;
+                            }
                             json = str;
-                            if (OldTemp != json)
+                            if (!string.IsNullOrWhiteSpace(json)&&OldTemp != json)
                             {
                                 var data=Struct.J_Alert.GetJAlertData(t, str);
                                 if (data.IsValid)
@@ -131,7 +140,11 @@ namespace MisakiEQ.Background.API
                                             if (J_AlertUpdateHandler != null) J_AlertUpdateHandler(this, args);
                                         }
                                     }
-                                    IsFirst = false;
+                                    else
+                                    {
+                                        if (IsFirst) Log.Instance.Info($"J-ALERTの取得に成功しました。最終更新:{data.AnnounceTime}");
+                                        IsFirst = false;
+                                    }
                                 }
                             }
                         }

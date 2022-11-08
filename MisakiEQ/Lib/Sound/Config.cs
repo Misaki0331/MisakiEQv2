@@ -11,5 +11,6 @@ namespace MisakiEQ.Lib.Sound
         public int EEWVolume =100;
         public int EarthquakeVolume=100;
         public int TsunamiVolume = 100;
+        public bool IsMute = false;
     }
 }

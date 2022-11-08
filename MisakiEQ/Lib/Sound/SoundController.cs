@@ -141,7 +141,7 @@ namespace MisakiEQ.Lib.Sound
         public bool IsPaused { get { return wav.PlaybackState == PlaybackState.Paused; } }
         public void Play()
         {
-            if (readers.CanPlay)
+            if (readers.CanPlay&&!Sounds.GetInstance().Config.IsMute)
             {
                 if (IsPaused) wav.Resume();
                 else wav.Play();
@@ -149,7 +149,7 @@ namespace MisakiEQ.Lib.Sound
         }
         public void Replay()
         {
-            if (readers.CanPlay)
+            if (readers.CanPlay && !Sounds.GetInstance().Config.IsMute)
             {
                 readers.SetPosition(0);
                 wav.Play();

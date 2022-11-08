@@ -136,6 +136,7 @@ namespace MisakiEQ.Lib.Config
             snd.EEWVolume = (int)(GetConfigValue("Sound_Volume_EEW") as long? ?? 100);
             snd.EarthquakeVolume = (int)(GetConfigValue("Sound_Volume_Earthquake") as long? ?? 100);
             snd.TsunamiVolume = (int)(GetConfigValue("Sound_Volume_Tsunami") as long? ?? 100);
+            snd.IsMute = GetConfigValue("Sound_All_Mute") as bool? ?? false;
             var tray = GUI.TrayHub.GetInstance()?.ConfigData;
             if (tray != null)
             {
@@ -277,6 +278,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
                 GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
                 GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_Tsunami", "津波情報の通知音量", "津波情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
+                GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_All_Mute", "完全ミュート", "音声デバイスがない時などはこのチェックボックスを有効にすることで軽量化されます。", def: false, "有効(再生されません)","無効"));
 
                 GetGroup("緊急地震速報発表時", true)?.Add(new IndexData("GUI_Popup_EEW_Compact", "簡易情報のポップ表示", "緊急地震速報が発令されると簡易ウィンドウがポップアップされます。", true, "ポップアップ表示", "ポップアップ非表示"));
                 GetGroup("緊急地震速報発表時", true)?.Add(new IndexData("GUI_TopMost_EEW_Compact", "簡易情報の表示モード", "簡易ウィンドウが前面表示されます。", true, "前面表示", "標準表示"));
