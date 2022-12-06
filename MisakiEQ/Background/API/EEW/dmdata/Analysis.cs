@@ -32,7 +32,7 @@ namespace MisakiEQ.Background.API.EEW.dmdata
         {
             try
             {
-                var clientId = Properties.Resources.dmdata;
+                var clientId = Resources.API.API.DMDataAPI;
                 var scopes = new[] { "contract.list", "telegram.list", "socket.start", "gd.eew", "socket.close", "eew.get.warning", "eew.get.forecast" };
                 var credential = await SimpleOAuthAuthenticator.AuthorizationAsync(
                     ApiBuilder.HttpClient,
@@ -86,7 +86,7 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                     if (res != LoadInfomation.Found)
                         return false;
                 }
-                var clientId = Properties.Resources.dmdata;
+                var clientId = Resources.API.API.DMDataAPI;
                 var scopes = new[] { "contract.list", "telegram.list", "socket.start", "gd.eew", "socket.close", "eew.get.warning", "eew.get.forecast"};
                 var credential = new OAuthRefreshTokenCredential(ApiBuilder.HttpClient,
                         scopes,

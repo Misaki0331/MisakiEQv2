@@ -40,7 +40,7 @@ namespace MisakiEQ.Lib.Discord
         {
             try
             {
-                client = new DiscordRpcClient(Properties.Resources.DiscordRPC);
+                client = new DiscordRpcClient(Resources.API.API.DiscordRPC);
                 client.OnReady += (sender, e) =>
                 {
                     Log.Instance.Info($"ユーザー名 : {e.User.Username}");

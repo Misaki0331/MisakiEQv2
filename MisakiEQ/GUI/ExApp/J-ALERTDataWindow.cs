@@ -24,7 +24,9 @@ namespace MisakiEQ.GUI.ExApp
             {
                 BarLine.BackColor = Color.FromArgb(184, 0, 2);
                 title.Text = data.Title;
-                index.Text = data.Detail;
+                string str = $"{data.Detail}\n\n対象地域:\n";
+                for (int i = 0; i < data.Areas.Count; i++) str += $"{data.Areas[i]} ";
+                index.Text = str;
                 ReciveTime.Text = $"{data.AnnounceTime:yyyy年MM月dd日HH時mm分受信}";
             }
         }

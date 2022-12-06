@@ -118,12 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="DiscordRPC" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\api\discordrpc.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="dmdata" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\api\dmdata.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="K-moni.BaseMap" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\basemap_new_black.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -590,8 +584,5 @@
   ],
   "OriginalText": "37 03 00 180618075849 C11 180618075834 ND20180618075838 NCN011 JD////////////// JN/// 520 N348 E1356 010 63 6+ RK66454 RT01/// RC0//// EBI 520 S6+6- ////// 11 511 S6-5+ ////// 11 501 S6-6- ////// 11 531 S6-6- ////// 11 540 S5+5- ////// 11 521 S5+5+ ////// 11 461 S5-04 075851 10 550 S0404 075850 10 500 S0404 075854 10 510 S0404 075854 10 401 S0404 075856 10 535 S0404 075856 10 460 S0404 075857 10 532 S0404 075857 10 462 S0404 075902 00 432 S0404 075904 00 551 S0404 075906 00 451 S0404 075908 00 610 S0404 075909 10 581 S0404 075917 00 530 S0403 075859 00 600 S0403 075906 00 9999="
 }</value>
-  </data>
-  <data name="TwitterAPI" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\api\twitter.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

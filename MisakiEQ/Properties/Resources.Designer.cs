@@ -61,24 +61,6 @@ namespace MisakiEQ.Properties {
         }
         
         /// <summary>
-        ///   Unpublished に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string DiscordRPC {
-            get {
-                return ResourceManager.GetString("DiscordRPC", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Unpublished に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string dmdata {
-            get {
-                return ResourceManager.GetString("dmdata", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
         public static System.Drawing.Bitmap K_moni_BaseMap {
@@ -146,15 +128,6 @@ namespace MisakiEQ.Properties {
         public static string testForecast {
             get {
                 return ResourceManager.GetString("testForecast", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Unpublished に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string TwitterAPI {
-            get {
-                return ResourceManager.GetString("TwitterAPI", resourceCulture);
             }
         }
     }

@@ -25,6 +25,12 @@ namespace MisakiEQ
         List<string> Logdata = new();
 
 
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")] // この行を追加
+        private static extern bool AllocConsole();                 // この行を追加  
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")] // この行を追加
+        private static extern bool FreeConsole();                 // この行を追加  
+
         public event EventHandler<string>? LogUpdateHandler;
 
         /// <summary>
@@ -86,6 +92,9 @@ namespace MisakiEQ
             //AppDomain.CurrentDomain.
             // ログファイルを生成する
             CreateLogfile(new FileInfo(logFilePath));
+#if DEBUG
+            AllocConsole();
+#endif
         }
 
         /*static void FirstChanceException(object? sender, FirstChanceExceptionEventArgs e)
@@ -244,20 +253,31 @@ namespace MisakiEQ
             {
                 case LogLevel.DEBUG:
                     col = "$D";
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.Black;
                     break;
                 case LogLevel.INFO:
                     col = "$I";
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.BackgroundColor = ConsoleColor.Black;
                     break;
                 case LogLevel.WARN:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.BackgroundColor = ConsoleColor.Black;
                     col = "$W";
                     break;
                 case LogLevel.ERROR:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.BackgroundColor = ConsoleColor.Black;
                     col = "$E";
                     break;
                 case LogLevel.FATAL:
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.Red;
                     col = "$F";
                     break;
             }
+            Console.WriteLine(logs);
             string addtext = "";
             lock (lockListObj)
             {

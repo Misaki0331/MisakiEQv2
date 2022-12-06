@@ -49,7 +49,7 @@ namespace MisakiEQ.Lib.Twitter
         private string AccessTokenSecret = "";
         public async Task<string> GetAuthURL()
         {
-            var keys = Properties.Resources.TwitterAPI.Split('\n');
+            var keys = Resources.API.API.TwitterAPI.Split('\n');
             keys[0] = keys[0].Replace("\r", "");
             AuthClient = new TwitterClient(keys[0], keys[1]);
             AuthReq = await AuthClient.Auth.RequestAuthenticationUrlAsync();
@@ -86,7 +86,7 @@ namespace MisakiEQ.Lib.Twitter
         {
             try
             {
-                var keys = Properties.Resources.TwitterAPI.Split('\n');
+                var keys = Resources.API.API.TwitterAPI.Split('\n');
                 keys[0] = keys[0].Replace("\r", "");
                 client = new TwitterClient(keys[0], keys[1], token, secret);
                 UserInfo = await client.Users.GetAuthenticatedUserAsync();

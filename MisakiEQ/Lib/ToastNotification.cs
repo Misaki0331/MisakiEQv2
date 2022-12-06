@@ -26,16 +26,16 @@ namespace MisakiEQ.Lib
                 if (percent > 1) percent = 1;
                 Percent = percent;
             }
-            public ToastProgress(double percent,string status)
+            public ToastProgress(double percent, string status)
             {
                 Initial(status, percent);
             }
-            public ToastProgress(string title, double percent,string status)
+            public ToastProgress(string title, double percent, string status)
             {
                 Title = title;
                 Initial(status, percent);
             }
-            public ToastProgress(string title, double percent, string status,string valueOverride)
+            public ToastProgress(string title, double percent, string status, string valueOverride)
             {
                 ValueString = valueOverride;
                 Title = title;
@@ -47,7 +47,7 @@ namespace MisakiEQ.Lib
                 Initial(status, percent);
             }
             public double Percent;
-            public string? Title=null;
+            public string? Title = null;
             public string Status = "";
             public string? ValueString = null;
             public bool IsIndeterminate = false;
@@ -55,76 +55,93 @@ namespace MisakiEQ.Lib
         }
         public static void InitNotify(NotifyIcon notify)
         {
-            OldNotify=notify;
+            OldNotify = notify;
             Log.Instance.Debug("フォームの通知欄を読み込みました。");
         }
-        public static async void PostNotification(string title, string? index=null,string? attribution=null,DateTime? customTime=null,ToastProgress? progress=null,Image? HeroImage=null, Image? IndexImage=null, Image? Icon=null)
+        public static async void PostNotification(string title, string? index = null, string? attribution = null, DateTime? customTime = null, ToastProgress? progress = null, Image? HeroImage = null, Image? IndexImage = null, Image? Icon = null)
         {
-            if (IsNewNotification)
-            {
-                await Task.Run(async () =>
-                {
+            var notify = IsNewNotification ? NotificationDisplayMode.WPFToast : NotificationDisplayMode.WinFormToast;
 
-                    using (await NotificationLock.LockAsync())
+
+            switch (notify)
+            {
+                case NotificationDisplayMode.WPFToast:
+
+                    await Task.Run(async () =>
                     {
 
-                        List<string> TempFiles = new();
-                        var a = new ToastContentBuilder()
-                        .AddText(title);
-                        if (index != null) a.AddText(index);
-                        if (attribution != null) a.AddAttributionText(attribution);
-                        if (progress != null) a.AddProgressBar(progress.Title, progress.Percent, progress.IsIndeterminate, progress.ValueString, progress.Status);
-                        if (customTime != null) a.AddCustomTimeStamp((DateTime)customTime);
-                        if (HeroImage != null)
+                        using (await NotificationLock.LockAsync())
                         {
-                            string name = Path.GetTempFileName();
-                            TempFiles.Add(name);
-                            HeroImage.Save(name);
-                            Uri uri = new(name);
-                            a.AddHeroImage(uri);
-                        }
-                        if (IndexImage != null)
-                        {
-                            string name = Path.GetTempFileName();
-                            TempFiles.Add(name);
-                            IndexImage.Save(name);
-                            Uri uri = new(name);
-                            a.AddInlineImage(uri);
-                        }
 
-                        if (Icon != null)
-                        {
-                            string name = Path.GetTempFileName();
-                            TempFiles.Add(name);
-                            Icon.Save(name);
-                            Uri uri = new(name);
-                            a.AddAppLogoOverride(uri);
+                            List<string> TempFiles = new();
+                            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763))
+                            {
+                                var a = new ToastContentBuilder()
+                                .AddText(title);
+                                if (index != null) a.AddText(index);
+                                if (attribution != null) a.AddAttributionText(attribution);
+                                if (progress != null) a.AddProgressBar(progress.Title, progress.Percent, progress.IsIndeterminate, progress.ValueString, progress.Status);
+                                if (customTime != null) a.AddCustomTimeStamp((DateTime)customTime);
+                                if (HeroImage != null)
+                                {
+                                    string name = Path.GetTempFileName();
+                                    TempFiles.Add(name);
+                                    HeroImage.Save(name);
+                                    Uri uri = new(name);
+                                    a.AddHeroImage(uri);
+                                }
+                                if (IndexImage != null)
+                                {
+                                    string name = Path.GetTempFileName();
+                                    TempFiles.Add(name);
+                                    IndexImage.Save(name);
+                                    Uri uri = new(name);
+                                    a.AddInlineImage(uri);
+                                }
+
+                                if (Icon != null)
+                                {
+                                    string name = Path.GetTempFileName();
+                                    TempFiles.Add(name);
+                                    Icon.Save(name);
+                                    Uri uri = new(name);
+                                    a.AddAppLogoOverride(uri);
+                                }
+                                a.Show();
+                                Log.Instance.Debug($"トースト送信 : {title}");
+                                Thread.Sleep(5000);
+                                for (int i = 0; i < TempFiles.Count; i++) File.Delete(TempFiles[i]);
+                                TempFiles.Clear();
+                            }
                         }
-                        a.Show();
-                        Log.Instance.Debug($"トースト送信 : {title}");
-                        Thread.Sleep(5000);
-                        for (int i = 0; i < TempFiles.Count; i++) File.Delete(TempFiles[i]);
-                        TempFiles.Clear();
-                    }
-                });
-            }
-            else
-            {
-                if (OldNotify != null)
-                {
-                    string a = "";
-                    if (index != null)
+                    });
+                    break;
+                case NotificationDisplayMode.WinFormToast:
+                    if (OldNotify != null)
                     {
-                        a = index;
-                        if (!string.IsNullOrWhiteSpace(attribution)) a = $"{attribution}\n{index}";
+                        string a = "";
+                        if (index != null)
+                        {
+                            a = index;
+                            if (!string.IsNullOrWhiteSpace(attribution)) a = $"{attribution}\n{index}";
+                        }
+                        OldNotify.ShowBalloonTip(3600000, title, a, ToolTipIcon.None);
                     }
-                    OldNotify.ShowBalloonTip(3600000,title,a,ToolTipIcon.None);
-                }
-                else
-                {
-                    Log.Instance.Error("Formの通知がnullです。");
-                }
+                    else
+                    {
+                        Log.Instance.Error("Formの通知がnullです。");
+                    }
+                    break;
+                case NotificationDisplayMode.Window:
+                    //ここにウィンドウモードの通知を書く
+                    break;
             }
+        }
+        public enum NotificationDisplayMode
+        {
+            WPFToast,
+            WinFormToast,
+            Window
         }
     }
 }

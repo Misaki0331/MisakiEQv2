@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
     <ApplicationIcon>main.ico</ApplicationIcon>
     <PackageIcon>logo.AppIcon.png</PackageIcon>
     <Configurations>Debug;Release;ADMIN</Configurations>
@@ -19,6 +19,7 @@
     <Company>水咲(みさき)</Company>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseWPF>False</UseWPF>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ADMIN|AnyCPU'">
@@ -73,6 +74,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Version.resx</DependentUpon>
     </Compile>
+    <Compile Update="Resources\API\API.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>API.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -91,6 +97,10 @@
     <EmbeddedResource Update="Properties\Version.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>version.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\API\API.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>API.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
