@@ -88,6 +88,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                         c.Reverse();
                         d.Reverse();
                     }
+                    if (SettingWindow.Check4Mode) d.Reverse();
                     if (SettingWindow.Check2Mode) (d, c) = (c, d);
                     for (int i = 0; i < c.Count; i++)tasks.Add(Lib.KyoshinAPI.KyoshinObervation.GetPoints(c[i]));
                     if(SettingWindow.Check1Mode) for (int i = 0; i < d.Count; i++) tasks.Add(Lib.KyoshinAPI.KyoshinObervation.GetPoints(d[i]));
@@ -96,50 +97,82 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
             await Task.WhenAll(tasks);
             int w = pictureBox1.Width;
             int h = pictureBox1.Height;
-            Log.Instance.Debug($"サーバー取得完了:{sw.Elapsed}");
+            if (w < 1) w = 1;
+            if (h < 1) h = 1;
             double WindowTopBottom = 0.05;
             var create = await Task.Run(() =>
             {
-                float sth = (h-(h*(float)WindowTopBottom / tasks.Count * 2)- (tasks.Count >= 6 ? 20 : 0)) / (tasks.Count);
+                float space =  (h * (float)WindowTopBottom > 20 ? h * (float)WindowTopBottom : 20) ;
+                float sth = (h-(h*(float)WindowTopBottom / tasks.Count * 2)- space * (tasks.Count>6?2:1) ) / (tasks.Count);
+                if (sth < 0) sth = 1;
                 Bitmap bitmap = new(w, h);
                 var g = Graphics.FromImage(bitmap);
-                g.FillRectangle(Brushes.Black, 0, 0, Width, Height);
+                g.FillRectangle(Brushes.Black, 0, 0, w,h);
+                using Font font1 = new("Arial", 10, FontStyle.Regular, GraphicsUnit.Point);
+                var rect1 = new RectangleF(0, (h * (float)WindowTopBottom / tasks.Count), w,space);
+                var stringFormat = new StringFormat()
+                {
+                    Alignment = StringAlignment.Near,
+                    LineAlignment = StringAlignment.Far
+                };
+                var stringname = "";
+                switch (SettingWindow.DisplayMode)
+                {
+                    case 0:
+                        stringname = "リアルタイム震度";
+                        break;
+                    case 1:
+                        stringname = "最大加速度 [PGA] (gal)";
+                        break;
+                    case 2:
+                        stringname = "最大速度 [PGV] (cm/s)";
+                        break;
+                    case 3:
+                        stringname = "最大変位 [PGD] (cm)";
+                        break;
+                    case 4:
+                        stringname = $"応答速度({(SettingWindow.Check2Mode ? "地中" : "地表")}) [PGV] (cm/s)";
+                        break;
+
+                }
+                stringname += $" {(SettingWindow.MaxValueMode?"観測最大地点":$"最寄り地点")}";
+                g.DrawString(stringname, font1, Brushes.White, rect1, stringFormat);
                 for (int i = 0; i < tasks.Count; i++)
                 {
                     var near = tasks[i].Result.NearPoint;
                     if (SettingWindow.MaxValueMode) near = tasks[i].Result.MaxPoint;
-                    using (Font font1 = new Font("Arial", 10, FontStyle.Regular, GraphicsUnit.Point))
+                    rect1 = new RectangleF(0, space + (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0), 40, sth);
+                    stringFormat = new StringFormat()
                     {
-                        var rect1 = new RectangleF(0, (h * (float)WindowTopBottom/tasks.Count) + i * sth + (i >= 6 ? 20 : 0), 40, sth);
-                        var stringFormat = new StringFormat()
+                        Alignment = StringAlignment.Far,
+                        LineAlignment = StringAlignment.Center
+                    };
+                    g.DrawString($"{tasks[i].Result.Graph.ShortTitle}:", font1, Brushes.White, rect1, stringFormat);
+                    rect1 = new RectangleF(40, space + (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0), 50, sth);
+                    stringFormat = new()
+                    {
+                        Alignment = StringAlignment.Far,
+                        LineAlignment = StringAlignment.Center
+                    };
+                    g.DrawString($"{near.Value.ToString(tasks[i].Result.Graph.Format)}", font1, Brushes.White, rect1, stringFormat);
+                    if (tasks.Count > 6)
+                    {
+                        stringFormat = new StringFormat()
                         {
-                            Alignment = StringAlignment.Far,
-                            LineAlignment = StringAlignment.Center
+                            Alignment = StringAlignment.Near,
+                            LineAlignment = StringAlignment.Far
                         };
-                        g.DrawString($"{tasks[i].Result.Graph.ShortTitle}:", font1, Brushes.White, rect1, stringFormat);
-                        //g.DrawRectangle(Pens.Yellow, rect1);
-                        rect1 = new RectangleF(40, (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? 20 : 0), 50, sth);
-                        stringFormat = new()
-                        {
-                            Alignment = StringAlignment.Far,
-                            LineAlignment = StringAlignment.Center
-                        };
-                        g.DrawString($"{near.Value.ToString(tasks[i].Result.Graph.Format)}", font1, Brushes.White, rect1, stringFormat);
-                        //g.DrawString($"999.99", font1, Brushes.White, rect1, stringFormat);
-                        //g.DrawRectangle(Pens.Yellow, rect1);
-                        double val = near.RawValue;
-                        if (val < tasks[i].Result.Graph.ColorOffset)
-                        {
-                            val = 0;
-                        }
-                        else
-                        {
-                            val = (val - tasks[i].Result.Graph.ColorOffset) / (1.0 - tasks[i].Result.Graph.ColorOffset);
-                        }
-                        g.FillRectangle(new SolidBrush(Color.FromArgb(16, 16, 16)), new RectangleF(40 + 50, (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? 20 : 0) + 1, bitmap.Width - (40 + 50), sth - 2));
+                        rect1 = new RectangleF(0, space + (h * (float)WindowTopBottom / tasks.Count) + 6 * sth, w, space); 
+                        stringname = $"応答速度({(SettingWindow.Check2Mode ? "地表" : "地中")}) [PGV] (cm/s)";
+                        stringname += $" {(SettingWindow.MaxValueMode ? "観測最大地点" : $"最寄り地点")}";
+                        g.DrawString(stringname, font1, Brushes.White, rect1, stringFormat);
 
-                        g.FillRectangle(new SolidBrush(near.PointColor), new RectangleF(40 + 50, (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? 20 : 0) + 1, (float)(val * (bitmap.Width - (40 + 50))), sth - 2));
                     }
+                    double val = near.RawValue;
+                    if (val < tasks[i].Result.Graph.ColorOffset) val = 0;
+                    else val = (val - tasks[i].Result.Graph.ColorOffset) / (1.0 - tasks[i].Result.Graph.ColorOffset);
+                    g.FillRectangle(new SolidBrush(Color.FromArgb(16, 16, 16)), new RectangleF(40 + 50, space+(h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0) + 1, bitmap.Width - (40 + 50), sth - 2));
+                    g.FillRectangle(new SolidBrush(near.PointColor), new RectangleF(40 + 50, space+(h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0) + 1, (float)(val * (bitmap.Width - (40 + 50))), sth - 2));
                 }
                 g.Dispose();
                 return bitmap;
@@ -148,7 +181,6 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
             pictureBox1.Image=create;
             if(old!=null)old.Dispose();
             sw.Stop();
-            Log.Instance.Debug($"全ての解析完了:{sw.Elapsed}");
         }
 
         private void KyoshinResponseGraph_FormClosed(object sender, FormClosedEventArgs e)

@@ -80,6 +80,14 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                     checkBox3.Visible = true;
                     checkBox3.Enabled = true;
                     checkBox3.Text = "表示順を反転する";
+                    checkBox4.Visible = true;
+                    checkBox4.Text = "下側の表示順のみを反転する";
+                    if (checkBox1.Checked) checkBox4.Enabled = true;
+                    else
+                    {
+                        checkBox4.Enabled = false;
+                        checkBox4.Checked = false;
+                    }
                     break;
             }
             switch (comboBox1.SelectedIndex)
@@ -90,11 +98,6 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                     checkBox3.Visible = false;
                     checkBox3.Enabled = false;
                     checkBox3.Checked = false;
-                    checkBox4.Visible = false;
-                    checkBox4.Enabled = false;
-                    checkBox4.Checked = false;
-                    break;
-                case 4:
                     checkBox4.Visible = false;
                     checkBox4.Enabled = false;
                     checkBox4.Checked = false;
