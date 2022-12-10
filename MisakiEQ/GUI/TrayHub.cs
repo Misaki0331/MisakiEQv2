@@ -20,7 +20,7 @@ namespace MisakiEQ.GUI
         internal readonly Config ConfigData = new();
         Config_Menu? Config = null;
         ExApp.KyoshinWindow? Kyoshin = null;
-        ExApp.KyoshinResponseGraph? KyoshinResponseGraph = null;
+        ExApp.KyoshinGraphWindow.Main? KyoshinResponseGraph = null;
         readonly EEW_Compact EEW_Compact = new();
         readonly ExApp.UserESTWindow ESTWindow = new();
         readonly Stopwatch apptimer = new();
