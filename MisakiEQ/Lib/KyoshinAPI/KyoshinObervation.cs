@@ -98,17 +98,29 @@ namespace MisakiEQ.Lib.KyoshinAPI
                     case Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType.rsp2000_b:
                     case Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType.rsp4000_s:
                     case Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType.rsp4000_b:
+                    case Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType.vcmap_s:
+                    case Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType.vcmap_b:
                         re.Graph.ColorOffset = 0.2;
                         re.Graph.Format = "0.00";
+                        re.Graph.MaxValue = 100;
+                        break;
+                    case Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType.acmap_s:
+                    case Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType.acmap_b:
+                        re.Graph.ColorOffset = 0.2;
+                        re.Graph.Format = "0.0";
+                        re.Graph.MaxValue = 1000;
                         break;
                     case Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType.dcmap_s:
                     case Background.API.KyoshinAPI.KyoshinAPI.KyoshinImageType.dcmap_b:
                         re.Graph.ColorOffset = 0.4;
                         re.Graph.Format = "0.000";
+                        re.Graph.MaxValue = 10;
                         break;
+
                     default:
                         re.Graph.ColorOffset = 0;
                         re.Graph.Format = "0.00";
+                        re.Graph.MaxValue = 7;
                         break;
                 }
                 double toNearDistance = double.PositiveInfinity;
@@ -216,6 +228,8 @@ namespace MisakiEQ.Lib.KyoshinAPI
             public double ColorOffset = 0;
             /// <summary>数値フォーマット</summary>
             public string Format = "";
+            /// <summary>最大値</summary>
+            public double MaxValue = double.NaN;
         }
         public class AnalysisPoint
         {

@@ -123,7 +123,7 @@ namespace MisakiEQ.Lib
                         if (index != null)
                         {
                             a = index;
-                            if (!string.IsNullOrWhiteSpace(attribution)) a = $"{attribution}\n{index}";
+                            //if (!string.IsNullOrWhiteSpace(attribution)) a = $"{attribution}\n{index}";
                         }
                         OldNotify.ShowBalloonTip(3600000, title, a, ToolTipIcon.None);
                     }

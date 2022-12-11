@@ -152,7 +152,8 @@ namespace MisakiEQ.GUI
                 {
                     if (((int)ConfigData.NoticeNationWide <= (int)e.eew.EarthQuake.MaxIntensity ||
                     (ConfigData.NoticeNationWide == Struct.ConfigBox.Notification_EEW_Nationwide.Enums.WarnOnly && e.eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning) ||
-                    (int)ConfigData.NoticeArea <= (int)e.eew.UserInfo.LocalIntensity))
+                    (int)ConfigData.NoticeArea <= (int)e.eew.UserInfo.LocalIntensity)||
+                    ConfigData.NoticeNationWide==Struct.ConfigBox.Notification_EEW_Nationwide.Enums.ALL)
                 {
                     Toast.Post(e.eew);
                         /*

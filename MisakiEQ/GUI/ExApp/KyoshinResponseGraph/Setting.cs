@@ -28,10 +28,12 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
         public bool Check3Mode { get; private set; }
         public bool Check4Mode { get; private set; }
         public bool MaxValueMode { get; private set; }
+        public bool LinearMode { get; private set; }
+
         public int WindowX { get; set; }
         public int WindowY { get; set; }
-        public int WindowW { get; set; }
-        public int WindowH { get; set; }
+        public int WindowW { get; set; } = 350;
+        public int WindowH { get; set; } = 140;
         public bool NeedMove { get; set; }
         public int CurrentNum { get; set; }
 
@@ -44,6 +46,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                 var writer=new StreamWriter($"{path}/{(int)numericUpDown1.Value}.cfg");
                 writer.WriteLine($"Title={textBox1.Text.Replace("%","%%").Replace("=","%3D")}");
                 writer.WriteLine($"DisplayMode={comboBox1.SelectedIndex}");
+                writer.WriteLine($"Linear={(checkBox6.Checked ? 1 : 0)}");
                 writer.WriteLine($"MaxValue={(checkBox5.Checked ? 1 : 0)}");
                 writer.WriteLine($"Check1={(checkBox1.Checked?1:0)}");
                 writer.WriteLine($"Check2={(checkBox2.Checked?1:0)}");
@@ -66,6 +69,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
         {
             checkBox1.Enabled = true;
             checkBox2.Enabled = true;
+            checkBox6.Enabled = true;
             var name = "";
             switch (comboBox1.SelectedIndex)
             {
@@ -110,6 +114,15 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
             switch (comboBox1.SelectedIndex)
             {
                 case 0:
+                    checkBox6.Enabled = false;
+                    checkBox6.Checked = false;
+                    checkBox3.Visible = false;
+                    checkBox3.Enabled = false;
+                    checkBox3.Checked = false;
+                    checkBox4.Visible = false;
+                    checkBox4.Enabled = false;
+                    checkBox4.Checked = false;
+                    break;
                 case 1:
                 case 2:
                 case 3:
@@ -131,6 +144,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
             Check3Mode = checkBox3.Checked;
             Check4Mode = checkBox4.Checked;
             MaxValueMode = checkBox5.Checked;
+            LinearMode = checkBox6.Checked;
         }
 
         private void ReadCommand_Click(object sender, EventArgs e)
@@ -151,10 +165,11 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                     checkBox3.Checked = false;
                     checkBox4.Checked = false;
                     checkBox5.Checked = false;
+                    checkBox6.Checked = false;
                     WindowX = 100;
                     WindowY = 100;
-                    WindowW = 140;
-                    WindowH = 60;
+                    WindowW = 350;
+                    WindowH = 140;
                     var reader = new StreamReader($"{path}/{ConfigNum}.cfg");
                     while (!reader.EndOfStream)
                     {
@@ -186,6 +201,9 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                             case "MaxValue":
                                 if (cmd[1] == "1") checkBox5.Checked = true;
                                 break;
+                            case "Linear":
+                                if (cmd[1] == "1") checkBox6.Checked = true;
+                                break;
                             case "WindowX":
                                 if(int.TryParse(cmd[1], out int data))WindowX=data;
                                 NeedMove = true;
@@ -211,17 +229,18 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                 }
                 else
                 {
-                    textBox1.Text = "リアルタイム震度 <VALUE1> / <VALUE2>";
+                    textBox1.Text = "<NAME>(<POSITION>) <VALUE1><UNIT> / <VALUE2><UNIT>";
                     comboBox1.SelectedIndex = 0;
                     checkBox1.Checked = true;
                     checkBox2.Checked = false;
                     checkBox3.Checked = false;
                     checkBox4.Checked = false;
                     checkBox5.Checked = false;
+                    checkBox6.Checked = false;
                     WindowX = 100;
                     WindowY = 100;
-                    WindowW = 140;
-                    WindowH = 60;
+                    WindowW = 350;
+                    WindowH = 140;
                 }
             }
             catch (Exception ex)

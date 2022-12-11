@@ -111,6 +111,9 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                 if (h < 1) h = 1;
                 double WindowTopBottom = 0.05;
                 List<string> taskval = new();
+                string name = "";
+                string unitname = "";
+                string position = "";
                 var create = await Task.Run(() =>
                 {
                     float space = (h * (float)WindowTopBottom > 20 ? h * (float)WindowTopBottom : 20);
@@ -130,23 +133,32 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                     switch (SettingWindow.DisplayMode)
                     {
                         case 0:
-                            stringname = "リアルタイム震度";
+                            name = "リアルタイム震度";
                             break;
                         case 1:
-                            stringname = "最大加速度 [PGA] (gal)";
+                            name = "最大加速度";
+                            stringname = $"({(SettingWindow.Check2Mode ? "地中" : "地表")}) [PGA]";
+                            unitname = "gal";
                             break;
                         case 2:
-                            stringname = "最大速度 [PGV] (cm/s)";
+                            name = "最大速度";
+                            stringname = $"({(SettingWindow.Check2Mode ? "地中" : "地表")}) [PGV]";
+                            unitname = "cm/s";
                             break;
                         case 3:
-                            stringname = "最大変位 [PGD] (cm)";
+                            name = "最大変位";
+                            stringname = $"({(SettingWindow.Check2Mode ? "地中" : "地表")}) [PGD]";
+                            unitname = "cm";
                             break;
                         case 4:
-                            stringname = $"応答速度({(SettingWindow.Check2Mode ? "地中" : "地表")}) [PGV] (cm/s)";
+                            name = "応答速度";
+                            stringname = $"({(SettingWindow.Check2Mode ? "地中" : "地表")}) [PGV]";
+                            unitname = "cm/s";
                             break;
 
                     }
-                    stringname += $" {(SettingWindow.MaxValueMode ? "観測最大地点" : $"最寄り地点")}";
+                    position = $"{(SettingWindow.MaxValueMode ? "観測最大地点" : $"最寄り地点")}"; ; 
+                    stringname = $"{name}{stringname} {(unitname!=string.Empty?$"({unitname})":"")} {position}";
                     g.DrawString(stringname, font1, Brushes.White, rect1, stringFormat);
                     for (int i = 0; i < tasks.Count; i++)
                     {
@@ -175,14 +187,21 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                                 LineAlignment = StringAlignment.Far
                             };
                             rect1 = new RectangleF(0, space + (h * (float)WindowTopBottom / tasks.Count) + 6 * sth, w, space);
-                            stringname = $"応答速度({(SettingWindow.Check2Mode ? "地表" : "地中")}) [PGV] (cm/s)";
-                            stringname += $" {(SettingWindow.MaxValueMode ? "観測最大地点" : $"最寄り地点")}";
+                            stringname = $"{name}({(SettingWindow.Check2Mode ? "地表" : "地中")}) [PGV] ({unitname}) {position}";
                             g.DrawString(stringname, font1, Brushes.White, rect1, stringFormat);
 
                         }
                         double val = near.RawValue;
-                        if (val < tasks[i].Result.Graph.ColorOffset) val = 0;
-                        else val = (val - tasks[i].Result.Graph.ColorOffset) / (1.0 - tasks[i].Result.Graph.ColorOffset);
+                        if (SettingWindow.LinearMode)
+                        {
+                            val = near.Value / tasks[i].Result.Graph.MaxValue;
+                        }
+                        else
+                        {
+                            if (val < tasks[i].Result.Graph.ColorOffset) val = 0;
+                            else val = (val - tasks[i].Result.Graph.ColorOffset) / (1.0 - tasks[i].Result.Graph.ColorOffset);
+                        }
+                        if (val < 0) val = 0;
                         g.FillRectangle(new SolidBrush(Color.FromArgb(16, 16, 16)), new RectangleF(40 + 50, space + (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0) + 1, bitmap.Width - (40 + 50), sth - 2));
                         g.FillRectangle(new SolidBrush(near.PointColor), new RectangleF(40 + 50, space + (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0) + 1, (float)(val * (bitmap.Width - (40 + 50))), sth - 2));
                     }
@@ -196,6 +215,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                     {
                         windowText = windowText.Replace($"<VALUE{i + 1}>", taskval[i]);
                     }
+                    windowText = windowText.Replace($"<NAME>", name).Replace("<UNIT>",unitname).Replace("<POSITION>",position);
                     if (InvokeRequired)
                         Invoke(() =>
                         {
