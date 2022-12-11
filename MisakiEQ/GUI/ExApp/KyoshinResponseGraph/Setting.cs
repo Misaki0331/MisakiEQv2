@@ -12,11 +12,14 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
 {
     public partial class Setting : Form
     {
-        public Setting()
+        public Setting(int ConfigNum=-1)
         {
             InitializeComponent();
             comboBox1.SelectedIndex = 0;
             CheckBoxTextChanging("", EventArgs.Empty);
+            ReadConfig(ConfigNum);
+            CurrentNum = ConfigNum;
+            if (ConfigNum >= 0 && ConfigNum <= 9999) numericUpDown1.Value = ConfigNum;
         }
         public string WindowName { get; private set; } = "";
         public int DisplayMode { get; private set; }
@@ -25,6 +28,12 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
         public bool Check3Mode { get; private set; }
         public bool Check4Mode { get; private set; }
         public bool MaxValueMode { get; private set; }
+        public int WindowX { get; set; }
+        public int WindowY { get; set; }
+        public int WindowW { get; set; }
+        public int WindowH { get; set; }
+        public bool NeedMove { get; set; }
+        public int CurrentNum { get; set; }
 
         private void WriteCommand_Click(object sender, EventArgs e)
         {
@@ -35,10 +44,18 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                 var writer=new StreamWriter($"{path}/{(int)numericUpDown1.Value}.cfg");
                 writer.WriteLine($"Title={textBox1.Text.Replace("%","%%").Replace("=","%3D")}");
                 writer.WriteLine($"DisplayMode={comboBox1.SelectedIndex}");
+                writer.WriteLine($"MaxValue={(checkBox5.Checked ? 1 : 0)}");
                 writer.WriteLine($"Check1={(checkBox1.Checked?1:0)}");
                 writer.WriteLine($"Check2={(checkBox2.Checked?1:0)}");
                 writer.WriteLine($"Check3={(checkBox3.Checked?1:0)}");
                 writer.WriteLine($"Check4={(checkBox4.Checked?1:0)}");
+                writer.WriteLine($"WindowX={WindowX}");
+                writer.WriteLine($"WindowY={WindowY}");
+                writer.WriteLine($"WindowW={WindowW}");
+                writer.WriteLine($"WindowH={WindowH}");
+                writer.Close();
+                CurrentNum = (int)numericUpDown1.Value;
+                Log.Instance.Debug($"No.{(int)numericUpDown1.Value}のメモリを書き込みました。");
             }
             catch (Exception ex)
             {
@@ -55,7 +72,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                 case 0:
                     name = "リアルタイム震度";
                     checkBox3.Text = "予測震度(EEW)を表示";
-                    checkBox3.Enabled = true;
+                    /*checkBox3.Enabled = true;
                     checkBox3.Visible = true;
                     checkBox4.Visible = true;
                     checkBox4.Text = "リアルタイム震度より予測震度を優先的に表示";
@@ -64,7 +81,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                     {
                         checkBox4.Enabled = false;
                         checkBox4.Checked = false;
-                    }
+                    }*/
                     break;
                 case 1:
                     name = "最大加速度";
@@ -92,6 +109,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
             }
             switch (comboBox1.SelectedIndex)
             {
+                case 0:
                 case 1:
                 case 2:
                 case 3:
@@ -117,18 +135,27 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
 
         private void ReadCommand_Click(object sender, EventArgs e)
         {
+            ReadConfig((int)numericUpDown1.Value);
+        }
+        void ReadConfig(int ConfigNum)
+        {
             var path = "Config/Graph";
             try
             {
-                textBox1.Text = "";
-                comboBox1.SelectedIndex = 0;
-                checkBox1.Checked = false;
-                checkBox2.Checked = false;
-                checkBox3.Checked = false;
-                checkBox4.Checked = false;
-                if (File.Exists($"{path}/{(int)numericUpDown1.Value}.cfg"))
+                if (ConfigNum >= 0 && ConfigNum <= 9999 && File.Exists($"{path}/{ConfigNum}.cfg"))
                 {
-                    var reader = new StreamReader($"{path}/{(int)numericUpDown1.Value}.cfg");
+                    textBox1.Text = "";
+                    comboBox1.SelectedIndex = 0;
+                    checkBox1.Checked = false;
+                    checkBox2.Checked = false;
+                    checkBox3.Checked = false;
+                    checkBox4.Checked = false;
+                    checkBox5.Checked = false;
+                    WindowX = 100;
+                    WindowY = 100;
+                    WindowW = 140;
+                    WindowH = 60;
+                    var reader = new StreamReader($"{path}/{ConfigNum}.cfg");
                     while (!reader.EndOfStream)
                     {
                         var read = reader.ReadLine();
@@ -138,10 +165,10 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                         switch (cmd[0])
                         {
                             case "Title":
-                                textBox1.Text = cmd[1];
+                                textBox1.Text = cmd[1].Replace("%3D","=").Replace("%%","%");
                                 break;
                             case "DisplayMode":
-                                if(int.TryParse(cmd[1], out int c))
+                                if (int.TryParse(cmd[1], out int c))
                                     comboBox1.SelectedIndex = c;
                                 break;
                             case "Check1":
@@ -156,12 +183,48 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                             case "Check4":
                                 if (cmd[1] == "1") checkBox4.Checked = true;
                                 break;
+                            case "MaxValue":
+                                if (cmd[1] == "1") checkBox5.Checked = true;
+                                break;
+                            case "WindowX":
+                                if(int.TryParse(cmd[1], out int data))WindowX=data;
+                                NeedMove = true;
+                                break;
+                            case "WindowY":
+                                if (int.TryParse(cmd[1], out data)) WindowY = data;
+                                NeedMove = true;
+                                break;
+                            case "WindowW":
+                                if (int.TryParse(cmd[1], out data)) WindowW = data;
+                                NeedMove = true;
+                                break;
+                            case "WindowH":
+                                if (int.TryParse(cmd[1], out data)) WindowH = data;
+                                NeedMove = true;
+                                break;
                         }
 
                     }
+                    CurrentNum = ConfigNum;
+                    reader.Close();
+                    Log.Instance.Debug($"No.{ConfigNum}のメモリを読み込みました。");
+                }
+                else
+                {
+                    textBox1.Text = "リアルタイム震度 <VALUE1> / <VALUE2>";
+                    comboBox1.SelectedIndex = 0;
+                    checkBox1.Checked = true;
+                    checkBox2.Checked = false;
+                    checkBox3.Checked = false;
+                    checkBox4.Checked = false;
+                    checkBox5.Checked = false;
+                    WindowX = 100;
+                    WindowY = 100;
+                    WindowW = 140;
+                    WindowH = 60;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Instance.Error(ex);
             }
@@ -179,6 +242,11 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                 e.Cancel = true;
                 Hide();
             }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            WindowName = textBox1.Text;
         }
     }
 }

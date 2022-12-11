@@ -20,7 +20,7 @@ namespace MisakiEQ.GUI
         internal readonly Config ConfigData = new();
         Config_Menu? Config = null;
         ExApp.KyoshinWindow? Kyoshin = null;
-        ExApp.KyoshinGraphWindow.Main? KyoshinResponseGraph = null;
+        List<ExApp.KyoshinGraphWindow.Main> KyoshinResponseGraph = new();
         readonly EEW_Compact EEW_Compact = new();
         readonly ExApp.UserESTWindow ESTWindow = new();
         readonly Stopwatch apptimer = new();
@@ -129,11 +129,11 @@ namespace MisakiEQ.GUI
             EEW_Compact.SetInfomation(Background.APIs.GetInstance().EEW.GetData());
             EEW_Compact.Activate();
         }
-        private void EventEEW(object? sender, Background.API.EEWEventArgs e)
+        private async void EventEEW(object? sender, Background.API.EEWEventArgs e)
         {
             try
             {
-                    Log.Instance.Debug("EEWイベント受信");
+                Log.Instance.Debug("EEWイベント受信");
                 if (e.eew == null) return;
                 double distance = Struct.EEW.GetDistance(e.eew, new(Background.APIs.GetInstance().KyoshinAPI.Config.UserLong, Background.APIs.GetInstance().KyoshinAPI.Config.UserLat));
                 e.eew.UserInfo.ArrivalTime = e.eew.EarthQuake.OriginTime.AddSeconds(distance / 4.2);
@@ -141,7 +141,8 @@ namespace MisakiEQ.GUI
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EEWPost(e.eew);
 #endif
-                
+                e.eew.UserInfo.LocalIntensity = await Background.API.KyoshinAPI.KyoshinAPI.GetUserIntensity();
+                e.eew.UserInfo.IntensityRaw = await Background.API.KyoshinAPI.KyoshinAPI.GetUserRawIntensity();
                 Funcs.EventLog.EEW(e.eew);
                 Log.Instance.Debug($"イベントログ書き込み完了");
                 Funcs.DiscordRPC.PostEEW(e.eew);
@@ -292,13 +293,46 @@ namespace MisakiEQ.GUI
             }
             ESTWindow.Activate();
         }
-
+        public void KyoshinResponseGraphRelease()
+        {
+            for(int i = KyoshinResponseGraph.Count - 1; i >= 0; i--)
+            {
+                if (KyoshinResponseGraph[i].IsDisposed)
+                {
+                    KyoshinResponseGraph.RemoveAt(i);
+                    Log.Instance.Debug($"グラフウィンドウ#{i+1}を削除しました。");
+                }
+            }
+        }
+        public ExApp.KyoshinGraphWindow.Main KyoshinResponseGraphCreate(int value=-1)
+        {
+            KyoshinResponseGraphRelease();
+            if (KyoshinResponseGraph.Count > 0 && (value < 0 || value > 9999))
+            {
+                value = KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].ConfigNumber+1;
+                if (value > 9999) value = -1;
+            }
+            var app = new ExApp.KyoshinGraphWindow.Main(value);
+            KyoshinResponseGraph.Add(app);
+            KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].Show();
+            KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].Activate();
+            Log.Instance.Debug($"グラフウィンドウ#{KyoshinResponseGraph.Count}を作成しました。");
+            return app;
+        }
         private void 速度応答グラフToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
-            if (KyoshinResponseGraph == null || KyoshinResponseGraph.IsDisposed) KyoshinResponseGraph = new();
-            KyoshinResponseGraph.Show();
-            KyoshinResponseGraph.Activate();
+            KyoshinResponseGraphRelease();
+            if (KyoshinResponseGraph.Count == 0)
+            {
+                var window = KyoshinResponseGraphCreate(0);
+                window.Show();
+                window.Activate();
+            }
+            else
+            {
+                KyoshinResponseGraph[KyoshinResponseGraph.Count-1].Show();
+                KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].Activate();
+            }
         }
         LogViewerWindow? LogViewer = null;
         private void 実行ログToolStripMenuItem_Click(object sender, EventArgs e)

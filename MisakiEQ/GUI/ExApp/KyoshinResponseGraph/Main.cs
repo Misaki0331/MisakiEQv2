@@ -13,18 +13,26 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
 {
     public partial class Main : Form
     {
-        public Main()
+        public Main(int ConfigNum=-1)
         {
+            SettingWindow = new(ConfigNum);
             InitializeComponent();
             Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin += UpdateImage;
             Icon = Properties.Resources.Logo_MainIcon;
+            if (SettingWindow.NeedMove)
+            {
+                SettingWindow.NeedMove = false;
+                Size = new(SettingWindow.WindowW, SettingWindow.WindowH);
+                StartPosition = FormStartPosition.Manual;
+                Location = new(SettingWindow.WindowX, SettingWindow.WindowY);
+            }
         }
+        Setting SettingWindow;
         private async void UpdateImage(object? sender, EventArgs args)
         {
             Stopwatch sw = new();
             sw.Start();
             List<Task<Lib.KyoshinAPI.KyoshinObervation.AnalysisResult>> tasks = new();
-            List<string> taskstr = new();
             switch (SettingWindow.DisplayMode)
             {
                 //リアルタイム震度
@@ -95,107 +103,162 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                     break;
             }
             await Task.WhenAll(tasks);
-            int w = pictureBox1.Width;
-            int h = pictureBox1.Height;
-            if (w < 1) w = 1;
-            if (h < 1) h = 1;
-            double WindowTopBottom = 0.05;
-            var create = await Task.Run(() =>
+            try
             {
-                float space =  (h * (float)WindowTopBottom > 20 ? h * (float)WindowTopBottom : 20) ;
-                float sth = (h-(h*(float)WindowTopBottom / tasks.Count * 2)- space * (tasks.Count>6?2:1) ) / (tasks.Count);
-                if (sth < 0) sth = 1;
-                Bitmap bitmap = new(w, h);
-                var g = Graphics.FromImage(bitmap);
-                g.FillRectangle(Brushes.Black, 0, 0, w,h);
-                using Font font1 = new("Arial", 10, FontStyle.Regular, GraphicsUnit.Point);
-                var rect1 = new RectangleF(0, (h * (float)WindowTopBottom / tasks.Count), w,space);
-                var stringFormat = new StringFormat()
+                int w = pictureBox1.Width;
+                int h = pictureBox1.Height;
+                if (w < 1) w = 1;
+                if (h < 1) h = 1;
+                double WindowTopBottom = 0.05;
+                List<string> taskval = new();
+                var create = await Task.Run(() =>
                 {
-                    Alignment = StringAlignment.Near,
-                    LineAlignment = StringAlignment.Far
-                };
-                var stringname = "";
-                switch (SettingWindow.DisplayMode)
-                {
-                    case 0:
-                        stringname = "リアルタイム震度";
-                        break;
-                    case 1:
-                        stringname = "最大加速度 [PGA] (gal)";
-                        break;
-                    case 2:
-                        stringname = "最大速度 [PGV] (cm/s)";
-                        break;
-                    case 3:
-                        stringname = "最大変位 [PGD] (cm)";
-                        break;
-                    case 4:
-                        stringname = $"応答速度({(SettingWindow.Check2Mode ? "地中" : "地表")}) [PGV] (cm/s)";
-                        break;
-
-                }
-                stringname += $" {(SettingWindow.MaxValueMode?"観測最大地点":$"最寄り地点")}";
-                g.DrawString(stringname, font1, Brushes.White, rect1, stringFormat);
-                for (int i = 0; i < tasks.Count; i++)
-                {
-                    var near = tasks[i].Result.NearPoint;
-                    if (SettingWindow.MaxValueMode) near = tasks[i].Result.MaxPoint;
-                    rect1 = new RectangleF(0, space + (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0), 40, sth);
-                    stringFormat = new StringFormat()
+                    float space = (h * (float)WindowTopBottom > 20 ? h * (float)WindowTopBottom : 20);
+                    float sth = (h - (h * (float)WindowTopBottom / tasks.Count * 2) - space * (tasks.Count > 6 ? 2 : 1)) / (tasks.Count);
+                    if (sth < 0) sth = 1;
+                    Bitmap bitmap = new(w, h);
+                    var g = Graphics.FromImage(bitmap);
+                    g.FillRectangle(Brushes.Black, 0, 0, w, h);
+                    using Font font1 = new("Arial", 10, FontStyle.Regular, GraphicsUnit.Point);
+                    var rect1 = new RectangleF(0, (h * (float)WindowTopBottom / tasks.Count), w, space);
+                    var stringFormat = new StringFormat()
                     {
-                        Alignment = StringAlignment.Far,
-                        LineAlignment = StringAlignment.Center
+                        Alignment = StringAlignment.Near,
+                        LineAlignment = StringAlignment.Far
                     };
-                    g.DrawString($"{tasks[i].Result.Graph.ShortTitle}:", font1, Brushes.White, rect1, stringFormat);
-                    rect1 = new RectangleF(40, space + (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0), 50, sth);
-                    stringFormat = new()
+                    var stringname = "";
+                    switch (SettingWindow.DisplayMode)
                     {
-                        Alignment = StringAlignment.Far,
-                        LineAlignment = StringAlignment.Center
-                    };
-                    g.DrawString($"{near.Value.ToString(tasks[i].Result.Graph.Format)}", font1, Brushes.White, rect1, stringFormat);
-                    if (tasks.Count > 6)
-                    {
-                        stringFormat = new StringFormat()
-                        {
-                            Alignment = StringAlignment.Near,
-                            LineAlignment = StringAlignment.Far
-                        };
-                        rect1 = new RectangleF(0, space + (h * (float)WindowTopBottom / tasks.Count) + 6 * sth, w, space); 
-                        stringname = $"応答速度({(SettingWindow.Check2Mode ? "地表" : "地中")}) [PGV] (cm/s)";
-                        stringname += $" {(SettingWindow.MaxValueMode ? "観測最大地点" : $"最寄り地点")}";
-                        g.DrawString(stringname, font1, Brushes.White, rect1, stringFormat);
+                        case 0:
+                            stringname = "リアルタイム震度";
+                            break;
+                        case 1:
+                            stringname = "最大加速度 [PGA] (gal)";
+                            break;
+                        case 2:
+                            stringname = "最大速度 [PGV] (cm/s)";
+                            break;
+                        case 3:
+                            stringname = "最大変位 [PGD] (cm)";
+                            break;
+                        case 4:
+                            stringname = $"応答速度({(SettingWindow.Check2Mode ? "地中" : "地表")}) [PGV] (cm/s)";
+                            break;
 
                     }
-                    double val = near.RawValue;
-                    if (val < tasks[i].Result.Graph.ColorOffset) val = 0;
-                    else val = (val - tasks[i].Result.Graph.ColorOffset) / (1.0 - tasks[i].Result.Graph.ColorOffset);
-                    g.FillRectangle(new SolidBrush(Color.FromArgb(16, 16, 16)), new RectangleF(40 + 50, space+(h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0) + 1, bitmap.Width - (40 + 50), sth - 2));
-                    g.FillRectangle(new SolidBrush(near.PointColor), new RectangleF(40 + 50, space+(h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0) + 1, (float)(val * (bitmap.Width - (40 + 50))), sth - 2));
+                    stringname += $" {(SettingWindow.MaxValueMode ? "観測最大地点" : $"最寄り地点")}";
+                    g.DrawString(stringname, font1, Brushes.White, rect1, stringFormat);
+                    for (int i = 0; i < tasks.Count; i++)
+                    {
+                        var near = tasks[i].Result.NearPoint;
+                        if (SettingWindow.MaxValueMode) near = tasks[i].Result.MaxPoint;
+                        rect1 = new RectangleF(0, space + (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0), 40, sth);
+                        stringFormat = new StringFormat()
+                        {
+                            Alignment = StringAlignment.Far,
+                            LineAlignment = StringAlignment.Center
+                        };
+                        g.DrawString($"{tasks[i].Result.Graph.ShortTitle}:", font1, Brushes.White, rect1, stringFormat);
+                        rect1 = new RectangleF(40, space + (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0), 50, sth);
+                        stringFormat = new()
+                        {
+                            Alignment = StringAlignment.Far,
+                            LineAlignment = StringAlignment.Center
+                        };
+                        g.DrawString($"{near.Value.ToString(tasks[i].Result.Graph.Format)}", font1, Brushes.White, rect1, stringFormat);
+                        taskval.Add($"{near.Value.ToString(tasks[i].Result.Graph.Format)}");
+                        if (tasks.Count > 6)
+                        {
+                            stringFormat = new StringFormat()
+                            {
+                                Alignment = StringAlignment.Near,
+                                LineAlignment = StringAlignment.Far
+                            };
+                            rect1 = new RectangleF(0, space + (h * (float)WindowTopBottom / tasks.Count) + 6 * sth, w, space);
+                            stringname = $"応答速度({(SettingWindow.Check2Mode ? "地表" : "地中")}) [PGV] (cm/s)";
+                            stringname += $" {(SettingWindow.MaxValueMode ? "観測最大地点" : $"最寄り地点")}";
+                            g.DrawString(stringname, font1, Brushes.White, rect1, stringFormat);
+
+                        }
+                        double val = near.RawValue;
+                        if (val < tasks[i].Result.Graph.ColorOffset) val = 0;
+                        else val = (val - tasks[i].Result.Graph.ColorOffset) / (1.0 - tasks[i].Result.Graph.ColorOffset);
+                        g.FillRectangle(new SolidBrush(Color.FromArgb(16, 16, 16)), new RectangleF(40 + 50, space + (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0) + 1, bitmap.Width - (40 + 50), sth - 2));
+                        g.FillRectangle(new SolidBrush(near.PointColor), new RectangleF(40 + 50, space + (h * (float)WindowTopBottom / tasks.Count) + i * sth + (i >= 6 ? space : 0) + 1, (float)(val * (bitmap.Width - (40 + 50))), sth - 2));
+                    }
+                    g.Dispose();
+                    return bitmap;
+                });
+                if (!IsDisposed)
+                {
+                    var windowText = SettingWindow.WindowName;
+                    for (int i = 0; i < tasks.Count; i++)
+                    {
+                        windowText = windowText.Replace($"<VALUE{i + 1}>", taskval[i]);
+                    }
+                    if (InvokeRequired)
+                        Invoke(() =>
+                        {
+                            Text = windowText;
+                            if (SettingWindow.NeedMove)
+                            {
+                                SettingWindow.NeedMove = false;
+                                Size = new(SettingWindow.WindowW, SettingWindow.WindowH);
+                                Location = new(SettingWindow.WindowX, SettingWindow.WindowY);
+                            }
+                        });
+                    else
+                    {
+                        Text = windowText;
+                        if (SettingWindow.NeedMove)
+                        {
+                            SettingWindow.NeedMove = false;
+                            Size = new(SettingWindow.WindowW, SettingWindow.WindowH);
+                            Location = new(SettingWindow.WindowX, SettingWindow.WindowY);
+                        }
+                    }
+
+                    var old = pictureBox1.Image;
+                    pictureBox1.Image = create;
+                    if (old != null) old.Dispose();
                 }
-                g.Dispose();
-                return bitmap;
-            });
-            var old = pictureBox1.Image;
-            pictureBox1.Image=create;
-            if(old!=null)old.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Error(ex);
+            }
             sw.Stop();
         }
 
         private void KyoshinResponseGraph_FormClosed(object sender, FormClosedEventArgs e)
         {
             Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin -= UpdateImage;
+            var instance = TrayHub.GetInstance();
+            if (instance != null) instance.KyoshinResponseGraphRelease();
         }
 
         private void CreateWindowMenu_Click(object sender, EventArgs e)
         {
-
+            var instance = TrayHub.GetInstance();
+            if(instance!=null)instance.KyoshinResponseGraphCreate();
         }
-        Setting SettingWindow = new();
         private void OpenSetting_Click(object sender, EventArgs e)
         {
             SettingWindow.ShowDialog();
         }
+
+        private void Main_Resize(object sender, EventArgs e)
+        {
+            SettingWindow.WindowW = Width;
+            SettingWindow.WindowH = Height;
+        }
+
+        private void Main_Move(object sender, EventArgs e)
+        {
+            SettingWindow.WindowX = Location.X;
+            SettingWindow.WindowY = Location.Y;
+        }
+
+        public int ConfigNumber { get => SettingWindow.CurrentNum; }
     }
 }
