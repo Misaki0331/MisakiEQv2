@@ -35,14 +35,14 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.DisplayEEWInfo = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenKmoni = new System.Windows.Forms.ToolStripMenuItem();
-            this.速度応答グラフToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.KyoshinGraphToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenAreaESTMonitor = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.実行ログToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.OpenConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.ExitApplication = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.ApplicationMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,7 +60,7 @@
             this.toolStripSeparator3,
             this.DisplayEEWInfo,
             this.OpenKmoni,
-            this.速度応答グラフToolStripMenuItem,
+            this.KyoshinGraphToolStripMenuItem,
             this.OpenAreaESTMonitor,
             this.toolStripMenuItem1,
             this.実行ログToolStripMenuItem,
@@ -69,7 +69,7 @@
             this.toolStripSeparator2,
             this.ExitApplication});
             this.ApplicationMenu.Name = "ApplicationMenu";
-            this.ApplicationMenu.Size = new System.Drawing.Size(208, 242);
+            this.ApplicationMenu.Size = new System.Drawing.Size(208, 220);
             this.ApplicationMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ApplicationMenu_Opening);
             // 
             // versionName
@@ -98,12 +98,12 @@
             this.OpenKmoni.Text = "強震モニタ";
             this.OpenKmoni.Click += new System.EventHandler(this.OpenKmoni_Click);
             // 
-            // 速度応答グラフToolStripMenuItem
+            // KyoshinGraphToolStripMenuItem
             // 
-            this.速度応答グラフToolStripMenuItem.Name = "速度応答グラフToolStripMenuItem";
-            this.速度応答グラフToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.速度応答グラフToolStripMenuItem.Text = "速度応答グラフ";
-            this.速度応答グラフToolStripMenuItem.Click += new System.EventHandler(this.速度応答グラフToolStripMenuItem_Click);
+            this.KyoshinGraphToolStripMenuItem.Name = "KyoshinGraphToolStripMenuItem";
+            this.KyoshinGraphToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.KyoshinGraphToolStripMenuItem.Text = "強震モニタ(グラフ)";
+            this.KyoshinGraphToolStripMenuItem.Click += new System.EventHandler(this.KyoshinGraphToolStripMenuItem_Click);
             // 
             // OpenAreaESTMonitor
             // 
@@ -113,6 +113,13 @@
             this.OpenAreaESTMonitor.Text = "エリア到達モニタ(利用不可)";
             this.OpenAreaESTMonitor.Visible = false;
             this.OpenAreaESTMonitor.Click += new System.EventHandler(this.OpenAreaESTMonitor_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(207, 22);
+            this.toolStripMenuItem1.Text = "J-ALERT情報";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // 実行ログToolStripMenuItem
             // 
@@ -145,13 +152,6 @@
             this.ExitApplication.Text = "終了";
             this.ExitApplication.Click += new System.EventHandler(this.ExitApplication_Click);
             // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(207, 22);
-            this.toolStripMenuItem1.Text = "J-ALERT情報";
-            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
-            // 
             // TrayHub
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -178,7 +178,7 @@
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripMenuItem OpenAreaESTMonitor;
-        private ToolStripMenuItem 速度応答グラフToolStripMenuItem;
+        private ToolStripMenuItem KyoshinGraphToolStripMenuItem;
         private ToolStripMenuItem 実行ログToolStripMenuItem;
         private ToolStripMenuItem versionName;
         private ToolStripSeparator toolStripSeparator3;

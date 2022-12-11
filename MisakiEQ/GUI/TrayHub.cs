@@ -320,21 +320,6 @@ namespace MisakiEQ.GUI
             Log.Instance.Debug($"グラフウィンドウ#{KyoshinResponseGraph.Count}を作成しました。");
             return app;
         }
-        private void 速度応答グラフToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            KyoshinResponseGraphRelease();
-            if (KyoshinResponseGraph.Count == 0)
-            {
-                var window = KyoshinResponseGraphCreate(0);
-                window.Show();
-                window.Activate();
-            }
-            else
-            {
-                KyoshinResponseGraph[KyoshinResponseGraph.Count-1].Show();
-                KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].Activate();
-            }
-        }
         LogViewerWindow? LogViewer = null;
         private void 実行ログToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -367,6 +352,22 @@ namespace MisakiEQ.GUI
                 JAlert.Show();
                 JAlert.WindowState=FormWindowState.Normal;
                 JAlert.Activate();
+            }
+        }
+
+        private void KyoshinGraphToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            KyoshinResponseGraphRelease();
+            if (KyoshinResponseGraph.Count == 0)
+            {
+                var window = KyoshinResponseGraphCreate(0);
+                window.Show();
+                window.Activate();
+            }
+            else
+            {
+                KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].Show();
+                KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].Activate();
             }
         }
     }
