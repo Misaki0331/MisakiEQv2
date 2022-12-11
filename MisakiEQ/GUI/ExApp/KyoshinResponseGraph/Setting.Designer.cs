@@ -193,6 +193,7 @@
             this.checkBox6.TabIndex = 13;
             this.checkBox6.Text = "棒グラフは一次関数の値を表示";
             this.checkBox6.UseVisualStyleBackColor = true;
+            this.checkBox6.CheckedChanged += new System.EventHandler(this.CheckBoxTextChanging);
             // 
             // Setting
             // 
