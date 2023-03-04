@@ -26,6 +26,7 @@ namespace MisakiEQ.Funcs
             public string LatestNote { get; set; } = string.Empty;
             public int LatestSerial { get; set; } = 0;
             public int DuplicateCount { get; set; } = 0;
+            public bool IsWarnFirstNoted { get; set; } = false;
             public DateTime LatestTime { get; set; } = DateTime.Now;
         }
 
@@ -77,7 +78,7 @@ namespace MisakiEQ.Funcs
             {
                 TweetIndex += $"{eew.EarthQuake.Hypocenter} 深さ: {Struct.Common.DepthToString(eew.EarthQuake.Depth)} M {eew.EarthQuake.Magnitude:0.0}\n";
                 TweetIndex += $"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n";
-                TweetIndex += $"発生時刻 : {eew.EarthQuake.OriginTime:M/dd HH:mm:ss}\n";
+                TweetIndex += $"発生時刻 : <plain>{eew.EarthQuake.OriginTime:M/dd HH:mm:ss}</plain>\n";
                 if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
                 {
                     TweetIndex += "\n⚠️以下の地域は強い揺れに注意⚠️\n";
@@ -98,12 +99,13 @@ namespace MisakiEQ.Funcs
                 TweetIndex += $"この緊急地震速報は取り消されました。\n";
             }
             TweetIndex += "\n";
-            TweetIndex += $"発表時刻 : {eew.Serial.UpdateTime:M/dd HH:mm:ss}\n";
+            TweetIndex += $"発表時刻 : <plain>{eew.Serial.UpdateTime:M/dd HH:mm:ss}</plain>\n";
             TweetIndex += $"#MisakiEQ #緊急地震速報";
             using (await EEW_Lock.LockAsync())
             {
                 try
                 {
+                    EEWNote Current = new(eew.Serial.EventID, "", eew.Serial.Number);
                     int Index = -1;
                     string LatestID = string.Empty;
                     for (int i = 0; i < EEWReplyList.Count; i++)
@@ -114,27 +116,35 @@ namespace MisakiEQ.Funcs
                             if (EEWReplyList[i].LatestSerial >= eew.Serial.Number)
                             {
                                 EEWReplyList[i].DuplicateCount++;
-                                Log.Instance.Warn($"この緊急地震速報は{EEWReplyList[i].DuplicateCount}回発信されています。\nEventID:{EEWReplyList[i].EventID} 情報番号:{EEWReplyList[i].LatestSerial}");
                                 return;
                             }
+                            Current= EEWReplyList[i];
                             Index = i;
                         }
                     }
-                    LatestID = await Lib.Misskey.APIData.CreateNote(replyid: LatestID, text: TweetIndex, visibility: Lib.Misskey.Setting.Visibility.Home);
+                    var visibility = Lib.Misskey.Setting.Visibility.Home;
+                    if (eew.Serial.Number == 1|| //第1報
+                        eew.Serial.IsFinal|| // 最終報
+                        (!Current.IsWarnFirstNoted &&//まだ規模が大きく変化した際の未発表の場合
+                        (eew.EarthQuake.MaxIntensity>=Struct.Common.Intensity.Int5Down || // 震度5弱以上
+                        eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)) || // 警報
+                        eew.Serial.Infomation == Struct.EEW.InfomationLevel.Cancelled) //キャンセル
+                    {
+                        Current.IsWarnFirstNoted = true;
+                        visibility = Lib.Misskey.Setting.Visibility.Public;
+                    }
+                    LatestID = await Lib.Misskey.APIData.CreateNote(replyid: LatestID, text: TweetIndex, visibility: visibility);
                     Log.Instance.Debug($"Noteしました。 ID:{LatestID}\n");
-                    if (Index != -1)
+
+                    if (LatestID != string.Empty)
                     {
-                        if (LatestID !=string.Empty)
-                        {
-                            EEWReplyList[Index].LatestNote = LatestID;
-                        }
-                        EEWReplyList[Index].LatestSerial = eew.Serial.Number;
-                        EEWReplyList[Index].LatestTime = DateTime.Now;
+                        Current.LatestNote = LatestID;
                     }
-                    else
-                    {
+                    Current.LatestSerial = eew.Serial.Number;
+                    Current.LatestTime = DateTime.Now;
+                    if (Index == -1)
                         EEWReplyList.Add(new(eew.Serial.EventID, LatestID, eew.Serial.Number));
-                    }
+                    
                     for (int i = EEWReplyList.Count - 1; i >= 0; i--)
                     {
                         TimeSpan T = DateTime.Now - EEWReplyList[i].LatestTime;
@@ -143,7 +153,7 @@ namespace MisakiEQ.Funcs
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Warn($"ツイート中にエラー : {ex.Message}");
+                    Log.Instance.Warn($"Note中にエラー : {ex.Message}");
                 }
             }
         }

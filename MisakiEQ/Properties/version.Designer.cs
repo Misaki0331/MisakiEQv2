@@ -70,7 +70,7 @@ namespace MisakiEQ.Properties {
         }
         
         /// <summary>
-        ///   MisakiEQ a2.4.2 に類似しているローカライズされた文字列を検索します。
+        ///   MisakiEQ a2.5 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string Name {
             get {

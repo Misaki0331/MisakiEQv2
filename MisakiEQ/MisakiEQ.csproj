@@ -14,7 +14,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/Misaki0331/MisakiEQv2</PackageProjectUrl>
-    <Copyright>©Misaki - 2020-2022 All Rights Reserved.</Copyright>
+    <Copyright>©Misaki - 2020-2023 All Rights Reserved.</Copyright>
     <Description>地震通知アプリケーション</Description>
     <Company>水咲(みさき)</Company>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
@@ -105,6 +105,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="logo.AppIcon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Update="Resources\logo.AppIcon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

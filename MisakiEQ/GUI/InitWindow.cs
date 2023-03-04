@@ -65,6 +65,11 @@ namespace MisakiEQ
             InitialTask_ReportFunction(89, "Twitter API連携", new(async () => {
                 try
                 {
+                    if (!File.Exists("TwitterAuth.cfg"))
+                    {
+                        Log.Instance.Warn("Twitter連携が未設定です。");
+                        return;
+                    }
                     using var reader = new StreamReader("TwitterAuth.cfg");
                     var text = reader.ReadToEnd();
                     var args = text.Split('\n');
@@ -75,8 +80,20 @@ namespace MisakiEQ
                     Log.Instance.Error(ex.Message);
                 }
             }), stw);
+            InitialTask_ReportFunction(90, "Misskey API連携", new(() =>
+            {
+                if (!File.Exists("MisskeyAccessToken.cfg"))
+                {
+                    Log.Instance.Warn("Misskeyのアクセストークンが設定されていません。\nアクセストークンを「MisskeyAccessToken.cfg」に設定してください。");
+                    return;
+                }
+                using var reader = new StreamReader("MisskeyAccessToken.cfg");
+                var text = reader.ReadToEnd();
+                Lib.Misskey.APIData.accessToken = text;
+
+            }), stw);
 #endif
-            InitialTask_ReportFunction(90, "イベントを設定", new(() =>
+            InitialTask_ReportFunction(95, "イベントを設定", new(() =>
             {
 #pragma warning disable CS8602 // null 参照の可能性があるものの逆参照です。
                 GUI.TrayHub.GetInstance(false).SetEvent();

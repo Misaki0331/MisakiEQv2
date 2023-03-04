@@ -277,8 +277,8 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Auth_Follower", "フォロワー数", ""));
                 GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Enable_Tweet", "自動ツイートの有効化", "自動でユーザーに地震情報をツイートします", def: true, "Twitterへの自動ツイートが有効", "Twitterへの自動ツイートが無効"));
                 GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_J-ALERT_Tweet", "J-ALERT配信有効化", "自動でユーザーにJアラートをツイートします", def: false, "Twitterへの自動ツイートが有効", "Twitterへの自動ツイートが無効"));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Misskey_Enable_Note", "自動ノートの有効か", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ツイートが有効", "Misskeyへの自動ツイートが無効"));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Misskey_J-ALERT_Note", "J-ALERT配信有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ツイートが有効", "Misskeyへの自動ツイートが無効"));
+                GetGroup("SNS設定", true)?.Add(new IndexData("Misskey_Enable_Note", "自動ノートの有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ノートが有効", "Misskeyへの自動ノートが無効"));
+                GetGroup("SNS設定", true)?.Add(new IndexData("Misskey_J-ALERT_Note", "J-ALERT配信有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ノートが有効", "Misskeyへの自動ノートが無効"));
 #endif
                 GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
                 GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));

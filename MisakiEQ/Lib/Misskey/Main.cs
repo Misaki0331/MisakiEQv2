@@ -25,11 +25,16 @@ namespace MisakiEQ.Lib.Misskey
         public static Config Config = new();
         static HttpClient client = new HttpClient();
         const string baseUrl = "https://misskey.io/api";
-        static string accessToken = Resources.API.API.MisskeyAPI;
+        public static string accessToken = "";
 
 
         public static async Task<string> CreateNote(string text, Setting.Visibility visibility, string replyid="", string fileid = "")
         {
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                Log.Instance.Info("Misskeyのアクセストークンが存在しないためノート投稿できませんでした。");
+                return "";
+            }
             try
             {
                 var api = new API.CreateNote();
