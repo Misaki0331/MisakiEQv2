@@ -140,6 +140,7 @@ namespace MisakiEQ.GUI
                 Log.Instance.Debug($"距離 = {distance} km");
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EEWPost(e.eew);
+                if (Lib.Misskey.APIData.Config.IsEnableEarthquakeNote) Funcs.Misskey.GetInstance().EEWPost(e.eew);
 #endif
                 e.eew.UserInfo.LocalIntensity = await Background.API.KyoshinAPI.KyoshinAPI.GetUserIntensity();
                 e.eew.UserInfo.IntensityRaw = await Background.API.KyoshinAPI.KyoshinAPI.GetUserRawIntensity();
@@ -216,6 +217,7 @@ namespace MisakiEQ.GUI
                 Log.Instance.Debug($"Jアラートのイベントが発生: {e.data.AnnounceTime:d日HH:mm} {e.data.Title}");
                 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled&& Lib.Twitter.APIs.GetInstance().Config.IsTweetJ_ALERT) Tweets.GetInstance().JALERTPost(e.data);
+                if (Lib.Misskey.APIData.Config.IsEnableJAlertNote) Funcs.Misskey.GetInstance().JALERTPost(e.data);
 #endif
                 Funcs.DiscordRPC.PostJAlert(e.data);
                 Funcs.EventLog.J_ALERT(e.data);
@@ -239,6 +241,8 @@ namespace MisakiEQ.GUI
                 Log.Instance.Debug($"地震情報のイベントが発生: {e.data.Details.OriginTime:d日HH:mm} {Struct.EarthQuake.TypeToString(e.data.Issue.Type)}");
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EarthquakePost(e.data);
+
+                if (Lib.Misskey.APIData.Config.IsEnableEarthquakeNote) Funcs.Misskey.GetInstance().EarthquakePost(e.data);
 #endif
                 Toast.Post(e.data);
                 Funcs.DiscordRPC.PostEarthquake(e.data);
@@ -257,6 +261,7 @@ namespace MisakiEQ.GUI
                 Log.Instance.Debug($"津波情報のイベントが発生: {e.data.CreatedAt:d日HH:mm} 津波発表エリア数:{e.data.Areas.Count}件");
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().TsunamiPost(e.data);
+                if (Lib.Misskey.APIData.Config.IsEnableEarthquakeNote) Funcs.Misskey.GetInstance().TsunamiPost(e.data);
 #endif
                 Toast.Post(e.data);
                 SoundCollective.SoundTsunami(e.data);

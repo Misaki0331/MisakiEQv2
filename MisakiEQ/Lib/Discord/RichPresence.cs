@@ -81,8 +81,8 @@ namespace MisakiEQ.Lib.Discord
             if (status != null) DiscordState = status;
             if (LImgKey != null) DiscordLImagePath = LImgKey;
             if (LImgText != null) DiscordLImageText = LImgText;
-            if(SImgKey != null) DiscordLImagePath = SImgKey;
-            if(SImgText != null) DiscordLImageText = SImgText;
+            if(SImgKey != null) DiscordSImagePath = SImgKey;
+            if(SImgText != null) DiscordSImageText = SImgText;
             if (DiscordLImagePath == "") DiscordLImagePath = "default_main";
             client.SetPresence(new DiscordRPC.RichPresence()
             {

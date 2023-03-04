@@ -1,42 +1,44 @@
-﻿using MisakiEQ.Lib;
-using MisakiEQ.Lib.Twitter;
-using MisakiEQ.Struct.cEEW;
+﻿using MisakiEQ.Background;
+using MisakiEQ.Lib;
+using MisakiEQ.Lib.PrefecturesAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tweetinvi.Models.V2;
 
 namespace MisakiEQ.Funcs
 {
-    internal class Tweets
+    internal class Misskey
     {
-        private class EEWTweet
+
+        private class EEWNote
         {
-            public EEWTweet(string Event, long Latest, int Serial)
+            public EEWNote(string Event, string Latest, int Serial)
             {
                 LatestTime = DateTime.Now;
                 EventID = Event;
-                LatestTweet = Latest;
-                LatestSerial= Serial;
+                LatestNote = Latest;
+                LatestSerial = Serial;
             }
             public string EventID { get; set; } = string.Empty;
-            public long LatestTweet { get; set; } = 0;
+            public string LatestNote { get; set; } = string.Empty;
             public int LatestSerial { get; set; } = 0;
             public int DuplicateCount { get; set; } = 0;
             public DateTime LatestTime { get; set; } = DateTime.Now;
         }
 
-        private class EarthquakeTweet
+        private class EarthquakeNote
         {
-            public EarthquakeTweet(DateTime origin, long Latest)
+            public EarthquakeNote(DateTime origin, string Latest)
             {
                 LatestTime = DateTime.Now;
                 OriginTime = origin;
-                LatestTweet = Latest;
+                LatestNote = Latest;
             }
             public DateTime OriginTime { get; set; } = DateTime.MinValue;
-            public long LatestTweet { get; set; } = 0;
+            public string LatestNote { get; set; } = string.Empty;
             public DateTime LatestTime { get; set; } = DateTime.Now;
         }
         private static Tweets? singleton = null;
@@ -48,8 +50,8 @@ namespace MisakiEQ.Funcs
             singleton ??= new Tweets();
             return singleton;
         }
-        readonly List<EEWTweet> EEWReplyList = new();
-        readonly List<EarthquakeTweet> EQReplyList = new();
+        readonly List<EEWNote> EEWReplyList = new();
+        readonly List<EarthquakeNote> EQReplyList = new();
         private readonly AsyncLock EEW_Lock = new();
         private readonly AsyncLock EQ_Lock = new();
         private readonly AsyncLock Tsunami_Lock = new();
@@ -103,12 +105,12 @@ namespace MisakiEQ.Funcs
                 try
                 {
                     int Index = -1;
-                    long LatestID = 0;
+                    string LatestID = string.Empty;
                     for (int i = 0; i < EEWReplyList.Count; i++)
                     {
                         if (EEWReplyList[i].EventID == eew.Serial.EventID)
                         {
-                            LatestID = EEWReplyList[i].LatestTweet;
+                            LatestID = EEWReplyList[i].LatestNote;
                             if (EEWReplyList[i].LatestSerial >= eew.Serial.Number)
                             {
                                 EEWReplyList[i].DuplicateCount++;
@@ -118,21 +120,20 @@ namespace MisakiEQ.Funcs
                             Index = i;
                         }
                     }
-                    var twitter = APIs.GetInstance();
-                    LatestID = await twitter.Tweet(reply: LatestID, tweet: TweetIndex);
-                    Log.Instance.Debug($"ツイートしました。 ID:{LatestID}\n" + TweetIndex);
+                    LatestID = await Lib.Misskey.APIData.CreateNote(replyid: LatestID, text: TweetIndex, visibility: Lib.Misskey.Setting.Visibility.Home);
+                    Log.Instance.Debug($"Noteしました。 ID:{LatestID}\n");
                     if (Index != -1)
                     {
-                        if (LatestID != 1)
+                        if (LatestID !=string.Empty)
                         {
-                            EEWReplyList[Index].LatestTweet = LatestID;
+                            EEWReplyList[Index].LatestNote = LatestID;
                         }
                         EEWReplyList[Index].LatestSerial = eew.Serial.Number;
                         EEWReplyList[Index].LatestTime = DateTime.Now;
                     }
                     else
                     {
-                        EEWReplyList.Add(new(eew.Serial.EventID, LatestID,eew.Serial.Number));
+                        EEWReplyList.Add(new(eew.Serial.EventID, LatestID, eew.Serial.Number));
                     }
                     for (int i = EEWReplyList.Count - 1; i >= 0; i--)
                     {
@@ -194,8 +195,6 @@ namespace MisakiEQ.Funcs
                             index.Add(string.Empty);
                             index.Add("各地の震度は以下の通りです。");
                             index.Add(string.Empty);
-                            int cnt = 0;
-                            for (int i = 0; i < index.Count; i++) cnt += APIs.GetLen(index[i]) + 1;
                             var list = eq.Details.PrefIntensity.GetIntensityPrefectures();
                             for (int i = 0; i < list.Count; i++)
                             {
@@ -205,13 +204,7 @@ namespace MisakiEQ.Funcs
                                     txt += Struct.Common.PrefecturesToString(list[i].Prefectures[j]);
                                     if (list[i].Prefectures.Count - 1 != j && j % 6 == 5)
                                     {
-                                        if (cnt + APIs.GetLen(txt) + 1 > 250 && txt.Contains('　'))
-                                        {
-                                            txt = $"震度{Struct.Common.IntToStringLong(list[i].Intensity)}：" + txt.Replace("　", "");
-                                            cnt = 0;
-                                        }
                                         index.Add(txt);
-                                        cnt += APIs.GetLen(txt) + 1;
                                         txt = "";
                                         for (int k = 0; k < (Struct.Common.IntToStringLong(list[i].Intensity).Length + 3); k++) txt += "　";
                                     }
@@ -220,21 +213,20 @@ namespace MisakiEQ.Funcs
                                         txt += " ";
                                     }
                                 }
-                                cnt += APIs.GetLen(txt) + 1;
                                 index.Add(txt);
 
                             }
                         }
                     }
                     bool IsExist = false;
-                    long LatestTweet = 0;
-                    EarthquakeTweet eqdata = new(eq.Details.OriginTime, 0);
+                    string LatestTweet = string.Empty;
+                    EarthquakeNote eqdata = new(eq.Details.OriginTime, string.Empty);
                     for (int i = 0; i < EQReplyList.Count; i++)
                     {
                         if (eq.Details.OriginTime == EQReplyList[i].OriginTime)
                         {
                             IsExist = true;
-                            LatestTweet = EQReplyList[i].LatestTweet;
+                            LatestTweet = EQReplyList[i].LatestNote;
                             eqdata = EQReplyList[i];
                             break;
                         }
@@ -244,34 +236,23 @@ namespace MisakiEQ.Funcs
                     string Text = "";
                     for (int i = 0; i < index.Count; i++)
                     {
-                        if (APIs.GetLen(Text + index[i]) + 1 > 250)
-                        {
-                            TweetIndexs.Add(Text + "\n#MisakiEQ #地震");
-                            Text = $"{index[i]}\n";
-                        }
-                        else
                             Text += $"{index[i]}\n";
                     }
                     TweetIndexs.Add(Text + "\n#MisakiEQ #地震");
-                    if (TweetIndexs.Count > 1)
-                    {
-                        for (int i = 0; i < TweetIndexs.Count; i++)
-                            TweetIndexs[i] += $" ({i + 1}/{TweetIndexs.Count})";
-                    }
                     for (int i = 0; i < TweetIndexs.Count; i++)
                     {
-                        long id = await APIs.GetInstance().Tweet(TweetIndexs[i], eqdata.LatestTweet);
-                        if (id != -1)
+                        string id = await Lib.Misskey.APIData.CreateNote(TweetIndexs[i], Lib.Misskey.Setting.Visibility.Public ,eqdata.LatestNote);
+                        if (!string.IsNullOrEmpty(id))
                         {
-                            eqdata.LatestTweet = id;
+                            eqdata.LatestNote = id;
                         }
                         else
                         {
-                            Log.Instance.Warn($"ツイートできませんでした。\n{TweetIndexs[i]}");
+                            Log.Instance.Warn($"Note投稿できませんでした。\n{TweetIndexs[i]}");
                         }
                     }
                     if (!IsExist)
-                        EQReplyList.Add(new(eq.Details.OriginTime, eqdata.LatestTweet));
+                        EQReplyList.Add(new(eq.Details.OriginTime, eqdata.LatestNote));
                     for (int i = EQReplyList.Count - 1; i >= 0; i--)
                     {
                         TimeSpan T = DateTime.Now - EQReplyList[i].LatestTime;
@@ -334,7 +315,6 @@ namespace MisakiEQ.Funcs
                             }
                         }
                         int cnt = 0;
-                        for (int i = 0; i < index.Count; i++) cnt += APIs.GetLen(index[i]) + 1;
                         bool IsFirst = false;
                         for (int i = 0; i < grades.Length; i++)
                         {
@@ -369,26 +349,12 @@ namespace MisakiEQ.Funcs
                                         break;
                                 }
                                 string tmp = index[^1];
-                                cnt += APIs.GetLen(index[^1]) + 1;
                                 string text = string.Empty;
                                 for (int j = 0; j < grades[i].Count; j++)
                                 {
                                     if (text.Length + grades[i][j].Length + 1 > 20)
                                     {
-                                        if (cnt + APIs.GetLen(text) + 1 > 250)
-                                        {
-                                            string t = string.Empty;
-                                            for (int k = 0; k < index.Count; k++)
-                                            {
-                                                t += index[k] + '\n';
-                                            }
-                                            index.Clear();
-                                            TweetList.Add(t);
-                                            index.Add(tmp);
-                                            cnt = APIs.GetLen(tmp);
-                                        }
                                         index.Add(text);
-                                        cnt += APIs.GetLen(text) + 1;
                                         text = $"{grades[i][j]}";
                                     }
                                     else
@@ -397,7 +363,6 @@ namespace MisakiEQ.Funcs
                                         text += $"{grades[i][j]}";
                                     }
                                 }
-                                cnt += APIs.GetLen(text) + 1;
                                 index.Add(text);
                                 if (cnt > 230)
                                 {
@@ -419,12 +384,12 @@ namespace MisakiEQ.Funcs
                         if (!string.IsNullOrWhiteSpace(l.Replace('\n', ' ')))
                             TweetList.Add(l);
                     }
-                    long Latest = 0;
+                    string Latest = "";
                     for (int i = 0; i < TweetList.Count; i++)
                     {
                         TweetList[i] += "#MisakiEQ #津波";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
-                        Latest = await APIs.GetInstance().Tweet(TweetList[i], Latest);
+                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i], Lib.Misskey.Setting.Visibility.Public,Latest);
                         Log.Instance.Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
                     }
                 }
@@ -447,20 +412,10 @@ namespace MisakiEQ.Funcs
                         $"🔺J-ALERT🔺【{data.Title}】",
                         $"{data.AnnounceTime:M/dd H:mm}受信"
                     };
-                    for(int i = 0; i < data.Detail.Length; i += (220-APIs.GetLen(data.Title))/2)
-                    {
-                        if (i + 90 > data.Detail.Length)
-                        {
-                            index.Add(data.Detail[i..]);
-                        }
-                        else
-                        {
-                            index.Add(data.Detail.Substring(i, (220 - APIs.GetLen(data.Title)) / 2));
-                        }
-                    }
-                    
-                    string areas = ""; 
-                    if (data.Areas.Count != 0) areas="発令地区: ";
+                    index.Add(data.Detail);
+
+                    string areas = "";
+                    if (data.Areas.Count != 0) areas = "発令地区: ";
                     for (int i = 0; i < data.Areas.Count; i++)
                     {
                         areas += data.Areas[i];
@@ -473,17 +428,9 @@ namespace MisakiEQ.Funcs
                         if (i != data.Areas.Count - 1) areas += " ";
                     }
                     if (areas != "") index.Add(areas);
-                    int cnt = 0;
                     string tweet = "";
-                    for(int i = 0; i < index.Count; i++)
+                    for (int i = 0; i < index.Count; i++)
                     {
-                        if(cnt+APIs.GetLen(index[i] + 1) > 256)
-                        {
-                            TweetList.Add(tweet);
-                            cnt = 0;
-                            tweet = "";
-                        }
-                        cnt += APIs.GetLen(index[i] + 1);
                         tweet += $"{index[i]}\n";
 
                     }
@@ -491,16 +438,16 @@ namespace MisakiEQ.Funcs
                     {
                         TweetList.Add(tweet);
                     }
-                    long Latest = 0;
+                    string Latest = "";
                     for (int i = 0; i < TweetList.Count; i++)
                     {
                         TweetList[i] += "#MisakiEQ #Jアラート";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
-                        Latest = await APIs.GetInstance().Tweet(TweetList[i], Latest);
-                        Log.Instance.Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
+                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i],Lib.Misskey.Setting.Visibility.Public, Latest);
+                        Log.Instance.Debug($"Misskeyにノートを投稿しました。 ID:{Latest}");
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Log.Instance.Error(ex);
                 }

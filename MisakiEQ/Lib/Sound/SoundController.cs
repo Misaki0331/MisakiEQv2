@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
+using MisakiEQ.Properties;
 using NAudio.Wave;
 
 namespace MisakiEQ.Lib.Sound
@@ -167,6 +170,18 @@ namespace MisakiEQ.Lib.Sound
                 readers.SetPosition(0);
             }
         }
+        public void SetDeviceID(int ID,string DeviceName)
+        {
+            var list=new List<string>();
+            for (int i = 0; i < WaveOut.DeviceCount; i++)
+                list.Add(WaveOut.GetCapabilities(i).ProductName);
+            if(list.Count<ID||list.Count>=ID)
+                throw new ArgumentOutOfRangeException(nameof(list),"そのデバイスは存在しないIDである為、指定できません。");
+            if (list[ID] != DeviceName)
+                throw new InvalidDataException("デバイス名とデバイスIDが一致しない為、指定できません。");
+            wav.DeviceNumber = ID;
+        }
+        public int DeviceID { get { return wav.DeviceNumber; } }
         public double Position { get { return readers.GetPosition(); } set { readers.SetPosition(value); } }
         public double Length { get { return readers.GetLength(); } }
         public float Volume { get { return wav.Volume; } set { wav.Volume = value; } }
@@ -231,6 +246,25 @@ namespace MisakiEQ.Lib.Sound
                 }
                 return false;
             });
+        }
+        //Todo:デバイスデータを返すようにする。GUIDで指定する予定
+        public class DeviceData{
+            public DeviceData(string name)
+            {
+
+            }
+        }
+        public List<string> GetSoundDevice()
+        {
+            var list = new List<string>();
+
+            for (int i = 0; i < WaveOut.DeviceCount; i++)
+            {
+                var capabilities = WaveOut.GetCapabilities(i);
+                //capabilities.NameGuid
+                list.Add(capabilities.ProductName);
+            }
+            return list;
         }
         public int GetSoundListCount()
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MisakiEQ.Lib.Misskey;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -85,10 +86,10 @@ namespace MisakiEQ.GUI
             UpdateGeo(null, EventArgs.Empty);
 //#if DEBUG
             var function = Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Function");
-            function?.SetAction(() =>
+            function?.SetAction(async () =>
             {
-               Lib.ToastNotification.PostNotification("テスト通知です。",Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.Value.ToString()??"");
-            });
+                await Lib.Misskey.APIData.CreateNote(Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.Value.ToString() ?? "",Setting.Visibility.Home);
+               });
 //#endif
         }
 

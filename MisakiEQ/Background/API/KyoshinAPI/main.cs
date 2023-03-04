@@ -105,6 +105,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
             }catch(Exception ex)
             { 
                 Log.Instance.Error(ex);
+                await Task.Delay(5000);
             }
         }
         public static async Task<double> GetUserRawIntensity()

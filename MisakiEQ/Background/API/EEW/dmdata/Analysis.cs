@@ -369,17 +369,16 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                             TelegramCategoryV1.EewWarning
             )
                         {
-                            AppName = "MisakiEQ",
+                            AppName = $"{Properties.Version.Name}",
                         });
                     }
                     else
                     {
                         await Socket.ConnectAsync(new DmdataSharp.ApiParameters.V2.SocketStartRequestParameter(
-                            TelegramCategoryV1.EewForecast,
-                            TelegramCategoryV1.EewWarning
+                            TelegramCategoryV1.EewForecast
             )
                         {
-                            AppName = "MisakiEQ",
+                            AppName = $"{Properties.Version.Name}",
                         });
                     }
                     break;

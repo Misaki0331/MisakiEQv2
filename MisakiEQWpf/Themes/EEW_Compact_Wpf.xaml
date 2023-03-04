@@ -8,8 +8,18 @@
         Title="Window1" Height="210" Width="651">
     <Grid Margin="0,0,466,294">
         <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,-466,-40">
-            <TextBlock TextWrapping="Wrap" Text="緊急地震速報(予報)" Margin="0,0,0,0" FontFamily="Meiryo UI" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="30" Name="EEWType"/>
+            <Grid>
+            <TextBlock TextWrapping="Wrap" Text="緊急地震速報(予報)" Margin="0,0,0,0" FontFamily="Meiryo UI" TextAlignment="Left" VerticalAlignment="Center" FontSize="30" Name="EEWType"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock TextWrapping="Wrap" Text="第 100 報" Margin="0,0,0,0" FontFamily="Meiryo UI" TextAlignment="Right" VerticalAlignment="Center"  FontSize="30" Name="EEWNumber" HorizontalAlignment="Right"/>
+
+                    <TextBlock TextWrapping="Wrap" Text="(最終報)" Margin="0,0,0,4" FontFamily="Meiryo UI" TextAlignment="Right" VerticalAlignment="Bottom"  FontSize="20" Name="EEWFinal" HorizontalAlignment="Right"/>
+                </StackPanel>
+            </Grid>
         </Border>
+        <StackPanel Orientation="Vertical">
+            
+        </StackPanel>
 
     </Grid>
 </Window>

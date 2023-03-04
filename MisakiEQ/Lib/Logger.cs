@@ -14,20 +14,32 @@ namespace MisakiEQ
 {
     class Log
     {
-        const bool IS_LOGFILE = true;
         LogLevel LOG_LEVEL = 0;
+
+        /// <summary>ログ機能の有効化</summary>
+        const bool IS_LOGFILE = true;
+        /// <summary>保存先のディレクトリ</summary>
         const string LOGDIR_PATH = "./logs/";
+        /// <summary>書き込むログファイル</summary>
         const string LOGFILE_NAME = "console";
-        const long LOGFILE_MAXSIZE = 1024*256;
+        /// <summary>ログファイルの最大容量</summary>
+        const long LOGFILE_MAXSIZE = 1024*1024*1;
+        /// <summary>ログ保存期間</summary>
         const int LOGFILE_PERIOD = 90;
+        /// <summary>関数名の長さ</summary>
         const int STACKLEN = 30;
-        const int LOG_DATA_LEN = 100;
         List<string> Logdata = new();
 
-
+        /// <summary>
+        /// コンソール画面を表示
+        /// </summary>
+        /// <returns></returns>
         [System.Runtime.InteropServices.DllImport("kernel32.dll")] // この行を追加
         private static extern bool AllocConsole();                 // この行を追加  
-
+        /// <summary>
+        /// コンソール画面を非表示
+        /// </summary>
+        /// <returns></returns>
         [System.Runtime.InteropServices.DllImport("kernel32.dll")] // この行を追加
         private static extern bool FreeConsole();                 // この行を追加  
 

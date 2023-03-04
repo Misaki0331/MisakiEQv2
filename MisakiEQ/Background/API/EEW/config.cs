@@ -14,6 +14,9 @@ namespace MisakiEQ.Background.API.EEW
         ///<summary>検出から通常時に戻る時間(ms)</summary>
         public uint DelayDetectCoolDown;
         ///<summary>DMDATAでの警報のみ受け取るか</summary>
-        public bool IsWarningOnlyInDMDATA { get => Background.APIs.GetInstance().EEW.DMData.IsWarnOnly; set => Background.APIs.GetInstance().EEW.DMData.IsWarnOnly = value; }
+        public bool IsWarningOnlyInDMDATA { 
+            get => Background.APIs.GetInstance().EEW.DMData.IsWarnOnly; 
+            set => Background.APIs.GetInstance().EEW.DMData.IsWarnOnly = value; 
+        }
     }
 }

@@ -103,6 +103,59 @@ namespace MisakiEQ.Lib
                 return string.Empty;
             }
         }
+
+        public static async Task<string> PostJson(string URL, string json, CancellationToken? token = null)
+        {
+            try
+            {
+                if (URL == "")
+                    throw new ArgumentException("アップロード先のURLが指定されていません。");
+                if (json == "")
+                    throw new ArgumentException("アップロードするjsonが指定されていません。");
+                using HttpClient webClient = new();
+                Task<HttpResponseMessage> stream;
+                if (token != null)
+                {
+                    stream = webClient.PostAsync(new Uri(URL), new StringContent(json, Encoding.UTF8), (CancellationToken)token);
+                }
+                else
+                {
+                    stream = webClient.PostAsync(new Uri(URL), new StringContent(json, Encoding.UTF8));
+                }
+                await stream;
+                if (stream.IsFaulted)
+                {
+                    if (stream.Exception != null)
+                    {
+                        throw stream.Exception;
+                    }
+                    else
+                    {
+                        throw new ArgumentException("例外エラーが発生しましたが、例外は返されませんでした。");
+                    }
+                }
+                var text = stream.Result.Content.ToString();
+                if (text == null) return "";
+                return text;
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new FileLoadException($"{GetHTTPErrorName(ex)} 参照元:\"{URL}\"");
+            }
+            catch (TaskCanceledException ex)
+            {
+                Log.Instance.Info("タスクが取り消されました。");
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Error(ex);
+                await Task.FromException<string>(ex);
+                return string.Empty;
+            }
+        }
+
+
         static string GetHTTPErrorName(HttpRequestException ex)
         {
             return ex.StatusCode switch
@@ -134,7 +187,7 @@ namespace MisakiEQ.Lib
                 (HttpStatusCode)425 => "425 - 繰り返される可能性のあるリクエストを拒否しました。(実験的)",
                 HttpStatusCode.UpgradeRequired => "426 - 別のプロトコルにアップグレードが必要です。",
                 HttpStatusCode.PreconditionRequired => "428 - オリジンサーバーはリクエストが条件付きになることを必要としています。",
-                HttpStatusCode.TooManyRequests => "429 - リクエストのレート制限に到達しました。",
+                HttpStatusCode.TooManyRequests => "429 - リクエストのレート制限に到達しました。時間をおいて再度実行してください。",
                 HttpStatusCode.RequestHeaderFieldsTooLarge => "431 - ヘッダーフィールドが大きすぎる為、リクエストを拒否しました。",
                 HttpStatusCode.UnavailableForLegalReasons => "451 - 検閲されたサーバーにリクエストしようとしました。",
                 HttpStatusCode.InternalServerError => "500 - サーバー内部エラー",

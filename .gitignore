@@ -1,9 +1,10 @@
 .vs/
 MisakiEQ/bin/
 MisakiEQ/obj/
+MisakiEQ/Release/
 MisakiEQWpf/bin/
 MisakiEQWpf/obj/
-.pdb
-.dll
-.exe
+*.pdb
+*.dll
+*.exe
 MisakiEQ/Resources/API/
