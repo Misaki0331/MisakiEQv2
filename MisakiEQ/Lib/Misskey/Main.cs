@@ -58,8 +58,10 @@ namespace MisakiEQ.Lib.Misskey
 
                 var responce = await client.PostAsync(baseUrl + "/notes/create", content);
 
-                Log.Instance.Debug($"{responce.StatusCode.ToString()}");
-
+                //レスポンスコードを返す
+                Log.Instance.Debug($"Responce : {responce.StatusCode.ToString()}");
+                //返り値をそのまま出す
+                Log.Instance.Debug($"{responce.Content.ReadAsStringAsync()}");
                 var rs = JsonConvert.DeserializeObject<API.CreateNoteResponse.Root>(await responce.Content.ReadAsStringAsync());
                 if (rs == null)
                 {

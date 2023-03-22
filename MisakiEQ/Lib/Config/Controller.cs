@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MisakiEQ.Background;
-
+/*
 namespace MisakiEQ.Lib.ConfigV2.Components.Common{
     public class CommonData{
         public string Name {get; internal set;} = string.Empty;
