@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Navigation;
 using MisakiEQ.Background;
 
 namespace MisakiEQ.Lib.ConfigV2.Components.Common{
@@ -11,8 +12,8 @@ namespace MisakiEQ.Lib.ConfigV2.Components.Common{
         public string Name {get; internal set;} = string.Empty;
         public string Title {get; internal set;} = string.Empty;
         public string Description {get; internal set;} = string.Empty;
-        public Component ComponentType {get; internal set;} = ComponentType.Unknown;
-        Enum Component {
+        public Component ComponentType {get; internal set;} = Component.Unknown;
+        public enum Component {
             Unknown,
             Toggle,
             Numeric,
@@ -29,11 +30,11 @@ namespace MisakiEQ.Lib.ConfigV2.Components{
     ///Toggleボタン用のコンポーネント
     ///</summary>
     public class Toggle : Common.CommonData{
-        bool Default;   //デフォルト値
-        bool Value;     //現在の値
+        public bool Default;   //デフォルト値
+        public bool Value;     //現在の値
         //UI関連
-        string OnText;  //オン設定時のテキスト
-        string OffText; //オフ設定時のテキスト
+        public string OnText;  //オン設定時のテキスト
+        public string OffText; //オフ設定時のテキスト
         ///<summary>
         ///
         ///</summary>
@@ -58,37 +59,37 @@ namespace MisakiEQ.Lib.ConfigV2.Components{
     ///
     ///</summary>
     public class Numeric : Common.CommonData{
-        double Minimum;
-        double Maximum;
-        double Default;
-        double Value;
+        public double Minimum;
+        public double Maximum;
+        public double Default;
+        public double Value;
         //表示コンフィグ
-        int Decimal;
-        string UnitName;
-        public Numeric(string name,string title, string description = "", double min = double.NagativeInfinity, double max = double.PositiveInfinity, double def = 0, string unitName = "", int decimal = 0)
+        public int Decimal;
+        public string UnitName;
+        public Numeric(string name,string title, string description = "", double min = double.NegativeInfinity, double max = double.PositiveInfinity, double def = 0, string unitName = "", int DecimalValue = 0)
         {
             Name = name;
             Title = title;
             Description = description;
 
-            if(decimal<0||decimal>=10)throw new System.ArgmentsException(); //小数点関係のエラーも例外投げる
-            if(min>max)throw new System.ArgmentsException();    //最大値より最小値が大きい場合は例外投げる
+            if(DecimalValue<0|| DecimalValue >= 10)throw new ArgumentException(); //小数点関係のエラーも例外投げる
+            if(min>max)throw new ArgumentException();    //最大値より最小値が大きい場合は例外投げる
             Minimum = min;
             Maximum = max;
             Default = def;
             Value = def;
             UnitName = unitName;
-            Decimal = decimal;
+            Decimal = DecimalValue;
             
             ComponentType = Component.Numeric;
         }
     }
 
     public class Trackbar : Common.CommonData{
-        int Minimum;
-        int Maximum;
-        int Default;
-        int Value;
+        public int Minimum;
+        public int Maximum;
+        public int Default;
+        public int Value;
         //表示コンフィグ
         string UnitName;
         public Trackbar(string name,string title, string description = "", int min = int.MinValue, int max = int.MaxValue, int def = 0, string unitName = "")
@@ -96,9 +97,6 @@ namespace MisakiEQ.Lib.ConfigV2.Components{
             Name = name;
             Title = title;
             Description = description;
-
-            if(decimal<0||decimal>=10)throw new System.ArgmentsException(); //小数点関係のエラーも例外投げる
-            if(min>max)throw new System.ArgmentsException();    //最大値より最小値が大きい場合は例外投げる
             Minimum = min;
             Maximum = max;
             Default = def;
@@ -109,8 +107,8 @@ namespace MisakiEQ.Lib.ConfigV2.Components{
         }
     }
     public class Textbox : Common.CommonData{
-        string Default;
-        string Value;
+        public string Default;
+        public string Value;
         public Textbox(string name, string title, string description = "",  string def = "")
         {
             Name = name;
@@ -123,16 +121,18 @@ namespace MisakiEQ.Lib.ConfigV2.Components{
     }
     public class Command : Common.CommonData{
         Action FunctionAction;
-        string ReadyString;
-        string WorkingString;
-        public Command(string name, string title, string description, string ReadyTitle, Action? action=null,string? WorkingTitle = null)
+        public string ReadyString;
+        public string WorkingString;
+        public Command(string name, string title, string description, string ReadyTitle, Action action 
+        ,string? WorkingTitle = null)
         {
             Description = description;
             Name = name;
             Title = title;
             FunctionAction = action;
             ReadyString = ReadyTitle;
-            WorkingString = WorkingTitle;
+            if (WorkingTitle != null) WorkingString = WorkingTitle;
+            else WorkingString = ReadyTitle;
 
             ComponentType = Component.Command;
         }
@@ -145,8 +145,24 @@ namespace MisakiEQ.Lib.ConfigV2.Components{
         public EventHandler<EventArgs>? ButtonChanged = null;
     }
     public class ReadOnly : Common.CommonData{
-        string Value="";
-        public IndexData(string name, string title, string description)
+        public event EventHandler<EventArgs>? ValueChanged;
+        string _value = "";
+        public string Value
+        {
+            get { return _value; }
+            set
+            {
+                if (value != _value)
+                {
+                    _value= value;
+                    if (ValueChanged != null)
+                    {
+                        ValueChanged(this, EventArgs.Empty);
+                    }
+                }
+            }
+        }
+        public ReadOnly(string name, string title, string description)
         {
             Description = description;
             Name = name;
@@ -158,18 +174,20 @@ namespace MisakiEQ.Lib.ConfigV2.Components{
         int Default;
         int Value;
         List<string> ComboStrings;
-        public IndexData(string name, string title, string description, int def, List<string> list)
+        public Combobox(string name, string title, string description, int def, List<string> list)
         {
+            ComboStrings = new();
             Init(name,title,description,def,list.Count);
             for (int i = 0; i < list.Count; i++) ComboStrings.Add(list[i]);
         }
-        public IndexData(string name, string title, string description, int def, string[] list)
+        public Combobox(string name, string title, string description, int def, string[] list)
         {
+            ComboStrings = new();
             Init(name,title,description,def,list.Length);
             for (int i = 0; i < list.Length; i++) ComboStrings.Add(list[i]);
         }
         private void Init(string name, string title, string description, int def,int count){
-            if(def>=count)throw new ArgmentsException();
+            if(def>=count)throw new ArgumentException();
             ComboStrings=new List<string>();
             Description = description;
             Name = name;

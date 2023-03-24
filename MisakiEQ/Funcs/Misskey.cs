@@ -42,13 +42,13 @@ namespace MisakiEQ.Funcs
             public string LatestNote { get; set; } = string.Empty;
             public DateTime LatestTime { get; set; } = DateTime.Now;
         }
-        private static Tweets? singleton = null;
+        private static Misskey? singleton = null;
         /// <summary>
         /// インスタンスを生成する
         /// </summary>
-        public static Tweets GetInstance()
+        public static Misskey GetInstance()
         {
-            singleton ??= new Tweets();
+            singleton ??= new Misskey();
             return singleton;
         }
         readonly List<EEWNote> EEWReplyList = new();
@@ -133,7 +133,7 @@ namespace MisakiEQ.Funcs
                         Current.IsWarnFirstNoted = true;
                         visibility = Lib.Misskey.Setting.Visibility.Public;
                     }
-                    LatestID = await Lib.Misskey.APIData.CreateNote(replyid: LatestID, text: TweetIndex, visibility: visibility);
+                    LatestID = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*/, text: TweetIndex, visibility: visibility);
                     Log.Instance.Debug($"Noteしました。 ID:{LatestID}\n");
 
                     if (LatestID != string.Empty)
@@ -251,7 +251,7 @@ namespace MisakiEQ.Funcs
                     TweetIndexs.Add(Text + "\n#MisakiEQ #地震");
                     for (int i = 0; i < TweetIndexs.Count; i++)
                     {
-                        string id = await Lib.Misskey.APIData.CreateNote(TweetIndexs[i], Lib.Misskey.Setting.Visibility.Public ,eqdata.LatestNote);
+                        string id = await Lib.Misskey.APIData.CreateNote(TweetIndexs[i], Lib.Misskey.Setting.Visibility.Public , ""/*LatestID*/);
                         if (!string.IsNullOrEmpty(id))
                         {
                             eqdata.LatestNote = id;
@@ -399,7 +399,7 @@ namespace MisakiEQ.Funcs
                     {
                         TweetList[i] += "#MisakiEQ #津波";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
-                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i], Lib.Misskey.Setting.Visibility.Public,Latest);
+                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i], Lib.Misskey.Setting.Visibility.Public,""/*Latest*/);
                         Log.Instance.Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
                     }
                 }
@@ -453,7 +453,7 @@ namespace MisakiEQ.Funcs
                     {
                         TweetList[i] += "#MisakiEQ #Jアラート";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
-                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i],Lib.Misskey.Setting.Visibility.Public, Latest);
+                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i],Lib.Misskey.Setting.Visibility.Public, ""/*Latest*/);
                         Log.Instance.Debug($"Misskeyにノートを投稿しました。 ID:{Latest}");
                     }
                 }
