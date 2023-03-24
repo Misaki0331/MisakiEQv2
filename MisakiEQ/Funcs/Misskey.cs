@@ -63,13 +63,13 @@ namespace MisakiEQ.Funcs
             switch (eew.Serial.Infomation)
             {
                 case Struct.EEW.InfomationLevel.Forecast:
-                    TweetIndex += $"🔵緊急地震速報(予報) 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
+                    TweetIndex += $"$[bg.color=4040FF $[fg.color=FFFFFF 緊急地震速報(予報)]] 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
                     break;
                 case Struct.EEW.InfomationLevel.Warning:
-                    TweetIndex += $"🔴⚠️緊急地震速報(警報) 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
+                    TweetIndex += $"$[bg.color=FFBFBF $[fg.color=FF0000 **緊急地震速報(警報)**]] 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
                     break;
                 case Struct.EEW.InfomationLevel.Cancelled:
-                    TweetIndex += $"🟢緊急地震速報(キャンセル)\n";
+                    TweetIndex += $"$[bg.color=3FFF3F $[fg.color=000000 緊急地震速報(キャンセル)]]\n";
                     break;
                 default:
                     return;
@@ -81,7 +81,7 @@ namespace MisakiEQ.Funcs
                 TweetIndex += $"発生時刻 : <plain>{eew.EarthQuake.OriginTime:M/dd HH:mm:ss}</plain>\n";
                 if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
                 {
-                    TweetIndex += "\n⚠️以下の地域は強い揺れに注意⚠️\n";
+                    TweetIndex += "\n$[bg.color=FFFF00 $[fg.color=FF0000 ⚠️以下の地域は強い揺れに注意⚠️]]\n";
                     for (int i = 0; i < eew.EarthQuake.ForecastArea.LocalAreas.Count; i++)
                     {
                         TweetIndex += $"{eew.EarthQuake.ForecastArea.LocalAreas[i]}";
