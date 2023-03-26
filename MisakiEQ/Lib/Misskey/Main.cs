@@ -33,7 +33,7 @@ namespace MisakiEQ.Lib.Misskey
             if (string.IsNullOrEmpty(accessToken))
             {
                 Log.Instance.Info("Misskeyのアクセストークンが存在しないためノート投稿できませんでした。");
-                return "";
+                return string.Empty;
             }
             try
             {
@@ -51,22 +51,29 @@ namespace MisakiEQ.Lib.Misskey
                 {
                     api.replyId = replyid;
                 }
-                Log.Instance.Debug(JsonConvert.SerializeObject(api));
-                var content = new StringContent(JsonConvert.SerializeObject(api), Encoding.UTF8, @"application/json");
+                string sendText = JsonConvert.SerializeObject(api);
+                Log.Instance.Debug(sendText);
+                var content = new StringContent(sendText, Encoding.UTF8, @"application/json");
 
                 Log.Instance.Debug("Misskey API Posting...");
 
                 var responce = await client.PostAsync(baseUrl + "/notes/create", content);
 
                 //レスポンスコードを返す
-                Log.Instance.Debug($"Responce : {responce.StatusCode.ToString()}");
+                Log.Instance.Debug($"Status Code : {(int)responce.StatusCode} - {responce.StatusCode.ToString()}");
                 //返り値をそのまま出す
-                Log.Instance.Debug($"{responce.Content.ReadAsStringAsync()}");
-                var rs = JsonConvert.DeserializeObject<API.CreateNoteResponse.Root>(await responce.Content.ReadAsStringAsync());
+                string output = await responce.Content.ReadAsStringAsync();
+                Log.Instance.Debug($"Contents : \"{output}\"");
+                if (responce.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    Log.Instance.Warn("リクエストが正常に送信できませんでした。");
+                    return string.Empty;
+                }
+                var rs = JsonConvert.DeserializeObject<API.CreateNoteResponse.Root>(output);
                 if (rs == null)
                 {
-                    Log.Instance.Error("Misskey.ioは何も返しませんでした。");
-                    return "";
+                    Log.Instance.Error("Misskey APIは何も返しませんでした。");
+                    return string.Empty;
                 }
                 else {
                     Log.Instance.Debug($"NoteID:{rs.createdNote.id} Visibility:{rs.createdNote.visibility}");
@@ -75,7 +82,7 @@ namespace MisakiEQ.Lib.Misskey
             }catch(Exception ex)
             {
                 Log.Instance.Error(ex);
-                return "";
+                return string.Empty;
             }
         }
 

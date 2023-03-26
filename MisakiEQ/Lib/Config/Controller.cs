@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
 using MisakiEQ.Background;
-/*
+
 namespace MisakiEQ.Lib.ConfigV2.Components.Common{
     public class CommonData{
         public string Name {get; internal set;} = string.Empty;
@@ -155,10 +156,7 @@ namespace MisakiEQ.Lib.ConfigV2.Components{
                 if (value != _value)
                 {
                     _value= value;
-                    if (ValueChanged != null)
-                    {
-                        ValueChanged(this, EventArgs.Empty);
-                    }
+                    ValueChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -171,8 +169,24 @@ namespace MisakiEQ.Lib.ConfigV2.Components{
         }
     }
     public class Combobox : Common.CommonData{
-        int Default;
-        int Value;
+        int _def = 0;
+        public int Default { get { return _def; } set 
+            {
+                if (ComboStrings.Count >= value || 0 > value) 
+                    throw new ArgumentOutOfRangeException(nameof(value),"Default value is out of range.");
+                _def = value;
+            } }
+        int _val = 0;
+        public int Value
+        {
+            get { return _val; }
+            set
+            {
+                if (ComboStrings.Count >= value || 0 > value)
+                    throw new ArgumentOutOfRangeException(nameof(value), "Value is out of range.");
+                _val = value;
+            }
+        }
         List<string> ComboStrings;
         public Combobox(string name, string title, string description, int def, List<string> list)
         {

@@ -88,7 +88,7 @@ namespace MisakiEQ.GUI
             var function = Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Function");
             function?.SetAction(async () =>
             {
-                await Lib.Misskey.APIData.CreateNote(Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.Value.ToString() ?? "",Setting.Visibility.Home);
+                await Lib.Misskey.APIData.CreateNote(Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.Value.ToString() ?? "",Setting.Visibility.Followers);
                });
 //#endif
         }

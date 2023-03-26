@@ -27,6 +27,7 @@ namespace MisakiEQ.Funcs
             public int LatestSerial { get; set; } = 0;
             public int DuplicateCount { get; set; } = 0;
             public bool IsWarnFirstNoted { get; set; } = false;
+            public int WarnAreaCount { get; set; } = 0;
             public DateTime LatestTime { get; set; } = DateTime.Now;
         }
 
@@ -76,9 +77,11 @@ namespace MisakiEQ.Funcs
             }
             if (eew.Serial.Infomation != Struct.EEW.InfomationLevel.Cancelled)
             {
-                TweetIndex += $"{eew.EarthQuake.Hypocenter} 深さ: {Struct.Common.DepthToString(eew.EarthQuake.Depth)} M {eew.EarthQuake.Magnitude:0.0}\n";
-                TweetIndex += $"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n";
-                TweetIndex += $"発生時刻 : <plain>{eew.EarthQuake.OriginTime:M/dd HH:mm:ss}</plain>\n";
+                TweetIndex += $"震源地 : {eew.EarthQuake.Hypocenter}\n" +
+                    $"深さ: {Struct.Common.DepthToString(eew.EarthQuake.Depth)}\n" +
+                    $"地震の規模 : M{eew.EarthQuake.Magnitude:0.0}\n" +
+                    $"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n" +
+                    $"発生時刻 : <plain>{eew.EarthQuake.OriginTime:M/dd HH:mm:ss}</plain>\n";
                 if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
                 {
                     TweetIndex += "\n$[bg.color=FFFF00 $[fg.color=FF0000 ⚠️以下の地域は強い揺れに注意⚠️]]\n";
@@ -128,11 +131,14 @@ namespace MisakiEQ.Funcs
                         (!Current.IsWarnFirstNoted &&//まだ規模が大きく変化した際の未発表の場合
                         (eew.EarthQuake.MaxIntensity>=Struct.Common.Intensity.Int5Down || // 震度5弱以上
                         eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)) || // 警報
-                        eew.Serial.Infomation == Struct.EEW.InfomationLevel.Cancelled) //キャンセル
+                        eew.Serial.Infomation == Struct.EEW.InfomationLevel.Cancelled ||//キャンセル
+                        eew.EarthQuake.ForecastArea.LocalAreas.Count>Current.WarnAreaCount) //地名の数が更新されたとき
                     {
-                        Current.IsWarnFirstNoted = true;
+                        if(eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
+                            Current.IsWarnFirstNoted = true;
                         visibility = Lib.Misskey.Setting.Visibility.Public;
                     }
+                    Current.WarnAreaCount = eew.EarthQuake.ForecastArea.LocalAreas.Count;
                     LatestID = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*/, text: TweetIndex, visibility: visibility);
                     Log.Instance.Debug($"Noteしました。 ID:{LatestID}\n");
 
@@ -290,7 +296,7 @@ namespace MisakiEQ.Funcs
                     if (tsunami.Cancelled)
                     {
                         index.Add("");
-                        index.Add("全ての津波予報が解除されました。");
+                        index.Add("**全ての津波予報が解除されました。**");
                         index.Add("");
                         string l = string.Empty;
                         for (int k = 0; k < index.Count; k++)
@@ -340,22 +346,22 @@ namespace MisakiEQ.Funcs
                                 switch (i)
                                 {
                                     case 0:
-                                        index.Add("🟥⬜大津波警報 (まもなく到達)");
+                                        index.Add("$[bg.color=FF0000 $[fg.color=FFFFFF **大津波警報 (まもなく到達)**]]");
                                         break;
                                     case 1:
-                                        index.Add("🟥⬜大津波警報");
+                                        index.Add("$[bg.color=FF0000 $[fg.color=FFFFFF **大津波警報**]]");
                                         break;
                                     case 2:
-                                        index.Add("🟥津波警報 (まもなく到達)");
+                                        index.Add("$[bg.color=FF0000 $[fg.color=FFFFFF 津波警報 **(まもなく到達)**]]");
                                         break;
                                     case 3:
-                                        index.Add("🟥津波警報");
+                                        index.Add("$[bg.color=FF0000 $[fg.color=FFFFFF 津波警報]]");
                                         break;
                                     case 4:
-                                        index.Add("🟨津波注意報 (まもなく到達)");
+                                        index.Add("$[bg.color=FFFF00 $[fg.color=000000 津波注意報 **(まもなく到達)**]]");
                                         break;
                                     case 5:
-                                        index.Add("🟨津波注意報");
+                                        index.Add("$[bg.color=FFFF00 $[fg.color=000000 津波注意報]]");
                                         break;
                                 }
                                 string tmp = index[^1];
@@ -374,7 +380,7 @@ namespace MisakiEQ.Funcs
                                     }
                                 }
                                 index.Add(text);
-                                if (cnt > 230)
+                                if (cnt > 2950)
                                 {
                                     string t = string.Empty;
                                     for (int k = 0; k < index.Count; k++)
@@ -419,7 +425,7 @@ namespace MisakiEQ.Funcs
                     List<string> TweetList = new();
                     List<string> index = new()
                     {
-                        $"🔺J-ALERT🔺【{data.Title}】",
+                        $"$[bg.color=FF0000 $[fg.color=FFFFFF **J-ALERT【{data.Title}】**]]",
                         $"{data.AnnounceTime:M/dd H:mm}受信"
                     };
                     index.Add(data.Detail);

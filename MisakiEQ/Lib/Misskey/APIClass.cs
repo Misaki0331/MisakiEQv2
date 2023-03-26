@@ -15,12 +15,16 @@ namespace MisakiEQ.Lib.Misskey.API
         /// </summary>
         [JsonProperty("i")]
         public string I { get; set; } = string.Empty;
+        [JsonProperty("detail")]
+        public bool detail { get; set; } = false;
         [JsonProperty("visibility")]
         public string Visibility { get; set; } = "Home";
-        [JsonProperty("text")] 
+        [JsonProperty("text")]
         public string Text { get; set; } = "";
+        [JsonIgnore]
         [JsonProperty("fileId")]
         public List<string>? FileId { get; set; } = null;
+        [JsonIgnore]
         [JsonProperty("replyId")]
         public string? replyId { get; set; } = null;
     }
