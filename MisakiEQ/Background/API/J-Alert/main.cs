@@ -125,16 +125,15 @@ namespace MisakiEQ.Background.API
                                 continue;
                             }
                             json = str;
-                            if (!string.IsNullOrWhiteSpace(json)&&OldTemp != json)
+                            if (!string.IsNullOrWhiteSpace(json) && OldTemp != json)
                             {
-                                var data=Struct.J_Alert.GetJAlertData(t, str);
+                                var data = Struct.J_Alert.GetJAlertData(t, str);
                                 if (data.IsValid)
                                 {
                                     OldTemp = json;
-                                    LatestData = data;
                                     if (!IsFirst)
                                     {
-                                        if (data.AnnounceTime.AddHours(-9).AddMinutes(5) > DateTime.UtcNow)
+                                        if ((data.Detail != LatestData.Detail || data.Areas.Count != LatestData.Areas.Count) && (data.AnnounceTime.AddHours(-9).AddMinutes(3) > DateTime.UtcNow))
                                         {
                                             var args = new J_AlertEventArgs(data);
                                             if (J_AlertUpdateHandler != null) J_AlertUpdateHandler(this, args);
@@ -145,6 +144,7 @@ namespace MisakiEQ.Background.API
                                         if (IsFirst) Log.Instance.Info($"J-ALERTの取得に成功しました。最終更新:{data.AnnounceTime}");
                                         IsFirst = false;
                                     }
+                                    LatestData = data;
                                 }
                             }
                         }

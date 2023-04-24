@@ -257,7 +257,7 @@ namespace MisakiEQ.Funcs
                     TweetIndexs.Add(Text + "\n#MisakiEQ #地震");
                     for (int i = 0; i < TweetIndexs.Count; i++)
                     {
-                        string id = await Lib.Misskey.APIData.CreateNote(TweetIndexs[i], Lib.Misskey.Setting.Visibility.Public , ""/*LatestID*/);
+                        string id = await Lib.Misskey.APIData.CreateNote(TweetIndexs[i], Lib.Misskey.Setting.Visibility.Public , eqdata.LatestNote/*LatestID*/);
                         if (!string.IsNullOrEmpty(id))
                         {
                             eqdata.LatestNote = id;
