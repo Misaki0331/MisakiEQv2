@@ -152,6 +152,7 @@ namespace MisakiEQ.Lib.Config
 
             Lib.Misskey.APIData.Config.IsEnableEarthquakeNote = (GetConfigValue("Misskey_Enable_Note") as bool? ?? true);
             Lib.Misskey.APIData.Config.IsEnableJAlertNote = (GetConfigValue("Misskey_J-ALERT_Note") as bool? ?? true);
+            MisakiEQ.Funcs.Misskey.GetInstance().EEWDelayTime = (int)(GetConfigValue("Misskey_EEW_Delay") as long? ?? 2000);
 #endif
         }
         /// <summary>
@@ -279,6 +280,8 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_J-ALERT_Tweet", "J-ALERT配信有効化", "自動でユーザーにJアラートをツイートします", def: false, "Twitterへの自動ツイートが有効", "Twitterへの自動ツイートが無効"));
                 GetGroup("SNS設定", true)?.Add(new IndexData("Misskey_Enable_Note", "自動ノートの有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ノートが有効", "Misskeyへの自動ノートが無効"));
                 GetGroup("SNS設定", true)?.Add(new IndexData("Misskey_J-ALERT_Note", "J-ALERT配信有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ノートが有効", "Misskeyへの自動ノートが無効"));
+                GetGroup("SNS設定", true)?.Add(new IndexData("Misskey_EEW_Delay", "EEWノート遅延", unitName: "秒", displayMag: 1000, description: "遅延時間です。", min: 0, max: 10000, def: 2000));   //通常時の遅延(ms)
+
 #endif
                 GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
                 GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));

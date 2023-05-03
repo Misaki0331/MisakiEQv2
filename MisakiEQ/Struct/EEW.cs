@@ -184,6 +184,8 @@ namespace MisakiEQ.Struct
             ///<summary>キャンセル報</summary>
             Cancelled,
             ///<summary>緊急地震速報(予報)</summary>
+            OldForecast,
+            ///<summary>緊急地震速報(地震動予報)</summary>
             Forecast,
             ///<summary>緊急地震速報(警報)</summary>
             Warning,

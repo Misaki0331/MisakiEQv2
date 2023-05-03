@@ -113,7 +113,7 @@ namespace MisakiEQ.Funcs
                             {
                                 EEWReplyList[i].DuplicateCount++;
                                 Log.Instance.Warn($"この緊急地震速報は{EEWReplyList[i].DuplicateCount}回発信されています。\nEventID:{EEWReplyList[i].EventID} 情報番号:{EEWReplyList[i].LatestSerial}");
-                                return;
+                                //return;
                             }
                             Index = i;
                         }

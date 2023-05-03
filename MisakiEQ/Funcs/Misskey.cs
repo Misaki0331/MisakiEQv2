@@ -43,6 +43,13 @@ namespace MisakiEQ.Funcs
             public string LatestNote { get; set; } = string.Empty;
             public DateTime LatestTime { get; set; } = DateTime.Now;
         }
+        private Misskey()
+        {
+            EEWDelay.SetTask(new( async(SendNote note) =>
+            {
+                 note.responseNote = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*/, text: note.Note, visibility: note.Visibility);
+            }));
+        }
         private static Misskey? singleton = null;
         /// <summary>
         /// インスタンスを生成する
@@ -51,6 +58,22 @@ namespace MisakiEQ.Funcs
         {
             singleton ??= new Misskey();
             return singleton;
+        }
+        public int EEWDelayTime
+        {
+            get { return EEWDelay.DelayTime; }
+            set { EEWDelay.DelayTime = value; }
+        }
+        private Lib.DelayFunction<SendNote> EEWDelay = new();
+        class SendNote
+        {
+            public SendNote()
+            {
+
+            }
+            public string responseNote = "";
+            public string Note = "";
+            public Lib.Misskey.Setting.Visibility Visibility = Lib.Misskey.Setting.Visibility.Specified;
         }
         readonly List<EEWNote> EEWReplyList = new();
         readonly List<EarthquakeNote> EQReplyList = new();
@@ -119,7 +142,7 @@ namespace MisakiEQ.Funcs
                             if (EEWReplyList[i].LatestSerial >= eew.Serial.Number)
                             {
                                 EEWReplyList[i].DuplicateCount++;
-                                return;
+                                //return;
                             }
                             Current= EEWReplyList[i];
                             Index = i;
@@ -139,12 +162,23 @@ namespace MisakiEQ.Funcs
                         visibility = Lib.Misskey.Setting.Visibility.Public;
                     }
                     Current.WarnAreaCount = eew.EarthQuake.ForecastArea.LocalAreas.Count;
-                    LatestID = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*/, text: TweetIndex, visibility: visibility);
-                    Log.Instance.Debug($"Noteしました。 ID:{LatestID}\n");
-
-                    if (LatestID != string.Empty)
+                    var n = new SendNote();
+                    n.Note = TweetIndex;
+                    n.Visibility = visibility;
+                    if (visibility == Lib.Misskey.Setting.Visibility.Public)
                     {
-                        Current.LatestNote = LatestID;
+                        EEWDelay.InterTask(n);
+                    }
+                    else
+                    {
+                        EEWDelay.SendTask(n);
+                    }
+                    //LatestID = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*/, text: TweetIndex, visibility: visibility);
+                    Log.Instance.Debug($"Noteしました。 ID:{n.responseNote}\n");
+
+                    if (n.responseNote != string.Empty)
+                    {
+                        Current.LatestNote = n.responseNote;
                     }
                     Current.LatestSerial = eew.Serial.Number;
                     Current.LatestTime = DateTime.Now;
