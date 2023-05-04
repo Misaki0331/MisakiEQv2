@@ -200,6 +200,13 @@ namespace MisakiEQ.Background.API.EEW.dmdata
             else
                 Log.Instance.Error("WebSocketから受信しましたがデータがありませんでした。");
         }
+
+        public void Test(string str)
+        {
+            Encoding encoding = Encoding.UTF8;
+            GetData(new MemoryStream(encoding.GetBytes(str)));
+        }
+
         public async void GetData(Stream stream)
         {
             try

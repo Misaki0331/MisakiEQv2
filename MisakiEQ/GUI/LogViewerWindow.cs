@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MisakiEQ.Background;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -22,7 +23,7 @@ namespace MisakiEQ.GUI
         {
             Log.Instance.LogUpdateHandler -= LogUpdate;
         }
-        
+
         private void LogUpdate(object? sender, string e)
         {
             textBox1.Invoke(() =>
@@ -57,7 +58,7 @@ namespace MisakiEQ.GUI
                                 break;
 
                         }
-                        textBox1.AppendText("\n"+ lines[i][2..]);
+                        textBox1.AppendText("\n" + lines[i][2..]);
 
                     }
                     /*
@@ -95,7 +96,96 @@ namespace MisakiEQ.GUI
 
         private void LogViewerWindow_Deactivate(object sender, EventArgs e)
         {
-            if(!IsDisposed&&!Disposing)Opacity = 0.8;
+            if (!IsDisposed && !Disposing) Opacity = 0.8;
+        }
+
+        private void Execution_Click(object sender, EventArgs e)
+        {
+            var commands = Command.Text.Split(' ');
+            if (commands.Length < 1)
+            {
+                Log.Instance.Error("コマンドの内容がありません。");
+            }
+            try
+            {
+                switch (commands[0].ToLower())
+                {
+                    case "/sendeew":
+                        if (commands.Length < 2) throw new ArgumentException("/sendeew 任意のファイル名");
+                        try
+                        {
+                            var reader = new StreamReader(commands[1]);
+                            var str = reader.ReadToEnd();
+                            APIs.GetInstance().EEW.DMData.Test(str);
+                            reader.Close();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Instance.Error(ex.ToString());
+                        }
+                        break;
+                    case "/misskey-token":
+                        Log.Instance.Info(Lib.Misskey.APIData.accessToken);
+                        break;
+                    default:
+                        Log.Instance.Warn("不明なコマンドです。" + commands[0]);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Error(ex.Message);
+            }
+            textBox1.Focus();
+            panel1.Visible = false;
+        }
+
+        private void Command_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter || e.KeyChar == (char)Keys.Escape)
+            {
+                e.Handled = true;
+                if (e.KeyChar == (char)Keys.Enter)
+                {
+                    Execution_Click(sender, e);
+                }
+                panel1.Visible = false;
+            }
+
+        }
+
+        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)'/')
+            {
+                panel1.Visible = true;
+                Command.Focus();
+            }
+        }
+
+        private void Command_DragDrop(object sender, DragEventArgs e)
+        {
+        }
+
+        private void Command_DragEnter(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.All;
+        }
+
+        private void LogViewerWindow_DragDrop(object sender, DragEventArgs e)
+        {
+
+            if (!panel1.Visible) return;
+            if (e.Data == null) return;
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
+
+            string[] dragFilePathArr = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            Command.Text += dragFilePathArr[0];
+        }
+
+        private void LogViewerWindow_DragEnter(object sender, DragEventArgs e)
+        {
+            if (panel1.Visible) e.Effect = DragDropEffects.All;
         }
     }
 }

@@ -26,7 +26,17 @@ namespace MisakiEQ.Lib.Misskey
         static HttpClient client = new HttpClient();
         const string baseUrl = "https://misskey.io/api";
         public static string accessToken = "";
-
+        public class Note
+        {
+            public Note(string note,DateTime time)
+            {
+                NoteString= note;
+                NotedTime = time;
+            }
+            public string NoteString = "";
+            public DateTime NotedTime;
+        }
+        public static List<Note> SendNotes=new List<Note>();
 
         public static async Task<string> CreateNote(string text, Setting.Visibility visibility, string replyid="", string fileid = "")
         {
@@ -52,7 +62,25 @@ namespace MisakiEQ.Lib.Misskey
                     api.replyId = replyid;
                 }
                 string sendText = JsonConvert.SerializeObject(api);
-                Log.Instance.Debug(sendText);
+
+                //また暴走を行うことを防ぐ為に
+                for(int i = 0; i < SendNotes.Count; i++)
+                {
+                    if (SendNotes[i].NoteString == text)
+                    {
+                        SendNotes[i].NotedTime= DateTime.Now;
+                        Log.Instance.Warn("誤動作防止：送信するテキストが同じである為失敗しました。");
+                        return "";
+                    }
+                }
+
+                foreach (var a in SendNotes)
+                {
+                    if(a.NotedTime.AddHours(1) < DateTime.Now)
+                    {
+                        SendNotes.Remove(a);
+                    }
+                }
                 var content = new StringContent(sendText, Encoding.UTF8, @"application/json");
 
                 Log.Instance.Debug("Misskey API Posting...");
@@ -76,6 +104,7 @@ namespace MisakiEQ.Lib.Misskey
                     return string.Empty;
                 }
                 else {
+                    SendNotes.Add(new(text, DateTime.Now));
                     Log.Instance.Debug($"NoteID:{rs.createdNote.id} Visibility:{rs.createdNote.visibility}");
                 }
                 return rs.createdNote.id;

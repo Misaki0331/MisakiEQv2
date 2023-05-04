@@ -45,10 +45,10 @@ namespace MisakiEQ.Funcs
         }
         private Misskey()
         {
-            EEWDelay.SetTask(new( async(SendNote note) =>
-            {
-                 note.responseNote = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*/, text: note.Note, visibility: note.Visibility);
-            }));
+            /*EEWDelay.SetTask(new( async(SendNote note) =>
+            //{
+           //      note.responseNote = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*///, text: note.Note, visibility: note.Visibility);
+            //}))
         }
         private static Misskey? singleton = null;
         /// <summary>
@@ -59,12 +59,13 @@ namespace MisakiEQ.Funcs
             singleton ??= new Misskey();
             return singleton;
         }
-        public int EEWDelayTime
-        {
-            get { return EEWDelay.DelayTime; }
-            set { EEWDelay.DelayTime = value; }
-        }
-        private Lib.DelayFunction<SendNote> EEWDelay = new();
+        public int EEWDelayTime;
+        //{
+           // get { return EEWDelay.DelayTime; }
+           // set { EEWDelay.DelayTime = value; }
+        //}
+        //Todo : 重大インシデント
+        //private Lib.DelayFunction<SendNote> EEWDelay = new();
         class SendNote
         {
             public SendNote()
@@ -165,15 +166,15 @@ namespace MisakiEQ.Funcs
                     var n = new SendNote();
                     n.Note = TweetIndex;
                     n.Visibility = visibility;
-                    if (visibility == Lib.Misskey.Setting.Visibility.Public)
+                    /*if (visibility == Lib.Misskey.Setting.Visibility.Public)
                     {
                         EEWDelay.InterTask(n);
                     }
                     else
                     {
                         EEWDelay.SendTask(n);
-                    }
-                    //LatestID = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*/, text: TweetIndex, visibility: visibility);
+                    }*/
+                    n.responseNote = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*/, text: TweetIndex, visibility: visibility);
                     Log.Instance.Debug($"Noteしました。 ID:{n.responseNote}\n");
 
                     if (n.responseNote != string.Empty)
