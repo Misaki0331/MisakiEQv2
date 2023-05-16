@@ -23,7 +23,7 @@ namespace MisakiEQ.GUI
         {
             Log.Instance.LogUpdateHandler -= LogUpdate;
         }
-
+        readonly List<string>SendCommands= new();
         private void LogUpdate(object? sender, string e)
         {
             textBox1.Invoke(() =>
@@ -98,7 +98,6 @@ namespace MisakiEQ.GUI
         {
             if (!IsDisposed && !Disposing) Opacity = 0.8;
         }
-
         private void Execution_Click(object sender, EventArgs e)
         {
             var commands = Command.Text.Split(' ');
@@ -114,10 +113,15 @@ namespace MisakiEQ.GUI
                         if (commands.Length < 2) throw new ArgumentException("/sendeew 任意のファイル名");
                         try
                         {
-                            var reader = new StreamReader(commands[1]);
-                            var str = reader.ReadToEnd();
-                            APIs.GetInstance().EEW.DMData.Test(str);
-                            reader.Close();
+                            var task = new Task(() => {
+                                Log.Instance.Debug($"{commands[1]}のデータ読込中...");
+                                var reader = new StreamReader(commands[1]);
+                                var str = reader.ReadToEnd();
+                                APIs.GetInstance().EEW.DMData.Test(str);
+                                reader.Close();
+                                Log.Instance.Debug($"Done");
+                            });
+                            task.Start();
                         }
                         catch (Exception ex)
                         {
@@ -136,12 +140,19 @@ namespace MisakiEQ.GUI
             {
                 Log.Instance.Error(ex.Message);
             }
+            SendCommands.Add(Command.Text);
+            Command.Text = "";
+            if(SendCommands.Count > 100) SendCommands.RemoveAt(0);
             textBox1.Focus();
             panel1.Visible = false;
         }
-
+        readonly int pos = 0;
         private void Command_KeyPress(object sender, KeyPressEventArgs e)
         {
+            if(e.KeyChar == (char)Keys.Up)
+            {
+                if (SendCommands.Count>0)Command.Text= SendCommands[^1];
+            }
             if (e.KeyChar == (char)Keys.Enter || e.KeyChar == (char)Keys.Escape)
             {
                 e.Handled = true;
@@ -150,6 +161,7 @@ namespace MisakiEQ.GUI
                     Execution_Click(sender, e);
                 }
                 panel1.Visible = false;
+                textBox1.Focus();
             }
 
         }
@@ -158,13 +170,21 @@ namespace MisakiEQ.GUI
         {
             if (e.KeyChar == (char)'/')
             {
+                
                 panel1.Visible = true;
                 Command.Focus();
+                Command.AppendText("/");
             }
         }
 
         private void Command_DragDrop(object sender, DragEventArgs e)
         {
+            if (!panel1.Visible) return;
+            if (e.Data == null) return;
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
+
+            string[] dragFilePathArr = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            Command.Text += dragFilePathArr[0];
         }
 
         private void Command_DragEnter(object sender, DragEventArgs e)

@@ -237,14 +237,21 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                     //最終報チェック
                     tmp = root.XPathSelectElement($"/jmx:Report/{GetName("Body")}/{GetName("NextAdvisory")}", nsManager)?.Value;
                     if (tmp != null && tmp.Contains("最終報")) eew.Serial.IsFinal = true; else eew.Serial.IsFinal = false;
+
+
+                    var info = root.XPathSelectElement($"/jmx:Report/{GetName("Control")}/{GetName("Title")}", nsManager)?.Value;
+                    switch (info)
+                    {
+                        case "緊急地震速報（予報）":
+                            eew.Serial.Infomation = Struct.EEW.InfomationLevel.OldForecast;
+                            return;
+                        case "緊急地震速報（地震動予報）":
+                            eew.Serial.Infomation = Struct.EEW.InfomationLevel.Forecast;
+                            break;
+                    }
                     //緊急地震速報のタイプ(キャンセル報か予報以上か)
                     tmp = root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("InfoType")}", nsManager)?.Value;
-                    eew.Serial.Infomation = tmp switch
-                    {
-                        "発表" => Struct.EEW.InfomationLevel.Forecast,
-                        "取消" => Struct.EEW.InfomationLevel.Cancelled,
-                        _ => Struct.EEW.InfomationLevel.Unknown,
-                    };
+                    if (tmp == "取消") eew.Serial.Infomation = Struct.EEW.InfomationLevel.Cancelled;
                     //発表時刻チェック
                     Log.Instance.Debug(root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("ReportDateTime")}", nsManager)?.Value ?? "");
                     if (!DateTime.TryParse(root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("ReportDateTime")}", nsManager)?.Value,
@@ -305,18 +312,15 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         if (tmp != null) areaInfo.Prefectures = Struct.Common.StringToPrefectures(tmp);
                         //Log.Instance.Debug(root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Name\"]", nsManager)?.Value??"");
                         if (!DateTime.TryParse(root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Area\"]/*[local-name()=\"ArrivalTime\"]", nsManager)?.Value, out areaInfo.ExpectedArrival)) areaInfo.ExpectedArrival = DateTime.MinValue;
-                        // 2024年頃に終了
-                        if (root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Area\"]/*[\"Category\"]/*[\"Kind\"]/*[\"Name\"]", nsManager)?.Value == "緊急地震速報（予報）")
-                        {
-                            eew.Serial.Infomation = Struct.EEW.InfomationLevel.OldForecast;
-                        }
-
-                        if (root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Area\"]/*[\"Category\"]/*[\"Kind\"]/*[\"Name\"]", nsManager)?.Value == "緊急地震速報（警報）")
+                        var text = root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Area\"]/*[\"Category\"]/*[\"Kind\"]/*[\"Name\"]", nsManager)?.Value;
+                        if(text== "緊急地震速報（警報）")
                         {
                             eew.Serial.Infomation = Struct.EEW.InfomationLevel.Warning;
                             if (!eew.EarthQuake.ForecastArea.LocalAreas.Contains(Struct.Common.PrefecturesToString(areaInfo.Prefectures))) eew.EarthQuake.ForecastArea.LocalAreas.Add(Struct.Common.PrefecturesToString(areaInfo.Prefectures));
 
                         }
+                        
+
 
                         eew.EarthQuake.ForecastArea.Regions.Add(areaInfo.Name);
                         eew.AreasInfo.Add(areaInfo);

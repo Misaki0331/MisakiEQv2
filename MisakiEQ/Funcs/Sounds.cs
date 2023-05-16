@@ -118,7 +118,7 @@ namespace MisakiEQ.Funcs
                         }
                         try
                         {
-                            if (controll != null)
+                            if (controll != null && !ins.Config.IsMute)
                             {
                                 controll.Volume = ins.Config.EEWVolume / 100f; ;
                                 controll.Replay();
@@ -168,7 +168,7 @@ namespace MisakiEQ.Funcs
                         controll = await ins.GetSound("Earthquake_Low");
                         break;
                 }
-                if (controll != null)
+                if (controll != null&&!ins.Config.IsMute)
                 {
                     controll.Volume = ins.Config.EarthquakeVolume / 100f; ;
                     controll.Replay();
@@ -216,7 +216,7 @@ namespace MisakiEQ.Funcs
                     else if (watch > 0)
                         controll = await ins.GetSound("Tsunami_Watch");
                 }
-                if (controll != null)
+                if (controll != null && !ins.Config.IsMute)
                 {
                     controll.Volume = ins.Config.TsunamiVolume / 100f;
                     controll.Replay();

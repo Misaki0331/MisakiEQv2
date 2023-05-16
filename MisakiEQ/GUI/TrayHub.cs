@@ -135,6 +135,11 @@ namespace MisakiEQ.GUI
             {
                 Log.Instance.Debug("EEWイベント受信");
                 if (e.eew == null) return;
+                if (e.eew.Serial.Infomation == Struct.EEW.InfomationLevel.OldForecast)
+                {
+                    Log.Instance.Debug("古いフォーマット方式の為スキップしました。");
+                    return;
+                }
                 double distance = Struct.EEW.GetDistance(e.eew, new(Background.APIs.GetInstance().KyoshinAPI.Config.UserLong, Background.APIs.GetInstance().KyoshinAPI.Config.UserLat));
                 e.eew.UserInfo.ArrivalTime = e.eew.EarthQuake.OriginTime.AddSeconds(distance / 4.2);
                 Log.Instance.Debug($"距離 = {distance} km");

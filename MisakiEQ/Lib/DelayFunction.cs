@@ -23,6 +23,7 @@ namespace MisakiEQ.Lib
         public void SetTask(Action<T> task)
         {
             DelayFunc = task;
+            IsUpdate = true;
         }
         bool IsRunning = false;
         /// <summary>
@@ -42,14 +43,22 @@ namespace MisakiEQ.Lib
                     IsRunning = true;
                     while (IsUpdate)
                     {
+                        IsUpdate = false;
                         var c = Context;
-                        DelayFunc(c);
+                        if(c!=null)DelayFunc(c);
+                        Context = default;
                         try
                         {
                             await Task.Delay(DelayTime, tokenSource.Token);
                         }
-                        catch (TaskCanceledException) { return; }
+                        catch (TaskCanceledException)
+                        {
+                            Log.Instance.Info("遅延処理はキャンセルされました。");
+                            return; 
+                        }
+                        Log.Instance.Info("遅延処理は実行しています。");
                     }
+                    Log.Instance.Info("遅延処理実行完了");
                     IsRunning = false;
                     return;
                 });

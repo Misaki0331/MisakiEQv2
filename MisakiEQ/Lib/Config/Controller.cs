@@ -213,6 +213,7 @@ namespace MisakiEQ.Lib.ConfigV2.Components{
     }
 
 }
+/// Todo: コンフィグを良い感じにする
 /*
 public class IndexData
         {

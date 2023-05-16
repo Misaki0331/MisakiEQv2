@@ -28,6 +28,8 @@ namespace MisakiEQ
         const int LOGFILE_PERIOD = 90;
         /// <summary>関数名の長さ</summary>
         const int STACKLEN = 30;
+        /// <summary>ログの関数の長さ</summary>
+        const int METHODNAMELEN = 256;
         List<string> Logdata = new();
 
         /// <summary>
@@ -239,6 +241,7 @@ namespace MisakiEQ
                 if (objStackFrame.GetMethod().ReflectedType == null) break;
                 strMethodName = $"{objStackFrame.GetMethod().ReflectedType.FullName}.{strMethodName}";
                 if (objStackFrame.GetMethod().ReflectedType.FullName.Contains("MisakiEQ")) break;
+                if (objStackFrame.GetMethod().ReflectedType.FullName.Contains("System")) break;
 #pragma warning restore CS8602 // null 参照の可能性があるものの逆参照です。
 
             }
@@ -307,7 +310,13 @@ namespace MisakiEQ
             if (IS_LOGFILE)
             {
                 msg = msg.Replace("\n", "\n\t");
+                var method = strMethodName;
                 string fullMsg = $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [{strMethodName}]: {msg}";
+                /*if (METHODNAMELEN < strMethodName.Length && METHODNAMELEN > 0)
+                {
+                    fullMsg = $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [..{strMethodName.Substring(strMethodName.Length-1-METHODNAMELEN)}]: {msg}";
+                }*/
+                
 
                 lock (lockObj)
                 {

@@ -3,10 +3,12 @@ using MisakiEQ.Lib;
 using MisakiEQ.Lib.PrefecturesAPI;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tweetinvi.Models.V2;
+using Windows.Storage.Streams;
 
 namespace MisakiEQ.Funcs
 {
@@ -43,12 +45,14 @@ namespace MisakiEQ.Funcs
             public string LatestNote { get; set; } = string.Empty;
             public DateTime LatestTime { get; set; } = DateTime.Now;
         }
+        bool IsNextPublic = false;
         private Misskey()
         {
-            /*EEWDelay.SetTask(new( async(SendNote note) =>
-            //{
-           //      note.responseNote = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*///, text: note.Note, visibility: note.Visibility);
-            //}))
+            EEWDelay.SetTask(new(async (SendNote note) =>
+            {
+                note.responseNote = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*/, text: note.Note, visibility: note.Visibility);
+                if (note.Visibility == Lib.Misskey.Setting.Visibility.Public) IsNextPublic = false;
+            }));
         }
         private static Misskey? singleton = null;
         /// <summary>
@@ -59,13 +63,14 @@ namespace MisakiEQ.Funcs
             singleton ??= new Misskey();
             return singleton;
         }
-        public int EEWDelayTime;
-        //{
-           // get { return EEWDelay.DelayTime; }
-           // set { EEWDelay.DelayTime = value; }
-        //}
+        public int EEWDelayTime
+        {
+           get { return EEWDelay.DelayTime; }
+           set { EEWDelay.DelayTime = value; }
+        }
+        public bool IsInterSend { get; set; } = true;
         //Todo : 重大インシデント
-        //private Lib.DelayFunction<SendNote> EEWDelay = new();
+        private Lib.DelayFunction<SendNote> EEWDelay = new();
         class SendNote
         {
             public SendNote()
@@ -82,6 +87,40 @@ namespace MisakiEQ.Funcs
         private readonly AsyncLock EQ_Lock = new();
         private readonly AsyncLock Tsunami_Lock = new();
         private readonly AsyncLock JALERT_Lock = new();
+
+        private string SetMisskeyColor(string BG,string FG, string str)
+        {
+            return $"$[bg.color={BG} $[fg.color={FG} {str}]]";
+        }
+        private string IntensityColor(Struct.Common.Intensity Intensity, string str) 
+        {
+            switch(Intensity)
+            {
+                case Struct.Common.Intensity.Int7:
+                    return SetMisskeyColor("800080", "FFFFFF", str);
+                case Struct.Common.Intensity.Int6Up:
+                    return SetMisskeyColor("FF00FF", "FFFFFF", str);
+                case Struct.Common.Intensity.Int6Down:
+                    return SetMisskeyColor("FFC0CB", "FF0000", str);
+                case Struct.Common.Intensity.Int5Down:
+                case Struct.Common.Intensity.Int5Up:
+                case Struct.Common.Intensity.Int5Over:
+                    return SetMisskeyColor("FF0000", "FFFFFF", str);
+                case Struct.Common.Intensity.Int4:
+                    return SetMisskeyColor("FFA500", "000000", str);
+                case Struct.Common.Intensity.Int3:
+                    return SetMisskeyColor("FFE600", "000000", str);
+                case Struct.Common.Intensity.Int2:
+                    return SetMisskeyColor("90EE90", "000000", str);
+                case Struct.Common.Intensity.Int1:
+                    return SetMisskeyColor("87CEEB", "000000", str);
+                case Struct.Common.Intensity.Int0:
+                case Struct.Common.Intensity.Unknown:
+                default:
+                    return SetMisskeyColor("FFFFFF","000000",str);
+            }
+        }
+
         public async void EEWPost(Struct.EEW eew)
         {
             string TweetIndex = string.Empty;
@@ -91,7 +130,7 @@ namespace MisakiEQ.Funcs
                     TweetIndex += $"$[bg.color=4040FF $[fg.color=FFFFFF 緊急地震速報(予報)]] 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
                     break;
                 case Struct.EEW.InfomationLevel.Warning:
-                    TweetIndex += $"$[bg.color=FFBFBF $[fg.color=FF0000 **緊急地震速報(警報)**]] 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
+                    TweetIndex += $"$[bg.color=FF0000 $[fg.color=FFFFFF **緊急地震速報(警報)**]] 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
                     break;
                 case Struct.EEW.InfomationLevel.Cancelled:
                     TweetIndex += $"$[bg.color=3FFF3F $[fg.color=000000 緊急地震速報(キャンセル)]]\n";
@@ -101,14 +140,11 @@ namespace MisakiEQ.Funcs
             }
             if (eew.Serial.Infomation != Struct.EEW.InfomationLevel.Cancelled)
             {
-                TweetIndex += $"震源地 : {eew.EarthQuake.Hypocenter}\n" +
-                    $"深さ: {Struct.Common.DepthToString(eew.EarthQuake.Depth)}\n" +
-                    $"地震の規模 : M{eew.EarthQuake.Magnitude:0.0}\n" +
-                    $"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n" +
-                    $"発生時刻 : <plain>{eew.EarthQuake.OriginTime:M/dd HH:mm:ss}</plain>\n";
+                TweetIndex += $"{eew.EarthQuake.Hypocenter} 深さ:{Struct.Common.DepthToString(eew.EarthQuake.Depth)} M{eew.EarthQuake.Magnitude:0.0}\n" +
+                    $"{IntensityColor(eew.EarthQuake.MaxIntensity,$"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}")}\n";
                 if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
                 {
-                    TweetIndex += "\n$[bg.color=FFFF00 $[fg.color=FF0000 ⚠️以下の地域は強い揺れに注意⚠️]]\n";
+                    TweetIndex += "$[bg.color=FFFF00 $[fg.color=FF0000 ⚠️以下の地域は強い揺れに注意⚠️]]\n";
                     for (int i = 0; i < eew.EarthQuake.ForecastArea.LocalAreas.Count; i++)
                     {
                         TweetIndex += $"{eew.EarthQuake.ForecastArea.LocalAreas[i]}";
@@ -120,6 +156,7 @@ namespace MisakiEQ.Funcs
                     }
                     TweetIndex += "\n";
                 }
+                TweetIndex += $"発生時刻 : <plain>{eew.EarthQuake.OriginTime:M/dd HH:mm:ss}</plain>\n";
             }
             else
             {
@@ -166,16 +203,22 @@ namespace MisakiEQ.Funcs
                     var n = new SendNote();
                     n.Note = TweetIndex;
                     n.Visibility = visibility;
-                    /*if (visibility == Lib.Misskey.Setting.Visibility.Public)
+                    if (visibility == Lib.Misskey.Setting.Visibility.Public)
                     {
-                        EEWDelay.InterTask(n);
+                        if(IsInterSend) EEWDelay.InterTask(n);
+                        else
+                        {
+                            IsNextPublic= true;
+                            EEWDelay.SendTask(n);
+                        }
                     }
                     else
                     {
+                        if (IsNextPublic) n.Visibility = Lib.Misskey.Setting.Visibility.Public;
                         EEWDelay.SendTask(n);
-                    }*/
-                    n.responseNote = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*/, text: TweetIndex, visibility: visibility);
-                    Log.Instance.Debug($"Noteしました。 ID:{n.responseNote}\n");
+                    }
+                    //n.responseNote = await Lib.Misskey.APIData.CreateNote(replyid: ""/*LatestID*/, text: TweetIndex, visibility: visibility);
+                    //Log.Instance.Debug($"Noteしました。 ID:{n.responseNote}\n");
 
                     if (n.responseNote != string.Empty)
                     {
@@ -209,7 +252,7 @@ namespace MisakiEQ.Funcs
                     {
                         case Struct.EarthQuake.EarthQuakeType.ScalePrompt:
                             index.Add($"震度速報 - {eq.Details.OriginTime:M/dd H:mm}頃");
-                            index.Add($"最大震度{Struct.Common.IntToStringLong(eq.Details.MaxIntensity)}を観測する地震が発生しました。");
+                            index.Add($"{IntensityColor(eq.Details.MaxIntensity, $"最大震度{Struct.Common.IntToStringLong(eq.Details.MaxIntensity)}を観測する地震が発生しました。")}");
                             break;
                         case Struct.EarthQuake.EarthQuakeType.Destination:
                             index.Add($"震源情報 - {eq.Details.OriginTime:M/dd H:mm}頃");
@@ -223,7 +266,7 @@ namespace MisakiEQ.Funcs
                             index.Add($"震源地: {eq.Details.Hypocenter}");
                             index.Add($"震源の深さ: {Struct.Common.DepthToString(eq.Details.Depth)}");
                             index.Add($"地震の規模: Ｍ{eq.Details.Magnitude:0.0}");
-                            index.Add($"最大震度: {Struct.Common.IntToStringLong(eq.Details.MaxIntensity)}");
+                            index.Add($"{IntensityColor(eq.Details.MaxIntensity, $"最大震度: {Struct.Common.IntToStringLong(eq.Details.MaxIntensity)}")}");
                             index.Add($"この地震による{Struct.EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}");
                             break;
                         case Struct.EarthQuake.EarthQuakeType.DetailScale:
@@ -231,7 +274,7 @@ namespace MisakiEQ.Funcs
                             index.Add($"震源地: {eq.Details.Hypocenter}");
                             index.Add($"震源の深さ: {Struct.Common.DepthToString(eq.Details.Depth)}");
                             index.Add($"地震の規模: Ｍ{eq.Details.Magnitude:0.0}");
-                            index.Add($"最大震度: {Struct.Common.IntToStringLong(eq.Details.MaxIntensity)}");
+                            index.Add($"{IntensityColor(eq.Details.MaxIntensity, $"最大震度: {Struct.Common.IntToStringLong(eq.Details.MaxIntensity)}")}");
                             index.Add($"この地震による{Struct.EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}");
                             break;
                         default:
@@ -249,7 +292,7 @@ namespace MisakiEQ.Funcs
                             var list = eq.Details.PrefIntensity.GetIntensityPrefectures();
                             for (int i = 0; i < list.Count; i++)
                             {
-                                string txt = $"震度{Struct.Common.IntToStringLong(list[i].Intensity)}：";
+                                string txt = $"{IntensityColor(list[i].Intensity,$"震度{Struct.Common.IntToStringLong(list[i].Intensity)}")}：";
                                 for (int j = 0; j < list[i].Prefectures.Count; j++)
                                 {
                                     txt += Struct.Common.PrefecturesToString(list[i].Prefectures[j]);
