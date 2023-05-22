@@ -7,8 +7,10 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 using Tweetinvi.Models.V2;
 using Windows.Storage.Streams;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MisakiEQ.Funcs
 {
@@ -97,27 +99,27 @@ namespace MisakiEQ.Funcs
             switch(Intensity)
             {
                 case Struct.Common.Intensity.Int7:
-                    return SetMisskeyColor("800080", "FFFFFF", str);
+                    return SetMisskeyColor("808", "FF0", str);
                 case Struct.Common.Intensity.Int6Up:
-                    return SetMisskeyColor("FF00FF", "FFFFFF", str);
+                    return SetMisskeyColor("F0F", "FFF", str);
                 case Struct.Common.Intensity.Int6Down:
-                    return SetMisskeyColor("FFC0CB", "FF0000", str);
+                    return SetMisskeyColor("FFC0CB", "F00", str);
                 case Struct.Common.Intensity.Int5Down:
                 case Struct.Common.Intensity.Int5Up:
                 case Struct.Common.Intensity.Int5Over:
-                    return SetMisskeyColor("FF0000", "FFFFFF", str);
+                    return SetMisskeyColor("F00", "FFF", str);
                 case Struct.Common.Intensity.Int4:
-                    return SetMisskeyColor("FFA500", "000000", str);
+                    return SetMisskeyColor("FFA500", "000", str);
                 case Struct.Common.Intensity.Int3:
-                    return SetMisskeyColor("FFE600", "000000", str);
+                    return SetMisskeyColor("FFE600", "000", str);
                 case Struct.Common.Intensity.Int2:
-                    return SetMisskeyColor("90EE90", "000000", str);
+                    return SetMisskeyColor("90EE90", "000", str);
                 case Struct.Common.Intensity.Int1:
-                    return SetMisskeyColor("87CEEB", "000000", str);
+                    return SetMisskeyColor("87CEEB", "000", str);
                 case Struct.Common.Intensity.Int0:
                 case Struct.Common.Intensity.Unknown:
                 default:
-                    return SetMisskeyColor("FFFFFF","000000",str);
+                    return SetMisskeyColor("FFF","000",str);
             }
         }
 
@@ -127,13 +129,13 @@ namespace MisakiEQ.Funcs
             switch (eew.Serial.Infomation)
             {
                 case Struct.EEW.InfomationLevel.Forecast:
-                    TweetIndex += $"$[bg.color=4040FF $[fg.color=FFFFFF 緊急地震速報(予報)]] 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
+                    TweetIndex += $"$[bg.color=44F $[fg.color=FFF 緊急地震速報(予報)]] 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
                     break;
                 case Struct.EEW.InfomationLevel.Warning:
-                    TweetIndex += $"$[bg.color=FF0000 $[fg.color=FFFFFF **緊急地震速報(警報)**]] 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
+                    TweetIndex += $"$[bg.color=F00 $[fg.color=FFF **緊急地震速報(警報)**]] 第 {eew.Serial.Number} 報 {(eew.Serial.IsFinal ? "(最終報)" : string.Empty)}\n";
                     break;
                 case Struct.EEW.InfomationLevel.Cancelled:
-                    TweetIndex += $"$[bg.color=3FFF3F $[fg.color=000000 緊急地震速報(キャンセル)]]\n";
+                    TweetIndex += $"$[bg.color=4F4 $[fg.color=000 緊急地震速報(キャンセル)]]\n";
                     break;
                 default:
                     return;
@@ -144,26 +146,45 @@ namespace MisakiEQ.Funcs
                     $"{IntensityColor(eew.EarthQuake.MaxIntensity,$"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}")}\n";
                 if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
                 {
-                    TweetIndex += "$[bg.color=FFFF00 $[fg.color=FF0000 ⚠️以下の地域は強い揺れに注意⚠️]]\n";
-                    for (int i = 0; i < eew.EarthQuake.ForecastArea.LocalAreas.Count; i++)
+                    TweetIndex += "$[bg.color=FF0 $[fg.color=F00 ⚠️以下の地域は強い揺れに注意⚠️]]\n";
+                    string line = "**";
+                    for (int i = 0; i < eew.EarthQuake.ForecastArea.Regions.Count; i++)
                     {
-                        TweetIndex += $"{eew.EarthQuake.ForecastArea.LocalAreas[i]}";
-                        if (i + 1 != eew.EarthQuake.ForecastArea.LocalAreas.Count)
+                        line += $"{eew.EarthQuake.ForecastArea.Regions[i]}";
+                        if (i + 1 != eew.EarthQuake.ForecastArea.Regions.Count)
                         {
-                            if (i % 5 == 4) TweetIndex += "\n";
-                            else TweetIndex += " ";
+                            if (line.Length > 16)
+                            {
+                                TweetIndex += line + "\n";
+                                line = "";
+                            }
+                            else
+                            {
+                                line += " ";
+                            }
                         }
                     }
-                    TweetIndex += "\n";
+                    TweetIndex += $"{line}**\n\n";
                 }
-                TweetIndex += $"発生時刻 : <plain>{eew.EarthQuake.OriginTime:M/dd HH:mm:ss}</plain>\n";
+                TweetIndex += $"発生時刻 : <plain>{(eew.EarthQuake.OriginTime==DateTime.MinValue?"不明":$"{eew.EarthQuake.OriginTime:M/dd HH:mm:ss}")}</plain>\n";
             }
             else
             {
                 TweetIndex += $"この緊急地震速報は取り消されました。\n";
             }
-            TweetIndex += "\n";
             TweetIndex += $"発表時刻 : <plain>{eew.Serial.UpdateTime:M/dd HH:mm:ss}</plain>\n";
+            if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
+            {
+                TweetIndex += "\n**【エリア予測情報】**\n";
+                for (int i = 0; i < eew.AreasInfo.Count; i++)
+                {
+                    string intensity = $"{IntensityColor(eew.AreasInfo[i].Intensity, $"震度{Struct.Common.IntToStringLong(eew.AreasInfo[i].Intensity).PadRight(2, 't').Replace("t", "  ")}")}";
+                    TweetIndex += $"**{intensity}{(eew.AreasInfo[i].ExpectedArrival == DateTime.MinValue ? "$[bg.color=F00 $[fg.color=FFF 到達済み]]" : $"{eew.AreasInfo[i].ExpectedArrival:HH:mm:ss}")}** {eew.AreasInfo[i].Name}";
+                    if (TweetIndex.Length > 2850||eew.AreasInfo.Count-1==i) break;
+                    TweetIndex += "\n";
+                }
+                TweetIndex += "\n";
+            }
             TweetIndex += $"#MisakiEQ #緊急地震速報";
             using (await EEW_Lock.LockAsync())
             {
