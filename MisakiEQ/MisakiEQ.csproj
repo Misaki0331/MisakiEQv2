@@ -115,4 +115,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Resources\API\" />
+  </ItemGroup>
+
 </Project>
