@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ABI.Windows.ApplicationModel.Activation;
 using MisakiEQ.Background;
 using static MisakiEQ.Lib.Config.Funcs;
 
@@ -45,7 +46,7 @@ namespace MisakiEQ.Lib.Config
                 for(int i = 0; i < Configs.Data.Count; i++)
                 {
                     var config=Configs.Data[i].Setting;
-                    for (int j = 0; j < config.Count; j++) sw.Write($"{config[j].Config}");
+                    for (int j = 0; j < config.Count; j++) sw.Write($"{config[j].GetConfigString()}");
                 }
                 sw.Close();
                 OverrideTemplates();
@@ -167,12 +168,12 @@ namespace MisakiEQ.Lib.Config
                 var config = Configs.Data[i].Setting;
                 for (int j = 0; j < config.Count; j++)
                 {
-                    if (config[j].Type == "combo")
+                    if (config[j] is ComboIndexData)
                     {
-                        ConfigTemplates.Add(new(config[j].Name, $"={config[j].Value}"));
+                        ConfigTemplates.Add(new(config[j].Name, $"={((ComboIndexData)config[j]).Value}"));
                     }
                     else
-                    if (config[j].ValueDefaultable()) ConfigTemplates.Add(new(config[j].Name, $"{config[j].Value}"));
+                    if (config[j].ValueDefaultable()) ConfigTemplates.Add(new(config[j].Name, $"{config[j].GetValue()}"));
                 }
             }
             for (int i = 0; i < ConfigTemplates.Count; i++) SetConfigValue(ConfigTemplates[i].Key, ConfigTemplates[i].Value, false);
@@ -207,7 +208,7 @@ namespace MisakiEQ.Lib.Config
         {
             var cls = GetConfigClass(name);
             if (cls == null) return null;
-            return cls.Value;
+            return cls.GetConfigString();
         }
 
         /// <summary>
@@ -225,7 +226,7 @@ namespace MisakiEQ.Lib.Config
                 if (IsThrow) throw new ArgumentException($"\"{name}\"はConfig上に存在しません。");
                 return;
             }
-            cls.Config = value;
+            cls.SetConfigString(value);
         }
         private class ConfigTemplate
         {
@@ -253,53 +254,53 @@ namespace MisakiEQ.Lib.Config
             public readonly List<ConfigGroup> Data = new();
             public Cfg()
             {
-                GetGroup("通信設定",true)?.Add(new IndexData("API_EEW_Delay","EEW標準遅延",unitName:"秒",displayMag:1000, description:"標準状態の緊急地震速報の遅延時間です。", min:1000, max:5000, def:1000));   //通常時の遅延(ms)
-                GetGroup("通信設定",true)?.Add(new IndexData("API_EEW_DelayDetectMode", "EEW検知遅延", unitName: "秒", displayMag: 1000, description: "検知状態の緊急地震速報の遅延時間です。", min:150, max:5000, def:200));     //検出時の遅延(ms)
-                GetGroup("通信設定",true)?.Add(new IndexData("API_EEW_DelayDetectCoolDown", "EEWモード移行時間", unitName: "秒", displayMag: 1000, description: "検知状態から標準状態に回復する時間です。", min:1000, max:10000, def:4000));     //検出から通常時に戻る時間(ms)
-                GetGroup("通信設定",true)?.Add(new IndexData("API_EEW_DMDATA_OnlyWarn", "DMDATA取得モード", "警報のみ受け取るか、予報も受け取るかを選択できます。", def: false, "警報のみ取得","予報・警報を取得"));   
-                GetGroup("通信設定",true)?.Add(new IndexData("API_EQInfo_Delay", "地震情報遅延", unitName: "秒", displayMag: 1000, description: "地震情報全般の取得遅延時間です。\n地震と津波情報共通でリクエスト多過ぎるとエラー出ます。", min:2000, max:30000, def:3000));   //通常時の遅延(ms)
-                GetGroup("通信設定",true)?.Add(new IndexData("API_EQInfo_Limit", "地震情報取得項目数", description: "1回で地震情報を取得する数です。\n値を大きくすると1回あたりより多くの情報が更新されますが、その分遅くなります。", min:1, max:100, def:10));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:5, def:1,unitName:"秒"));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Frequency", "強震モニタ更新間隔", description: "強震モニタの更新間隔です。データ消費量を抑えたい時にお使いください。", min:1, max:5, def:1,unitName:"秒"));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new IndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new IndexData("API_J-ALERT_Delay", "Jアラート遅延時間", description: "Jアラートの更新間隔です。", min:3, max:60, def:30,unitName:"秒"));   
-                GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数
-                GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
-                GetGroup("ユーザー設定", true)?.Add(new IndexData("USER_Pos_Result", "該当地域名", "緯度・経度に対応されるであろう該当地域名です。"));
-                GetGroup("ユーザー設定",true)?.Add(new IndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示","強震モニタに非表示"));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new IndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", WorkingTitle: "時刻調整中...", action:new Action(async() => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
-                GetGroup("通信設定", true)?.Add(new IndexData("Kyoshin_Time", "強震モニタ時刻", "強震モニタ上の最終更新時刻です。"));
-                GetGroup("Project DM-Data Service", true)?.Add(new IndexData("DMDATA_AuthFunction", "アプリ連携", "MisakiEQでDMDATAの緊急地震速報データを取得できるようにします。", "認証", WorkingTitle: "ブラウザで認証中..."));
+                GetGroup("通信設定",true)?.Add(new LongIndexData("API_EEW_Delay","EEW標準遅延",unitName:"秒",displayMag:1000, description:"標準状態の緊急地震速報の遅延時間です。", min:1000, max:5000, def:1000));   //通常時の遅延(ms)
+                GetGroup("通信設定",true)?.Add(new LongIndexData("API_EEW_DelayDetectMode", "EEW検知遅延", unitName: "秒", displayMag: 1000, description: "検知状態の緊急地震速報の遅延時間です。", min:150, max:5000, def:200));     //検出時の遅延(ms)
+                GetGroup("通信設定",true)?.Add(new LongIndexData("API_EEW_DelayDetectCoolDown", "EEWモード移行時間", unitName: "秒", displayMag: 1000, description: "検知状態から標準状態に回復する時間です。", min:1000, max:10000, def:4000));     //検出から通常時に戻る時間(ms)
+                GetGroup("通信設定",true)?.Add(new BoolIndexData("API_EEW_DMDATA_OnlyWarn", "DMDATA取得モード", "警報のみ受け取るか、予報も受け取るかを選択できます。", def: false, "警報のみ取得","予報・警報を取得"));   
+                GetGroup("通信設定",true)?.Add(new LongIndexData("API_EQInfo_Delay", "地震情報遅延", unitName: "秒", displayMag: 1000, description: "地震情報全般の取得遅延時間です。\n地震と津波情報共通でリクエスト多過ぎるとエラー出ます。", min:2000, max:30000, def:3000));   //通常時の遅延(ms)
+                GetGroup("通信設定",true)?.Add(new LongIndexData("API_EQInfo_Limit", "地震情報取得項目数", description: "1回で地震情報を取得する数です。\n値を大きくすると1回あたりより多くの情報が更新されますが、その分遅くなります。", min:1, max:100, def:10));   //取得時の配列の数
+                GetGroup("通信設定",true)?.Add(new LongIndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:5, def:1,unitName:"秒"));   //取得時の配列の数
+                GetGroup("通信設定",true)?.Add(new LongIndexData("API_K-moni_Frequency", "強震モニタ更新間隔", description: "強震モニタの更新間隔です。データ消費量を抑えたい時にお使いください。", min:1, max:5, def:1,unitName:"秒"));   //取得時の配列の数
+                GetGroup("通信設定",true)?.Add(new LongIndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
+                GetGroup("通信設定",true)?.Add(new LongIndexData("API_J-ALERT_Delay", "Jアラート遅延時間", description: "Jアラートの更新間隔です。", min:3, max:60, def:30,unitName:"秒"));   
+                GetGroup("ユーザー設定",true)?.Add(new LongIndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数
+                GetGroup("ユーザー設定",true)?.Add(new LongIndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
+                GetGroup("ユーザー設定", true)?.Add(new ReadonlyIndexData("USER_Pos_Result", "該当地域名", "緯度・経度に対応されるであろう該当地域名です。"));
+                GetGroup("ユーザー設定",true)?.Add(new BoolIndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示","強震モニタに非表示"));   //取得時の配列の数
+                GetGroup("通信設定",true)?.Add(new FunctionIndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", workingTitle: "時刻調整中...", action:new Action(async() => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
+                GetGroup("通信設定", true)?.Add(new ReadonlyIndexData("Kyoshin_Time", "強震モニタ時刻", "強震モニタ上の最終更新時刻です。"));
+                GetGroup("Project DM-Data Service", true)?.Add(new FunctionIndexData("DMDATA_AuthFunction", "アプリ連携", "MisakiEQでDMDATAの緊急地震速報データを取得できるようにします。", "認証", workingTitle: "ブラウザで認証中..."));
 #if ADMIN||DEBUG
-                GetGroup("SNS設定",true)?.Add(new IndexData("Twitter_Auth", "Twitter認証", "アカウント認証します","認証",WorkingTitle:"認証中..."));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Auth_Info", "Twitter認証情報", ""));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Auth_UserID", "ユーザーID", ""));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Auth_UserName", "ユーザー名", ""));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Auth_Tweet", "ツイート数", ""));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Auth_Follower", "フォロワー数", ""));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_Enable_Tweet", "自動ツイートの有効化", "自動でユーザーに地震情報をツイートします", def: true, "Twitterへの自動ツイートが有効", "Twitterへの自動ツイートが無効"));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Twitter_J-ALERT_Tweet", "J-ALERT配信有効化", "自動でユーザーにJアラートをツイートします", def: false, "Twitterへの自動ツイートが有効", "Twitterへの自動ツイートが無効"));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Misskey_Enable_Note", "自動ノートの有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ノートが有効", "Misskeyへの自動ノートが無効"));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Misskey_J-ALERT_Note", "J-ALERT配信有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ノートが有効", "Misskeyへの自動ノートが無効"));
-                GetGroup("SNS設定", true)?.Add(new IndexData("Misskey_EEW_Delay", "EEWノート遅延", unitName: "秒", displayMag: 1000, description: "遅延時間です。", min: 0, max: 10000, def: 2000));   //通常時の遅延(ms)
-                GetGroup("SNS設定", true)?.Add(new IndexData("Misskey_EEW_Delay_IsInter", "遅延の割り込み", "パブリック投稿時に割り込んで投稿します。", def: false, "割り込み処理が有効", "割り込み処理が無効"));
+                GetGroup("SNS設定",true)?.Add(new FunctionIndexData("Twitter_Auth", "Twitter認証", "アカウント認証します","認証",workingTitle:"認証中..."));
+                GetGroup("SNS設定", true)?.Add(new ReadonlyIndexData("Twitter_Auth_Info", "Twitter認証情報", ""));
+                GetGroup("SNS設定", true)?.Add(new ReadonlyIndexData("Twitter_Auth_UserID", "ユーザーID", ""));
+                GetGroup("SNS設定", true)?.Add(new ReadonlyIndexData("Twitter_Auth_UserName", "ユーザー名", ""));
+                GetGroup("SNS設定", true)?.Add(new ReadonlyIndexData("Twitter_Auth_Tweet", "ツイート数", ""));
+                GetGroup("SNS設定", true)?.Add(new ReadonlyIndexData("Twitter_Auth_Follower", "フォロワー数", ""));
+                GetGroup("SNS設定", true)?.Add(new BoolIndexData("Twitter_Enable_Tweet", "自動ツイートの有効化", "自動でユーザーに地震情報をツイートします", def: true, "Twitterへの自動ツイートが有効", "Twitterへの自動ツイートが無効"));
+                GetGroup("SNS設定", true)?.Add(new BoolIndexData("Twitter_J-ALERT_Tweet", "J-ALERT配信有効化", "自動でユーザーにJアラートをツイートします", def: false, "Twitterへの自動ツイートが有効", "Twitterへの自動ツイートが無効"));
+                GetGroup("SNS設定", true)?.Add(new BoolIndexData("Misskey_Enable_Note", "自動ノートの有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ノートが有効", "Misskeyへの自動ノートが無効"));
+                GetGroup("SNS設定", true)?.Add(new BoolIndexData("Misskey_J-ALERT_Note", "J-ALERT配信有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ノートが有効", "Misskeyへの自動ノートが無効"));
+                GetGroup("SNS設定", true)?.Add(new LongIndexData("Misskey_EEW_Delay", "EEWノート遅延", unitName: "秒", displayMag: 1000, description: "遅延時間です。", min: 0, max: 10000, def: 2000));   //通常時の遅延(ms)
+                GetGroup("SNS設定", true)?.Add(new BoolIndexData("Misskey_EEW_Delay_IsInter", "遅延の割り込み", "パブリック投稿時に割り込んで投稿します。", def: false, "割り込み処理が有効", "割り込み処理が無効"));
 
 #endif
-                GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
-                GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
-                GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_Volume_Tsunami", "津波情報の通知音量", "津波情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
-                GetGroup("サウンド設定",true)?.Add(new IndexData("Sound_All_Mute", "完全ミュート", "音声デバイスがない時などはこのチェックボックスを有効にすることで軽量化されます。", def: false, "有効(再生されません)","無効"));
+                GetGroup("サウンド設定",true)?.Add(new LongIndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
+                GetGroup("サウンド設定",true)?.Add(new LongIndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
+                GetGroup("サウンド設定",true)?.Add(new LongIndexData("Sound_Volume_Tsunami", "津波情報の通知音量", "津波情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
+                GetGroup("サウンド設定",true)?.Add(new BoolIndexData("Sound_All_Mute", "完全ミュート", "音声デバイスがない時などはこのチェックボックスを有効にすることで軽量化されます。", def: false, "有効(再生されません)","無効"));
 
-                GetGroup("緊急地震速報発表時", true)?.Add(new IndexData("GUI_Popup_EEW_Compact", "簡易情報のポップ表示", "緊急地震速報が発令されると簡易ウィンドウがポップアップされます。", true, "ポップアップ表示", "ポップアップ非表示"));
-                GetGroup("緊急地震速報発表時", true)?.Add(new IndexData("GUI_TopMost_EEW_Compact", "簡易情報の表示モード", "簡易ウィンドウが前面表示されます。", true, "前面表示", "標準表示"));
-                GetGroup("J-ALERT", true)?.Add(new IndexData("GUI_Popup_J-ALERT", "全画面ポップアップ", "Jアラート発令時に自動的に全画面でポップアップ表示されます。", true, "表示する", "表示しない"));
-                GetGroup("アプリ情報", true)?.Add(new IndexData("AppInfo_Uptime", "アプリ起動時間", "起動してからの経過時間です。"));
-                GetGroup("アプリ情報", true)?.Add(new IndexData("AppInfo_UsingAPI", "使用中のEEW API", "EEW APIの使用状況"));
-                GetGroup("通知設定", true)?.Add(new IndexData("Notification_EEW_Nationwide", "EEW全国通知条件", "全国共通で緊急地震速報を通知する条件を設定します", 9,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "ALL","Warning only","None"}));
-                GetGroup("通知設定", true)?.Add(new IndexData("Notification_EEW_Area", "EEW地域通知条件", "お住まいの地域で緊急地震速報を通知する条件を設定します", 8,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "≧0", "None"}));
-                GetGroup("通知設定", true)?.Add(new IndexData("Notification_Popup_Notify", "トースト通知タイプ", "通知タイプを設定します。", def:false, "Windows プッシュ通知", "Windows Form標準通知"));
-                GetGroup("Debug Mode", true)?.Add(new IndexData("Debug_Input", "Misskey", "デバック用",""));
-                GetGroup("Debug Mode", true)?.Add(new IndexData("Debug_Function", "ノート投稿", "デバック用", "Execute", WorkingTitle: "Working..."));
+                GetGroup("緊急地震速報発表時", true)?.Add(new BoolIndexData("GUI_Popup_EEW_Compact", "簡易情報のポップ表示", "緊急地震速報が発令されると簡易ウィンドウがポップアップされます。", true, "ポップアップ表示", "ポップアップ非表示"));
+                GetGroup("緊急地震速報発表時", true)?.Add(new BoolIndexData("GUI_TopMost_EEW_Compact", "簡易情報の表示モード", "簡易ウィンドウが前面表示されます。", true, "前面表示", "標準表示"));
+                GetGroup("J-ALERT", true)?.Add(new BoolIndexData("GUI_Popup_J-ALERT", "全画面ポップアップ", "Jアラート発令時に自動的に全画面でポップアップ表示されます。", true, "表示する", "表示しない"));
+                GetGroup("アプリ情報", true)?.Add(new ReadonlyIndexData("AppInfo_Uptime", "アプリ起動時間", "起動してからの経過時間です。"));
+                GetGroup("アプリ情報", true)?.Add(new ReadonlyIndexData("AppInfo_UsingAPI", "使用中のEEW API", "EEW APIの使用状況"));
+                GetGroup("通知設定", true)?.Add(new ComboIndexData("Notification_EEW_Nationwide", "EEW全国通知条件", "全国共通で緊急地震速報を通知する条件を設定します", 9,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "ALL","Warning only","None"}));
+                GetGroup("通知設定", true)?.Add(new ComboIndexData("Notification_EEW_Area", "EEW地域通知条件", "お住まいの地域で緊急地震速報を通知する条件を設定します", 8,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "≧0", "None"}));
+                GetGroup("通知設定", true)?.Add(new BoolIndexData("Notification_Popup_Notify", "トースト通知タイプ", "通知タイプを設定します。", def:false, "Windows プッシュ通知", "Windows Form標準通知"));
+                GetGroup("Debug Mode", true)?.Add(new StringIndexData("Debug_Input", "Misskey", "デバック用",""));
+                GetGroup("Debug Mode", true)?.Add(new FunctionIndexData("Debug_Function", "ノート投稿", "デバック用", "Execute", workingTitle: "Working..."));
 
             }
 
@@ -320,16 +321,18 @@ namespace MisakiEQ.Lib.Config
             /// <returns>対応するグループ</returns>
             public List<IndexData>? GetGroup(string name, bool Create = false)
             {
-                for(int i = 0; i < Data.Count; i++)
+                var instance = Data.Find(a => a.Name == name);
+                if(instance == null)
                 {
-                    if (Data[i].Name==name)return Data[i].Setting;
+                    if (Create)
+                    {
+                        Data.Add(new(name));
+                        return Data[^1].Setting;
+                    }
+                    else return null;
                 }
-                if (Create)
-                {
-                    Data.Add(new(name));
-                    return Data[^1].Setting;
-                }
-                return null;
+                else
+                    return instance.Setting;
             }
             public class ConfigGroup
             {
@@ -342,82 +345,211 @@ namespace MisakiEQ.Lib.Config
                 public readonly List<IndexData> Setting=new();
             }
         }
-        public class IndexData
+        public abstract class IndexData
         {
-            public IndexData(string name,string title, string description = "", long min = long.MinValue, long max = long.MaxValue, long def = 0, string unitName = "", double displayMag = 1)
+            public EventHandler? ValueChanged = null;
+            public string Name { get; }
+            public string Title { get; }
+            public string Description { get; }
+
+            protected internal IndexData(string name, string title, string description)
             {
                 Name = name;
                 Title = title;
                 Description = description;
-                LongMin = min;
-                LongMax = max;
-                LongDefault = def;
-                LongValue = def;
+            }
+            public virtual string GetConfigString()
+            {
+                return string.Empty;
+            }
+            public virtual bool SetConfigString(string value)
+            {
+                return false;
+            }
+            public virtual bool ValueDefaultable()
+            {
+                return false;
+            }
+            public virtual string GetValue()
+            {
+                throw new InvalidDataException();
+            }
+            // 共通のメソッドやプロパティを定義する場合はここに追加する
+        }
+        public class LongIndexData : IndexData
+        {
+            public long Min { get; set; }
+            public long Max { get; set; }
+            public long Default { get; set; }
+            private long _value;
+            public long Value
+            {
+                get { return _value; } set
+                {
+                    if (value < Min) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} < {Min}");
+                    if (value > Max) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} > {Max}");
+                    if (_value != value)
+                    {
+                        _value = value;
+                        ValueChanged?.Invoke(this,EventArgs.Empty);
+                    }
+                }
+
+            }
+            public string UnitName { get; set; }
+            public double DisplayMag { get; set; }
+
+            public LongIndexData(string name, string title, string description, long min = long.MinValue, long max = long.MaxValue, long def = 0, string unitName = "", double displayMag = 1)
+                : base(name, title, description)
+            {
+                Min = min;
+                Max = max;
+                Default = def;
+                _value = def;
                 UnitName = unitName;
                 DisplayMag = displayMag;
-                Type = "long";
             }
 
-            public IndexData(string name, string title, string description = "",  string def = "")
+            public override string GetConfigString()
             {
-                Name = name;
-                Title = title;
-                Description = description;
-                StringDefault = def;
-                StringValue = def;
-                Type = "string";
+                return Name + "=" + Value.ToString()+ Environment.NewLine;
             }
-            public IndexData(string name,string title, string description = "", bool def = false, string ToggleOnText = "", string ToggleOffText = "")
+
+            public override bool SetConfigString(string value)
             {
-                Name = name;
-                Title = title;
-                Description = description;
-                BooleanDefault = def;
-                BooleanValue = def;
-                Type = "bool";
-                BoolToggleOn = ToggleOnText;
-                BoolToggleOff = ToggleOffText;
+                long val = long.Parse(value);
+                if (val < Min) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{val} < {Min}");
+                if (val > Max) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{val} > {Max}");
+                Value = val;
+                return true;
             }
-            public IndexData(string name, string title, string description, string ReadyTitle, Action? action=null,string? WorkingTitle = null)
+            public override bool ValueDefaultable()
             {
-                Description = description;
-                Name = name;
-                Title = title;
-                Type = "function";
+                return true;
+            }
+            public override string GetValue()
+            {
+                return Value.ToString();
+            }
+            // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
+        }
+        public class StringIndexData : IndexData
+        {
+            public int MaxLength { get; set; }
+            public string DefaultValue { get; set; }
+            string _value;
+            public string Value { get=>_value; set
+                {
+                    if (!string.Equals(_value, value))
+                    {
+                        _value = value;
+                        ValueChanged?.Invoke(this, EventArgs.Empty);
+                    }
+                }
+            }
+
+            public StringIndexData(string name, string title, string description, string defaultValue = "", int maxLength = int.MaxValue)
+                : base(name, title, description)
+            {
+                MaxLength = maxLength;
+                DefaultValue = defaultValue;
+                _value= defaultValue;
+            }
+            public override string GetConfigString()
+            {
+                return Name + "=" + Value.Replace("%", "%%").Replace("=", "%3D").Replace("\n", "%0D") + Environment.NewLine;
+            }
+            public override bool SetConfigString(string value)
+            {
+                string? str = (string?)value;
+                if (string.IsNullOrEmpty(str)) str = string.Empty;
+                Value = str.Replace("%0D", "\n").Replace("%3D", "=").Replace("%%", "%");
+                return true;
+            }
+            public override bool ValueDefaultable()
+            {
+                return true;
+            }
+            public override string GetValue()
+            {
+                return Value.ToString();
+            }
+            // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
+        }
+        public class BoolIndexData : IndexData
+        {
+            public bool DefaultValue { get; }
+            private bool _value;
+            public bool Value
+            {
+                get => _value; set
+                {
+                    if (_value != value)
+                    {
+                        _value = value;
+                        ValueChanged?.Invoke(this, EventArgs.Empty);
+                    }
+                }
+            }
+            public string BoolToggleOn { get; set; }
+            public string BoolToggleOff { get; set; }
+
+            public BoolIndexData(string name, string title, string description = "", bool def = false, string toggleOnText = "", string toggleOffText = "")
+                : base(name, title, description)
+            {
+                DefaultValue = def;
+                _value = def;
+                BoolToggleOn = toggleOnText;
+                BoolToggleOff = toggleOffText;
+            }
+            public string GetToggleText(bool Is)
+            {
+                return Is?BoolToggleOn:BoolToggleOff;
+            }
+            public override string GetConfigString()
+            {
+                return Name + "=" + Value.ToString() + Environment.NewLine;
+            }
+            public override bool SetConfigString(string value)
+            {
+                if (value.ToLower() == "true" || value == "0")
+                {
+                    Value = true;
+                }
+                else if (value.ToLower() == "false" || value == "1")
+                {
+                    Value = false;
+                }
+                else
+                {
+                    throw new ArgumentException($"bool型ではない、もしくは正しく検出できませんでした。val=\"{value}\"", nameof(value));
+                }
+                return true;
+            }
+            public override bool ValueDefaultable()
+            {
+                return true;
+            }
+            public override string GetValue()
+            {
+                return Value.ToString();
+            }
+            // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
+        }
+        public class FunctionIndexData : IndexData
+        {
+            private Action? FunctionAction { get; set; }
+            public string FunctionReady { get; set; }
+            public string? FunctionWorking { get; set; }
+
+            public FunctionIndexData(string name, string title, string description, string readyTitle, Action? action = null, string? workingTitle = null)
+                : base(name, title, description)
+            {
                 FunctionAction = action;
-                FunctionReady = ReadyTitle;
-                FunctionWorking = WorkingTitle;
+                FunctionReady = readyTitle;
+                FunctionWorking = workingTitle;
+            }
 
-            }
-            public IndexData(string name, string title, string description)
-            {
-                Description = description;
-                Name = name;
-                Title = title;
-                Type = "readonly";
-            }
-            public IndexData(string name, string title, string description, int def, List<string> list)
-            {
-                Type = "combo";
-                Description = description;
-                Name = name;
-                LongDefault = def;
-                LongValue = def;
-                Title = title;
-                for (int i = 0; i < list.Count; i++) ComboStrings.Add(list[i]);
-
-            }
-            public IndexData(string name, string title, string description, int def, string[] list)
-            {
-                Type = "combo";
-                Description = description;
-                Name = name;
-                LongDefault = def;
-                LongValue = def;
-                Title = title;
-                for (int i = 0; i < list.Length; i++) ComboStrings.Add(list[i]);
-
-            }
             /// <summary>
             /// ラムダ式を設定します。
             /// IndexDataのタイプが Function である必要があります。
@@ -427,215 +559,9 @@ namespace MisakiEQ.Lib.Config
             /// <exception cref="InvalidOperationException"></exception>
             public void SetAction(Action act)
             {
-                //if (Type != "function") throw new InvalidOperationException($"{Type}型は関数設定できません！");
                 FunctionAction = act;
             }
-            public EventHandler? ValueChanged = null;
 
-            public bool ValueDefaultable()
-            {
-                return Type switch
-                {
-                    "long" => true,
-                    "string" => true,
-                    "bool" => true,
-                    "combo" => true,
-                    _ => false
-                };
-            }
-            /// <summary>
-            /// 値を設定または取得します。
-            /// </summary>
-            public object Value
-            {
-                get
-                {
-                    return Type switch
-                    {
-                        "long" => LongValue,
-                        "string" => StringValue,
-                        "bool" => BooleanValue,
-                        "readonly" => StringValue,
-                        "combo" => LongValue,
-                        _ => throw new InvalidDataException($"[{Name}]は値がありません。"),
-                    };
-                }
-                set
-                {
-                    switch (Type)
-                    {
-                        case "long":
-                            if (value.GetType() == typeof(short))
-                            {
-                                if (LongMin < short.MinValue || LongMax > short.MaxValue) throw new ArgumentOutOfRangeException($"[{Name}]の設定可能値はshort型からオーバーフローしています。long型で変更してください。");
-                                if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} < {LongMin}");
-                                if ((long)value > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} > {LongMax}");
-                                if (LongValue != (long)value)
-                                {
-                                    LongValue = (long)value;
-                                    FunctionAction?.Invoke();
-                                }
-                            }
-                            else
-                            if (value.GetType() == typeof(int))
-                            {
-                                if (LongMin < int.MinValue || LongMax > int.MaxValue) throw new ArgumentOutOfRangeException($"[{Name}]の設定可能値はint型オーバーフローしています。long型で変更してください。");
-                                if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} < {LongMin}");
-                                if ((long)value > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} > {LongMax}");
-                                if (LongValue != (long)value)
-                                {
-                                    LongValue = (long)value;
-                                    FunctionAction?.Invoke();
-                                }
-                            }
-                            else if (value.GetType() == typeof(long))
-                            {
-                                if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} < {LongMin}");
-                                if ((long)value > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} > {LongMax}");
-                                if (LongValue != (long)value)
-                                {
-                                    LongValue = (long)value;
-                                    FunctionAction?.Invoke();
-                                }
-                            }
-                            else
-                                throw new InvalidCastException($"[{Name}]は整数型しか対応していませんが、{value.GetType()}で変更しようとしました。");
-                            break;
-                        case "string":
-                            if (value.GetType() != typeof(string)) throw new InvalidCastException($"[{Name}]はstring型しか対応していませんが、{value.GetType()}で変更しようとしました。");
-                            if ((string)value!=StringValue)
-                            {
-                                StringValue = (string)value;
-                                try { ValueChanged?.Invoke(this, EventArgs.Empty); } catch(Exception ex) { Log.Instance.Warn(ex.Message); }
-                            }
-                            break;
-                        case "bool":
-                            if(value.GetType()!=typeof(bool)) throw new InvalidCastException($"[{Name}]はbool型しか対応していませんが、{value.GetType()}で変更しようとしました。");
-                            BooleanValue = (bool)value;
-                            break;
-                        case "readonly":
-                            if (value.GetType() != typeof(string)) throw new InvalidCastException($"[{Name}]はstring型しか対応していませんが、{value.GetType()}で変更しようとしました。");
-                            if ((string)value != StringValue)
-                            {
-                                StringValue = (string)value;
-                                try { ValueChanged?.Invoke(this, EventArgs.Empty); } catch (Exception ex) { Log.Instance.Warn(ex.Message); }
-                            }
-                            break;
-                        case "combo":
-                            if (value.GetType() == typeof(string))
-                            {
-                                for(int i = 0; i < ComboStrings.Count; i++)
-                                {
-                                    if(ComboStrings[i] == (string)value)
-                                    {
-                                        LongValue = i;
-                                        break;
-                                    }
-                                    if(i == ComboStrings.Count - 1)
-                                        throw new ArgumentException($"\"{value}\"は[{Name}]のコレクションの中には存在しませんでした。", nameof(value));
-                                }
-                            }
-                            else if(value.GetType() == typeof(int))
-                            {
-                                int v = (int)value;
-                                if (v < 0 || v >= ComboStrings.Count) throw new ArgumentOutOfRangeException($"[{Name}]のコレクションに対応する配列が見つかりません。設定した値:{value} 配列数:{ComboStrings.Count}");
-                                LongValue = v;
-                            }
-                            else if (value.GetType() == typeof(long))
-                            {
-                                long v = (long)value;
-                                if (v < 0 || v >= ComboStrings.Count) throw new ArgumentOutOfRangeException($"[{Name}]のコレクションに対応する配列が見つかりません。設定した値:{value} 配列数:{ComboStrings.Count}");
-                                LongValue = v;
-                            }
-                            else
-                            {
-                                throw new InvalidCastException($"[{Name}]はstring型,int型,long型しか対応していませんが、{value.GetType()}で変更しようとしました。");
-                            }
-                            break;
-                        default:
-                            throw new InvalidDataException($"[{Name}は値を設定することができません。");
-                    }
-                }
-            }
-            /// <summary>
-            /// コンフィグファイルの読書き用に使用されます。
-            /// </summary>
-            public string Config
-            {
-                get
-                {
-                    if (Type == "function"||Type== "readonly") return string.Empty;
-                    return Name+"="+Type switch
-                    {
-                        "long" => LongValue.ToString(),
-                        "string" => StringValue.Replace("%", "%%").Replace("=", "%3D").Replace("\n", "%0D"),
-                        "bool" => BooleanValue.ToString(),
-                        "combo" => ComboStrings[(int)LongValue].Replace("%", "%%").Replace("=", "%3D").Replace("\n", "%0D"),
-                        _ => throw new NullReferenceException("タイプが一致しません。"),
-                    }+Environment.NewLine;
-                }
-                set
-                {
-                    switch (Type)
-                    {
-                        case "long":
-                            long val = long.Parse(value);
-                            if (val < LongMin) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{val} < {LongMin}");
-                            if (val > LongMax) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{val} > {LongMax}");
-                            LongValue = val;
-                            break;
-                        case "string":
-                            string? str = (string?)value;
-                            if (string.IsNullOrEmpty(str)) str = string.Empty;
-                            StringValue = str.Replace("%0D", "\n").Replace("%3D", "=").Replace("%%", "%");
-                            break;
-                        case "bool":
-                            if (value.ToLower() == "true" || value == "0")
-                            {
-                                BooleanValue = true;
-                            }
-                            else if (value.ToLower() == "false" || value == "1")
-                            {
-                                BooleanValue = false;
-                            }
-                            else
-                            {
-                                throw new ArgumentException($"bool型ではない、もしくは正しく検出できませんでした。val=\"{value}\"", nameof(value));
-                            }
-                            break;
-                        case "combo":
-                            if (value.StartsWith("="))
-                            {
-                                if(int.TryParse(value.Replace("=",""),out int num))
-                                {
-                                    if (ComboStrings.Count > num && 0 <= num)
-                                    {
-                                        LongValue = num;
-                                        break;
-                                    }
-                                    else throw new ArgumentOutOfRangeException(nameof(value), $"\"{num}\" は \"{ComboStrings.Count}\" の範囲外です。");
-                                }
-                                else
-                                {
-                                    throw new InvalidDataException($"\"{value}\"は数値に変換できませんでした。");
-                                }
-                            }
-                            for (int i = 0; i < ComboStrings.Count; i++)
-                            {
-                                string vals = value.Replace("%0D", "\n").Replace("%3D", "=").Replace("%%", "%");
-                                if (ComboStrings[i] == vals)
-                                {
-                                    LongValue = i;
-                                    break;
-                                }
-
-                                if (i == ComboStrings.Count - 1)
-                                    throw new ArgumentException($"\"{vals}\"は[{Name}]のコレクションの中には存在しませんでした。", nameof(value));
-                            }
-                            break;
-                    }
-                }
-            }
             /// <summary>
             /// Function関数の場合は関数が実行されます。<br/>
             /// そうでない場合は例外がスローされます。
@@ -643,9 +569,9 @@ namespace MisakiEQ.Lib.Config
             /// <exception cref="InvalidCastException"></exception>
             public void ExecuteAction()
             {
-                if (Type != "function") throw new InvalidCastException($"{Type}型は実行できません。");
                 Task.Run(() => { FunctionAction?.Invoke(); });
             }
+
             bool __buttonEnable = true;
             /// <summary>
             /// ボタンが使用できるかどうかを設定します。<br/>
@@ -655,25 +581,25 @@ namespace MisakiEQ.Lib.Config
             {
                 get
                 {
-                    if (Type != "function") throw new InvalidCastException($"{Type}型は実行できません。");
                     return __buttonEnable;
                 }
                 set
                 {
-                    if(Type!="function") throw new InvalidCastException($"{Type}型は実行できません。");
                     if (__buttonEnable != value)
                     {
                         __buttonEnable = value;
                         try
                         {
                             ButtonChanged?.Invoke(this, EventArgs.Empty);
-                        }catch(Exception ex)
+                        }
+                        catch (Exception ex)
                         {
                             Log.Instance.Warn(ex.Message);
                         }
                     }
                 }
             }
+
             /// <summary>
             /// ボタンの有効状態が変更された際に実行されるイベントです。
             /// </summary>
@@ -687,212 +613,91 @@ namespace MisakiEQ.Lib.Config
             /// <exception cref="InvalidCastException"></exception>
             public string GetButton(bool IsWorking)
             {
-                if (Type != "function") throw new InvalidCastException($"{Type}型は実行できません。");
-                if (IsWorking) return FunctionWorking?? FunctionReady;
+                if (IsWorking) return FunctionWorking ?? FunctionReady;
                 else return FunctionReady;
             }
-            public string GetToggleOffText()
+            // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
+        }
+        public class ReadonlyIndexData : IndexData
+        {
+            public string Value { get; set; }
+            public ReadonlyIndexData(string name, string title, string description)
+                : base(name, title, description)
             {
-                return Type switch
-                {
-                    "bool" => BoolToggleOff,
-                    _ => throw new ArgumentException("タイプが一致しません。")
-                };
-            }
-            public string GetToggleOnText()
-            {
-                return Type switch
-                {
-                    "bool" => BoolToggleOn,
-                    _ => throw new ArgumentException("タイプが一致しません。")
-                };
+                Value = "";
             }
 
-            public double GetDisplayMag()
+            // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
+        }
+        public class ComboIndexData : IndexData
+        {
+            public List<string> ComboStrings { get; set; }
+            public int Default { get; set; }
+            public int Value { get; set; }
+            public ComboIndexData(string name, string title, string description, int def, IEnumerable<string> list)
+                : base(name, title, description)
             {
-                return Type switch
+                ComboStrings = new();
+                Default = def;
+                Value = def;
+
+                foreach (var item in list)
                 {
-                    "long" => DisplayMag,
-                    _ => throw new ArgumentException("タイプが一致しません。"),
-                };
+                    ComboStrings.Add(item);
+                }
             }
 
-            string _type="Unknown";
-            string _name="";
-            string _title = "";
-            string _unitName = "";
-            string _description = "";
+            public override string GetConfigString()
+            {
+                return Name + "=" + ComboStrings[Value].Replace("%", "%%").Replace("=", "%3D").Replace("\n", "%0D")+ Environment.NewLine;
+            }
+            public override bool SetConfigString(string value)
+            {
+                if (value.StartsWith("="))
+                {
+                    if (int.TryParse(value.Replace("=", ""), out int num))
+                    {
+                        if (ComboStrings.Count > num && 0 <= num)
+                        {
+                            Value = num;
+                            return true;
+                        }
+                        else throw new ArgumentOutOfRangeException(nameof(value), $"\"{num}\" は \"{ComboStrings.Count}\" の範囲外です。");
+                    }
+                    else
+                    {
+                        throw new InvalidDataException($"\"{value}\"は数値に変換できませんでした。");
+                    }
+                }
+                for (int i = 0; i < ComboStrings.Count; i++)
+                {
+                    string vals = value.Replace("%0D", "\n").Replace("%3D", "=").Replace("%%", "%");
+                    if (ComboStrings[i] == vals)
+                    {
+                        Value = i;
+                        return true;
+                    }
 
-            /// <summary>
-            /// 関数の型名
-            /// </summary>
-            public string Type
-            {
-                get => _type; 
-                private set => _type = value; 
+                    if (i == ComboStrings.Count - 1)
+                        throw new ArgumentException($"\"{vals}\"は[{Name}]のコレクションの中には存在しませんでした。", nameof(value));
+                }
+                return false;
             }
-            /// <summary>
-            /// 関数の名前
-            /// </summary>
-            public string Name
+            
+            public override bool ValueDefaultable()
             {
-                get => _name; 
-                private set => _name = value;
+                return true;
             }
-            /// <summary>
-            /// 関数の表示する文字列
-            /// </summary>
-            public string Title
-            {
-                get => _title;
-                private set => _title = value;
-            }
-            /// <summary>
-            /// 数量名の設定<br/>
-            /// long型以外は例外がスローされます。
-            /// </summary>
-            public string UnitName
-            {
-                get { if (Type != "long") throw new InvalidCastException($"\"{Type}\"longに変換できません。");
-                    return _unitName; } 
-                private set => _unitName = value; 
-            }
-            /// <summary>
-            /// 説明
-            /// </summary>
-            public string Description
-            {
-                get => _description;
-                private set => _description = value;
-            }
-            public object Min
+            public string[] Items
             {
                 get
                 {
-                    return Type switch
-                    {
-                        "long" => (object)LongMin,
-                        _ => throw new ArgumentException("タイプが一致しません。"),
-                    };
-                }
-                private set
-                {
-                    switch(Type)
-                    {
-                        case "long":
-                            if (value.GetType() == typeof(long))
-                            {
-                                if ((long)value > LongMax) throw new ArgumentOutOfRangeException($"値は必ずMaxより小さければなりません。 {(long)value}<={LongMax}");
-                                LongMin = (long)value;
-                            }else if(value.GetType() == typeof(int))
-                            {
-                                if ((int)value > LongMax) throw new ArgumentOutOfRangeException($"値は必ずMaxより小さければなりません。 {(long)value}<={LongMax}");
-                                LongMin = (int)value;
-                            }
-                            else
-                            {
-                                throw new InvalidCastException($"{value.GetType()}は整数型に変換できません。");
-                            }
-                        break;
-                        default: throw new ArgumentException("タイプが一致しません。");
-                    }
-                }
-            }
-            public object Max
-            {
-                get
-                {
-                    return Type switch
-                    {
-                        "long" => (object)LongMax,
-                        _ => throw new ArgumentException("タイプが一致しません。"),
-                    };
-                }
-                private set
-                {
-                    switch (Type)
-                    {
-                        case "long":
-                            if (value.GetType() == typeof(long))
-                            {
-                                if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"値は必ずMinより大きければなりません。 {(long)value}>={LongMin}");
-                                LongMax = (long)value;
-                            }
-                            else if (value.GetType() == typeof(int))
-                            {
-                                if ((int)value < LongMin) throw new ArgumentOutOfRangeException($"値は必ずMinより大きければなりません。 {(long)value}>={LongMin}");
-                                LongMax = (int)value;
-                            }
-                            else
-                            {
-                                throw new InvalidCastException($"{value.GetType()}は整数型に変換できません。");
-                            }
-                            break;
-                        default: throw new ArgumentException("タイプが一致しません。");
-                    }
-                }
-            }
-            /// <summary>
-            /// デフォルト値の取得
-            /// </summary>
-            public object Default
-            {
-                get
-                {
-                    return Type switch
-                    {
-                        "long" => LongDefault,
-                        "string" => StringDefault,
-                        "bool" => BooleanDefault,
-                        "combo"=> LongDefault,
-                        _ => throw new ArgumentException("タイプが一致しません。"),
-                    };
-                }
-                private set
-                {
-                    switch (Type)
-                    {
-                        case "long":
-                            if (value.GetType() == typeof(long))
-                            {
-                                if ((long)value < LongMin) throw new ArgumentOutOfRangeException($"値は必ずMinより大きければなりません。 {(long)value}>={LongMin}");
-                                LongDefault = (long)value;
-                            }
-                            else if (value.GetType() == typeof(int))
-                            {
-                                LongDefault = (int)value;
-                            }
-                            else
-                            {
-                                throw new InvalidCastException($"{value.GetType()}は整数型に変換できません。");
-                            }
-                            break;
-                        default: throw new ArgumentException("タイプが一致しません。");
-                    }
-                }
-            }
-            public string[] Items { get
-                {
-                    if (Type != "combo") throw new ArgumentException("タイプが一致しません");
                     string[] strings = new string[ComboStrings.Count];
                     for (int i = 0; i < ComboStrings.Count; i++) strings[i] = ComboStrings[i];
                     return strings;
-                } }
-            long LongValue;
-            long LongMin;
-            long LongMax;
-            long LongDefault;
-            readonly double DisplayMag;
-            string StringValue="";
-            readonly string StringDefault="";
-            bool BooleanValue = false;
-            readonly bool BooleanDefault = false;
-            readonly string BoolToggleOn = "";
-            readonly string BoolToggleOff = "";
-            Action? FunctionAction = null;
-            readonly string FunctionReady = "";
-            readonly string? FunctionWorking = null;
-            readonly List<string> ComboStrings = new();
+                }
+            }
+            // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
         }
     }
 }

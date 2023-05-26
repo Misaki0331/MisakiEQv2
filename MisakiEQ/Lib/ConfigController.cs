@@ -1,10 +1,14 @@
-﻿using System;
+﻿using MisakiEQ.Lib.ConfigV2.Components;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Media.Devices;
+using static MisakiEQ.Lib.Config.Funcs;
 
 namespace MisakiEQ.Lib.ConfigController
 {
@@ -56,7 +60,7 @@ namespace MisakiEQ.Lib.ConfigController
                 var list2 = list[i].Setting;
                 for(int j = 0; j < list2.Count; j++)
                 {
-                    if (list2[j].Type == "readonly") list2[j].Value = string.Empty;
+                    if (list2[j] is ReadonlyIndexData read) read.Value = string.Empty;
                 }
             }
             for (int i = 0; i < controllGroups.Count; i++)
@@ -140,28 +144,29 @@ namespace MisakiEQ.Lib.ConfigController
             for (int i = 0; i < tools.Count; i++)
             {
                 int w = Box.Width;
-                switch (tools[i].Type)
+                if (tools[i].Type == typeof(LongIndexData))
                 {
-                    case "long":
-                        tools[i].ToolUnitLabel.Location = new Point(w - 28, 22 + i * 23);
-                        tools[i].ToolNumUD.Location = new Point(w - 108, 22 + i * 23);
-                        tools[i].ToolTrack.Size = new Size(w - 234, 23);
-                        break;
-                    case "string":
-                        tools[i].ToolTextBox.Size = new Size(w - 151, 23);
-                        break;
-                    case "bool":
-                        tools[i].ToolCheckBox.Size = new Size(w - 149, 23);
-                        break;
-                    case "function":
-                        tools[i].ToolButton.Size = new Size(w - 149, 23);
-                        break;
-                    case "readonly":
-                        tools[i].ToolTextBox.Size = new Size(w - 151, 23);
-                        break;
-                    case "combo":
-                        tools[i].ToolComboBox.Size = new Size(w - 149, 23);
-                        break;
+                    tools[i].ToolUnitLabel.Location = new Point(w - 28, 22 + i * 23);
+                    tools[i].ToolNumUD.Location = new Point(w - 108, 22 + i * 23);
+                    tools[i].ToolTrack.Size = new Size(w - 234, 23);
+                }else if (tools[i].Type == typeof(StringIndexData))
+                {
+                    tools[i].ToolTextBox.Size = new Size(w - 151, 23);
+                }else if (tools[i].Type == typeof(BoolIndexData))
+                {
+                    tools[i].ToolCheckBox.Size = new Size(w - 149, 23);
+                }
+                else if (tools[i].Type == typeof(FunctionIndexData))
+                {
+                    tools[i].ToolButton.Size = new Size(w - 149, 23);
+                }
+                else if (tools[i].Type == typeof(ReadonlyIndexData))
+                {
+                    tools[i].ToolTextBox.Size = new Size(w - 151, 23);
+                }
+                else if (tools[i].Type == typeof(ComboIndexData))
+                {
+                    tools[i].ToolComboBox.Size = new Size(w - 149, 23);
                 }
             }
         }
@@ -178,8 +183,8 @@ namespace MisakiEQ.Lib.ConfigController
         public ComboBox ToolComboBox = new();
         readonly GroupBox gp;
         readonly Config.Funcs.IndexData cl;
-        public string Type { get => cl.Type; }
-        void LongInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
+        public Type Type { get => cl.GetType();}
+        void LongInit(GroupBox gb, Config.Funcs.LongIndexData data, int pos)
         {
             //338
             var w = gb.Width;
@@ -199,7 +204,7 @@ namespace MisakiEQ.Lib.ConfigController
             ToolTrack.Location = new Point(122, 22 + pos * 23);
             ToolTrack.Size = new Size(w-234, 23);
             ToolTrack.TickStyle = TickStyle.None;
-            ToolTrack.LargeChange = (int)data.GetDisplayMag();
+            ToolTrack.LargeChange = (int)data.DisplayMag;
             ToolTrack.AccessibleDescription = data.Description;
             ToolTrack.Scroll += new EventHandler(TrackChanged);
             ToolNumUD.ValueChanged += new EventHandler(NumUDChanged);
@@ -207,10 +212,10 @@ namespace MisakiEQ.Lib.ConfigController
             ToolNumUD.AccessibleDescription = data.Description;
             ToolNumUD.Minimum = long.MinValue;
             ToolNumUD.Maximum = long.MaxValue;
-            ToolNumUD.Value = (decimal)((long)data.Value / data.GetDisplayMag());
-            ToolNumUD.DecimalPlaces = (int)Math.Log10(data.GetDisplayMag());
-            ToolNumUD.Minimum = (decimal)((long)data.Min / data.GetDisplayMag());
-            ToolNumUD.Maximum = (decimal)((long)data.Max / data.GetDisplayMag());
+            ToolNumUD.Value = (decimal)((long)data.Value / data.DisplayMag);
+            ToolNumUD.DecimalPlaces = (int)Math.Log10(data.DisplayMag);
+            ToolNumUD.Minimum = (decimal)((long)data.Min / data.DisplayMag);
+            ToolNumUD.Maximum = (decimal)((long)data.Max / data.DisplayMag);
             ToolNumUD.TextAlign = HorizontalAlignment.Right;
             ToolTrack.Minimum = int.MinValue;
             ToolTrack.Maximum = int.MaxValue;
@@ -220,7 +225,7 @@ namespace MisakiEQ.Lib.ConfigController
             ((ISupportInitialize)(ToolNumUD)).EndInit();
             ((ISupportInitialize)(ToolTrack)).EndInit();
         }
-        void StringInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
+        void StringInit(GroupBox gb, Config.Funcs.StringIndexData data, int pos)
         {
             //338
             var w = gb.Width;
@@ -231,7 +236,7 @@ namespace MisakiEQ.Lib.ConfigController
             ToolTextBox.Text = (string)data.Value;
             ToolTextBox.TextChanged += new EventHandler(TextBoxChanged);
         }
-        void BoolInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
+        void BoolInit(GroupBox gb, Config.Funcs.BoolIndexData data, int pos)
         {
             //338
             var w = gb.Width;
@@ -239,14 +244,12 @@ namespace MisakiEQ.Lib.ConfigController
             ToolCheckBox.Location = new Point(122, 22 + pos * 23);
             ToolCheckBox.Size = new Size(w-149, 23);
             ToolCheckBox.Checked = (bool)data.Value;
-            if (ToolCheckBox.Checked)
-                ToolCheckBox.Text = cl.GetToggleOnText();
-            else ToolCheckBox.Text = cl.GetToggleOffText();
+            ToolCheckBox.Text = ((BoolIndexData)cl).GetToggleText(ToolCheckBox.Checked);
             ToolCheckBox.Appearance = Appearance.Button;
             ToolCheckBox.CheckedChanged += new EventHandler(CheckBoxChanged);
             ToolCheckBox.TextAlign = ContentAlignment.MiddleCenter;
         }
-        void FunctionInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
+        void FunctionInit(GroupBox gb, Config.Funcs.FunctionIndexData data, int pos)
         {
             //338
             var w = gb.Width;
@@ -258,7 +261,7 @@ namespace MisakiEQ.Lib.ConfigController
             ToolButton.Enabled = data.ButtonEnable;
             data.ButtonChanged += ButtonChanged;
         }
-        void ReadOnlyInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
+        void ReadOnlyInit(GroupBox gb, Config.Funcs.ReadonlyIndexData data, int pos)
         {
             var w = gb.Width;
             gb.Controls.Add(ToolTextBox);
@@ -270,7 +273,7 @@ namespace MisakiEQ.Lib.ConfigController
             ToolTextBox.ReadOnly = true;
             data.ValueChanged += new EventHandler(UpdateText);
         }
-        void ComboInit(GroupBox gb, Config.Funcs.IndexData data, int pos)
+        void ComboInit(GroupBox gb, Config.Funcs.ComboIndexData data, int pos)
         {
             var w = gb.Width;
             gb.Controls.Add(ToolComboBox);
@@ -286,15 +289,8 @@ namespace MisakiEQ.Lib.ConfigController
         {
             try
             {
-                switch (cl.Type)
-                {
-                    case "readonly":
-                        cl.ValueChanged -= UpdateText;
-                        break;
-                    case "function":
-                        cl.ButtonChanged -= ButtonChanged;
-                        break;
-                }
+                if (cl is ReadonlyIndexData read) read.ValueChanged -= UpdateText;
+                if (cl is FunctionIndexData func) func.ButtonChanged -= ButtonChanged;
             }
             catch(Exception ex)
             {
@@ -311,69 +307,70 @@ namespace MisakiEQ.Lib.ConfigController
             ToolLabel.Size = new Size(116, 23);
             ToolLabel.Text = data.Title;
             ToolLabel.TextAlign = ContentAlignment.MiddleRight;
-            switch (data.Type)
-            {
-                case "long":LongInit(gb,data, pos);break;
-                case "string":StringInit(gb, data, pos); break;
-                case "bool":BoolInit(gb, data, pos);break;
-                case "function":FunctionInit(gb, data, pos);break;
-                case "readonly":ReadOnlyInit(gb, data, pos);break;
-                case "combo":ComboInit(gb, data, pos); break;
-            }
+            if (data is LongIndexData L) LongInit(gb, L, pos);
+            else if (data is StringIndexData S) StringInit(gb, S, pos);
+            else if (data is BoolIndexData B) BoolInit(gb, B, pos);
+            else if (data is FunctionIndexData F) FunctionInit(gb, F, pos);
+            else if (data is ReadonlyIndexData R) ReadOnlyInit(gb, R, pos);
+            else if (data is ComboIndexData C) ComboInit(gb, C, pos);
 
-            
+
         }
         void UpdateText(object? sender, EventArgs e)
         {
+            string text = "";
+            if (cl is StringIndexData str) text = str.Value;
+            else if (cl is ReadonlyIndexData read) text = read.Value;
             if (gp.InvokeRequired)
             {
                 gp.Invoke(() =>
                 {
-                    ToolTextBox.Text = (string)cl.Value;
+                    ToolTextBox.Text = text;
                 });
             }
             else
             {
-                ToolTextBox.Text = (string)cl.Value;
+                ToolTextBox.Text = text;
             }
         }
         void ButtonClick(object? sender, EventArgs e)
         {
-            cl.ExecuteAction();
+            ((FunctionIndexData)cl).ExecuteAction();
         }
         void ButtonChanged(object? sender, EventArgs e)
         {
             ToolButton.Invoke(() =>
             {
-                ToolButton.Enabled = cl.ButtonEnable;
-                ToolButton.Text = cl.GetButton(!cl.ButtonEnable);
+                ToolButton.Enabled = ((FunctionIndexData)cl).ButtonEnable;
+                ToolButton.Text = ((FunctionIndexData)cl).GetButton(!((FunctionIndexData)cl).ButtonEnable);
             });
         }
         void TrackChanged(object? sender, EventArgs e)
         {
-                ToolNumUD.Value = (decimal)((double)ToolTrack.Value / cl.GetDisplayMag());
-                cl.Value=(long)ToolTrack.Value;
+            if (cl is LongIndexData)
+            {
+                ToolNumUD.Value = (decimal)((double)ToolTrack.Value / ((LongIndexData)cl).DisplayMag);
+                ((LongIndexData)cl).Value = (long)ToolTrack.Value;
+            }
 
         }
         void NumUDChanged(object? sender, EventArgs e)
         {
-                ToolTrack.Value = (int)((double)ToolNumUD.Value * cl.GetDisplayMag());
-                cl.Value=(long)ToolTrack.Value;
+                ToolTrack.Value = (int)((double)ToolNumUD.Value * ((LongIndexData)cl).DisplayMag);
+                ((LongIndexData)cl).Value =(long)ToolTrack.Value;
         }
         void TextBoxChanged(object? sender, EventArgs e)
         {
-            cl.Value = ToolTextBox.Text;
+            ((StringIndexData)cl).Value = ToolTextBox.Text;
         }
         void CheckBoxChanged(object? sender, EventArgs e)
         {
-            cl.Value = ToolCheckBox.Checked;
-            if (ToolCheckBox.Checked)
-                ToolCheckBox.Text = cl.GetToggleOnText();
-            else ToolCheckBox.Text = cl.GetToggleOffText();
+            ((BoolIndexData)cl).Value = ToolCheckBox.Checked;
+            ToolCheckBox.Text = ((BoolIndexData)cl).GetToggleText(ToolCheckBox.Checked);
         }
         void ComboBoxChanged(object? sender, EventArgs e)
         {
-            cl.Value = ToolComboBox.SelectedIndex;
+            ((ComboIndexData)cl).Value = ToolComboBox.SelectedIndex;
         }
     }
 }
