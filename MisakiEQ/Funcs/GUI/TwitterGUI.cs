@@ -14,27 +14,27 @@ namespace MisakiEQ.Funcs.GUI
             var fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Info");
             if (twi.GetUserScreenID() != null)
             {
-                if (fc != null) fc.Value = "認証済";
+                if (fc != null) fc.SetValue("認証済");
                 fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserID");
-                if (fc != null) fc.Value = $"@{twi.GetUserScreenID()}";
+                if (fc != null) fc.SetValue($"@{twi.GetUserScreenID()}");
                 fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserName");
-                if (fc != null) fc.Value = $"{twi.GetUserName()}";
+                if (fc != null) fc.SetValue($"{twi.GetUserName()}");
                 fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Tweet");
-                if (fc != null) fc.Value = $"{twi.GetUserTweets()}";
+                if (fc != null) fc.SetValue($"{twi.GetUserTweets()}");
                 fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Follower");
-                if (fc != null) fc.Value = $"{twi.GetUserFollowers()}";
+                if (fc != null) fc.SetValue($"{twi.GetUserFollowers()}");
             }
             else
             {
-                if (fc != null) fc.Value = "認証失敗";
+                if (fc != null) fc.SetValue("認証失敗");
                 fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserID");
-                if (fc != null) fc.Value = $"";
+                if (fc != null) fc.SetValue($"");
                 fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_UserName");
-                if (fc != null) fc.Value = $"";
+                if (fc != null) fc.SetValue($"");
                 fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Tweet");
-                if (fc != null) fc.Value = $"";
+                if (fc != null) fc.SetValue($"");
                 fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth_Follower");
-                if (fc != null) fc.Value = $"";
+                if (fc != null) fc.SetValue($"");
             }
         }
     }

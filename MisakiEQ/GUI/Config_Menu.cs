@@ -1,4 +1,5 @@
-﻿using MisakiEQ.Lib.Misskey;
+﻿using MisakiEQ.Lib.Config;
+using MisakiEQ.Lib.Misskey;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static MisakiEQ.Lib.Config.Funcs;
 
 namespace MisakiEQ.GUI
 {
@@ -43,33 +45,35 @@ namespace MisakiEQ.GUI
 #endif
 #if ADMIN || DEBUG
             var fc = Lib.Config.Funcs.GetInstance().GetConfigClass("Twitter_Auth");
-            fc?.SetAction(() =>
-            {
-                fc.ButtonEnable = false;
-                Process.Start(new ProcessStartInfo(Lib.Twitter.APIs.GetInstance().GetAuthURL().Result)
+            if (fc != null)
+                ((FunctionIndexData)fc).SetAction(() =>
                 {
-                    UseShellExecute = true
-                });
-                this.Invoke(() =>
-                {
-                    try
+                    ((FunctionIndexData)fc).ButtonEnable = false;
+                    Process.Start(new ProcessStartInfo(Lib.Twitter.APIs.GetInstance().GetAuthURL().Result)
                     {
-                        if (TwitterAuthGUI != null && TwitterAuthGUI.Visible) TwitterAuthGUI.Close();
-                        TwitterAuthGUI = new();
-                        TwitterAuthGUI.ShowDialog();
-                        Funcs.GUI.TwitterGUI.SetInfotoConfigUI();
-                    }
-                    catch (Exception ex)
+                        UseShellExecute = true
+                    });
+                    this.Invoke(() =>
                     {
-                        Log.Instance.Error(ex);
-                    }
+                        try
+                        {
+                            if (TwitterAuthGUI != null && TwitterAuthGUI.Visible) TwitterAuthGUI.Close();
+                            TwitterAuthGUI = new();
+                            TwitterAuthGUI.ShowDialog();
+                            Funcs.GUI.TwitterGUI.SetInfotoConfigUI();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Instance.Error(ex);
+                        }
+                    });
+                    ((FunctionIndexData)fc).ButtonEnable = true;
                 });
-                fc.ButtonEnable = true;
-            });
             Funcs.GUI.TwitterGUI.SetInfotoConfigUI();
 #endif
             var fd = Lib.Config.Funcs.GetInstance().GetConfigClass("DMDATA_AuthFunction");
-            fd?.SetAction(() =>
+            if(fd!=null)
+                ((FunctionIndexData)fd).SetAction(() =>
             {
                 this.Invoke(() =>
                 {
@@ -81,14 +85,14 @@ namespace MisakiEQ.GUI
             UpdatePos.Tick += UpdateGeo;
             var lat = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Lat");
             var lon = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Long");
-            if(lat!=null)lat.SetAction(new Action(() => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } }));
-            if(lon!=null)lon.SetAction(new Action(() => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } }));
+            if(lat!=null)lat.ValueChanged+= (s,e) => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } };
+            if(lon!=null)lon.ValueChanged += (s, e) => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } };
             UpdateGeo(null, EventArgs.Empty);
 //#if DEBUG
             var function = Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Function");
-            function?.SetAction(async () =>
+            if(function!=null)((FunctionIndexData)function).SetAction(async () =>
             {
-                await Lib.Misskey.APIData.CreateNote(Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.Value.ToString() ?? "",Setting.Visibility.Followers);
+                await Lib.Misskey.APIData.CreateNote(Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.GetValue() ?? "",Setting.Visibility.Followers);
                });
 //#endif
         }
@@ -101,13 +105,13 @@ namespace MisakiEQ.GUI
             {
                 IsUpdatePosBusy = true;
                 UpdatePos.Stop();
-                var res = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Result");
-                var lat = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Lat");
-                var lon = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Long");
+                var res = (ReadonlyIndexData?)Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Result");
+                var lat = (LongIndexData?)Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Lat");
+                var lon = (LongIndexData?)Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Long");
                 if (lon != null && lat != null)
                 {
-                    if (res != null) res.Value = "地点取得中...";
-                    var index = await Lib.PrefecturesAPI.API.GetReverseGeo(new((long)lon.Value / 10000.0, (long)lat.Value / 10000.0));
+                    if (res != null) res.SetValue("地点取得中...");
+                    var index = await Lib.PrefecturesAPI.API.GetReverseGeo(new(lon.Value / 10000.0, (long)lat.Value / 10000.0));
                     var result = index.Prefcity;
                     if (result == string.Empty)
                     {
@@ -151,18 +155,18 @@ namespace MisakiEQ.GUI
             LabelDate.Text = DateTime.Now.ToString("yyyy/MM/dd (ddd)");
             LabelTime.Text = DateTime.Now.ToString("HH:mm:ss");
             var uptime = Lib.Config.Funcs.GetInstance().GetConfigClass("AppInfo_Uptime");
-            if (uptime != null) uptime.Value = $"{TrayHub.GetInstance()?.AppTimer.ToString(@"dd\.hh\:mm\:ss")}";
+            if (uptime != null) uptime.SetValue($"{TrayHub.GetInstance()?.AppTimer.ToString(@"dd\.hh\:mm\:ss")}");
             var usingapi = Lib.Config.Funcs.GetInstance().GetConfigClass("AppInfo_UsingAPI");
-            if (usingapi != null) usingapi.Value = $"{Background.APIs.GetInstance().EEW.CurrentAPI}";
+            if (usingapi != null) usingapi.SetValue($"{Background.APIs.GetInstance().EEW.CurrentAPI}");
             var kyoshin = Background.APIs.GetInstance().KyoshinAPI;
             uptime = Lib.Config.Funcs.GetInstance().GetConfigClass("Kyoshin_Time");
             if (kyoshin.KyoshinLatest.Year > 2000)
             {
-                if (uptime != null) uptime.Value = $"{kyoshin.KyoshinLatest:yyyy/MM/dd HH:mm:ss}";
+                if (uptime != null) uptime.SetValue($"{kyoshin.KyoshinLatest:yyyy/MM/dd HH:mm:ss}");
             }
             else
             {
-                if (uptime != null) uptime.Value = "不明";
+                if (uptime != null) uptime.SetValue("不明");
             }
         }
 
@@ -175,8 +179,8 @@ namespace MisakiEQ.GUI
         {
             var lat = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Lat");
             var lon = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Long");
-            if (lat != null) lat.SetAction(new Action(() => { return; }));
-            if (lon != null) lon.SetAction(new Action(() => { return; }));
+            if (lat != null) lat.ValueChanged = null;
+            if (lon != null) lon.ValueChanged = null;
             Lib.Config.Funcs.GetInstance().DiscardConfig();
             ConfigSetting?.FormEventDispose();
         }

@@ -131,10 +131,20 @@ namespace MisakiEQ.GUI
                     case "/misskey-token":
                         Log.Instance.Info(Lib.Misskey.APIData.accessToken);
                         break;
+                    case "/config_view":
+                        Lib.Config.Funcs.GetInstance().Configs.OutputLog();
+                        break;
+                    case "/crash":
+                        throw new NullReferenceException();
+                        break;
                     default:
                         Log.Instance.Warn("不明なコマンドです。" + commands[0]);
                         break;
                 }
+            }
+            catch (NullReferenceException ex)
+            {
+                throw ex;
             }
             catch (Exception ex)
             {

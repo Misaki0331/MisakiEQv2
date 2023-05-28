@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,9 +44,9 @@ namespace MisakiEQ.Lib.Config
                 Log.Instance.Info("Config書込開始");
                 System.Reflection.FieldInfo[] fields = Configs.GetType().GetFields();
                 using var sw = new StreamWriter(CfgFile, false, Encoding.UTF8);
-                for(int i = 0; i < Configs.Data.Count; i++)
+                for (int i = 0; i < Configs.Data.Count; i++)
                 {
-                    var config=Configs.Data[i].Setting;
+                    var config = Configs.Data[i].Setting;
                     for (int j = 0; j < config.Count; j++) sw.Write($"{config[j].GetConfigString()}");
                 }
                 sw.Close();
@@ -83,11 +84,12 @@ namespace MisakiEQ.Lib.Config
                     {
                         try
                         {
-                            SetConfigValue(lines[0],lines[1]);
+                            SetConfigValue(lines[0], lines[1]);
 
                             Log.Instance.Debug($"{line}");
                             PASS++;
-                        }catch(Exception ex)
+                        }
+                        catch (Exception ex)
                         {
                             Log.Instance.Error(ex);
                         }
@@ -118,10 +120,10 @@ namespace MisakiEQ.Lib.Config
         public void ApplyConfig()
         {
             var api = APIs.GetInstance();
-            api.EEW.Config.Delay = (uint)(GetConfigValue("API_EEW_Delay") as long ? ?? long.MaxValue);
+            api.EEW.Config.Delay = (uint)(GetConfigValue("API_EEW_Delay") as long? ?? long.MaxValue);
             api.EEW.Config.DelayDetectMode = (uint)(GetConfigValue("API_EEW_DelayDetectMode") as long? ?? long.MaxValue);
-            api.EEW.Config.DelayDetectCoolDown = (uint)(GetConfigValue("API_EEW_DelayDetectCoolDown") as long? ?? long.MaxValue); 
-            api.EEW.Config.IsWarningOnlyInDMDATA = (GetConfigValue("API_EEW_DMDATA_OnlyWarn") as bool? ?? false); 
+            api.EEW.Config.DelayDetectCoolDown = (uint)(GetConfigValue("API_EEW_DelayDetectCoolDown") as long? ?? long.MaxValue);
+            api.EEW.Config.IsWarningOnlyInDMDATA = (GetConfigValue("API_EEW_DMDATA_OnlyWarn") as bool? ?? false);
             api.EQInfo.Config.Delay = (uint)(GetConfigValue("API_EQInfo_Delay") as long? ?? long.MaxValue);
             api.EQInfo.Config.Limit = (uint)(GetConfigValue("API_EQInfo_Limit") as long? ?? long.MaxValue);
             api.KyoshinAPI.Config.KyoshinDelayTime = (int)(GetConfigValue("API_K-moni_Delay") as long? ?? long.MaxValue);
@@ -146,7 +148,7 @@ namespace MisakiEQ.Lib.Config
                 tray.NoticeNationWide = Struct.ConfigBox.Notification_EEW_Nationwide.GetIndex(GetConfigValue("Notification_EEW_Nationwide") as long? ?? 9);
                 tray.NoticeArea = Struct.ConfigBox.Notification_EEW_Area.GetIndex(GetConfigValue("Notification_EEW_Area") as long? ?? 8);
             }
-            Lib.ToastNotification.IsNewNotification= (bool)(GetConfigValue("Notification_Popup_Notify") as bool? ?? false);
+            Lib.ToastNotification.IsNewNotification = (bool)(GetConfigValue("Notification_Popup_Notify") as bool? ?? false);
 #if DEBUG||ADMIN
             Twitter.APIs.GetInstance().Config.TweetEnabled = (GetConfigValue("Twitter_Enable_Tweet") as bool? ?? true);
             Twitter.APIs.GetInstance().Config.IsTweetJ_ALERT = (GetConfigValue("Twitter_J-ALERT_Tweet") as bool? ?? true);
@@ -187,17 +189,17 @@ namespace MisakiEQ.Lib.Config
         /// 存在しない場合はnullが返ります</returns>
         public IndexData? GetConfigClass(string name)
         {
-                for (int i = 0; i < Configs.Data.Count; i++)
+            for (int i = 0; i < Configs.Data.Count; i++)
+            {
+                var config = Configs.Data[i].Setting;
+                for (int j = 0; j < config.Count; j++)
                 {
-                    var config = Configs.Data[i].Setting;
-                    for (int j = 0; j < config.Count; j++)
-                    {
-                        if (config[j].Name == name) return config[j];
-                    }
+                    if (config[j].Name == name) return config[j];
                 }
-                return null;
-                
-            
+            }
+            return null;
+
+
         }
         /// <summary>
         /// nameからコンフィグの値を取得します。
@@ -218,7 +220,7 @@ namespace MisakiEQ.Lib.Config
         /// <param name="value">設定する値</param>
         /// <param name="IsThrow">存在しない時に例外をスローするか</param>
         /// <exception cref="ArgumentNullException"></exception>
-        void SetConfigValue(string name, string value, bool IsThrow=true)
+        void SetConfigValue(string name, string value, bool IsThrow = true)
         {
             var cls = GetConfigClass(name);
             if (cls == null)
@@ -230,15 +232,15 @@ namespace MisakiEQ.Lib.Config
         }
         private class ConfigTemplate
         {
-            public ConfigTemplate(string key,string value)
+            public ConfigTemplate(string key, string value)
             {
                 Key = key;
                 Value = value;
             }
             public string Key = string.Empty;
-            public string Value=string.Empty;
+            public string Value = string.Empty;
         }
-        readonly List<ConfigTemplate> ConfigTemplates=new();
+        readonly List<ConfigTemplate> ConfigTemplates = new();
         public void DiscardConfig()
         {
             Log.Instance.Debug($"現在の設定が保存せずに破棄された為、コンフィグを前の状態に戻します。");
@@ -248,31 +250,47 @@ namespace MisakiEQ.Lib.Config
             sw.Stop();
             Log.Instance.Debug($"コンフィグを前の状態に戻しました。処理時間 : {sw.Elapsed}");
         }
-        public Cfg Configs=new();
+        public Cfg Configs = new();
         public class Cfg
         {
             public readonly List<ConfigGroup> Data = new();
+            public void OutputLog()
+            {
+                int i = 0;
+                foreach(var d in Data)
+                {
+                    foreach(var e in d.Setting)
+                    {
+                        i++;
+                        try
+                        {
+                            Log.Instance.Debug($"No.{i.ToString().PadLeft(4, ' ')}: \"{d.Name}\".\"{e.Name}\" Value=\"{e.GetValue()}\"");
+                        }
+                        catch  { }
+                    }
+                }
+            }
             public Cfg()
             {
-                GetGroup("通信設定",true)?.Add(new LongIndexData("API_EEW_Delay","EEW標準遅延",unitName:"秒",displayMag:1000, description:"標準状態の緊急地震速報の遅延時間です。", min:1000, max:5000, def:1000));   //通常時の遅延(ms)
-                GetGroup("通信設定",true)?.Add(new LongIndexData("API_EEW_DelayDetectMode", "EEW検知遅延", unitName: "秒", displayMag: 1000, description: "検知状態の緊急地震速報の遅延時間です。", min:150, max:5000, def:200));     //検出時の遅延(ms)
-                GetGroup("通信設定",true)?.Add(new LongIndexData("API_EEW_DelayDetectCoolDown", "EEWモード移行時間", unitName: "秒", displayMag: 1000, description: "検知状態から標準状態に回復する時間です。", min:1000, max:10000, def:4000));     //検出から通常時に戻る時間(ms)
-                GetGroup("通信設定",true)?.Add(new BoolIndexData("API_EEW_DMDATA_OnlyWarn", "DMDATA取得モード", "警報のみ受け取るか、予報も受け取るかを選択できます。", def: false, "警報のみ取得","予報・警報を取得"));   
-                GetGroup("通信設定",true)?.Add(new LongIndexData("API_EQInfo_Delay", "地震情報遅延", unitName: "秒", displayMag: 1000, description: "地震情報全般の取得遅延時間です。\n地震と津波情報共通でリクエスト多過ぎるとエラー出ます。", min:2000, max:30000, def:3000));   //通常時の遅延(ms)
-                GetGroup("通信設定",true)?.Add(new LongIndexData("API_EQInfo_Limit", "地震情報取得項目数", description: "1回で地震情報を取得する数です。\n値を大きくすると1回あたりより多くの情報が更新されますが、その分遅くなります。", min:1, max:100, def:10));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new LongIndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min:0, max:5, def:1,unitName:"秒"));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new LongIndexData("API_K-moni_Frequency", "強震モニタ更新間隔", description: "強震モニタの更新間隔です。データ消費量を抑えたい時にお使いください。", min:1, max:5, def:1,unitName:"秒"));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new LongIndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min:10, max:720, def:30,unitName:"分"));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new LongIndexData("API_J-ALERT_Delay", "Jアラート遅延時間", description: "Jアラートの更新間隔です。", min:3, max:60, def:30,unitName:"秒"));   
-                GetGroup("ユーザー設定",true)?.Add(new LongIndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896,displayMag:10000));   //取得時の配列の数
-                GetGroup("ユーザー設定",true)?.Add(new LongIndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min:1225000, max: 1460000, def: 1396983, displayMag:10000));   //取得時の配列の数
+                GetGroup("通信設定", true)?.Add(new LongIndexData("API_EEW_Delay", "EEW標準遅延", unitName: "秒", displayMag: 1000, description: "標準状態の緊急地震速報の遅延時間です。", min: 1000, max: 5000, def: 1000));   //通常時の遅延(ms)
+                GetGroup("通信設定", true)?.Add(new LongIndexData("API_EEW_DelayDetectMode", "EEW検知遅延", unitName: "秒", displayMag: 1000, description: "検知状態の緊急地震速報の遅延時間です。", min: 150, max: 5000, def: 200));     //検出時の遅延(ms)
+                GetGroup("通信設定", true)?.Add(new LongIndexData("API_EEW_DelayDetectCoolDown", "EEWモード移行時間", unitName: "秒", displayMag: 1000, description: "検知状態から標準状態に回復する時間です。", min: 1000, max: 10000, def: 4000));     //検出から通常時に戻る時間(ms)
+                GetGroup("通信設定", true)?.Add(new BoolIndexData("API_EEW_DMDATA_OnlyWarn", "DMDATA取得モード", "警報のみ受け取るか、予報も受け取るかを選択できます。", def: false, "警報のみ取得", "予報・警報を取得"));
+                GetGroup("通信設定", true)?.Add(new LongIndexData("API_EQInfo_Delay", "地震情報遅延", unitName: "秒", displayMag: 1000, description: "地震情報全般の取得遅延時間です。\n地震と津波情報共通でリクエスト多過ぎるとエラー出ます。", min: 2000, max: 30000, def: 3000));   //通常時の遅延(ms)
+                GetGroup("通信設定", true)?.Add(new LongIndexData("API_EQInfo_Limit", "地震情報取得項目数", description: "1回で地震情報を取得する数です。\n値を大きくすると1回あたりより多くの情報が更新されますが、その分遅くなります。", min: 1, max: 100, def: 10));   //取得時の配列の数
+                GetGroup("通信設定", true)?.Add(new LongIndexData("API_K-moni_Delay", "強震モニタ遅延時間", description: "強震モニタの時刻からの遅延を設定できます。\n低い程低遅延ですが、更新されない可能性があります。", min: 0, max: 5, def: 1, unitName: "秒"));   //取得時の配列の数
+                GetGroup("通信設定", true)?.Add(new LongIndexData("API_K-moni_Frequency", "強震モニタ更新間隔", description: "強震モニタの更新間隔です。データ消費量を抑えたい時にお使いください。", min: 1, max: 5, def: 1, unitName: "秒"));   //取得時の配列の数
+                GetGroup("通信設定", true)?.Add(new LongIndexData("API_K-moni_Adjust", "強震モニタ補正間隔", description: "強震モニタの時刻調整間隔です。自動で時刻補正する間隔を設定できます。", min: 10, max: 720, def: 30, unitName: "分"));   //取得時の配列の数
+                GetGroup("通信設定", true)?.Add(new LongIndexData("API_J-ALERT_Delay", "Jアラート遅延時間", description: "Jアラートの更新間隔です。", min: 3, max: 60, def: 30, unitName: "秒"));
+                GetGroup("ユーザー設定", true)?.Add(new LongIndexData("USER_Pos_Lat", "所在地(緯度)", description: "ユーザーの緯度です。予測震度を表示させたい場合にお使いください。", min: 237000, max: 462000, def: 356896, displayMag: 10000));   //取得時の配列の数
+                GetGroup("ユーザー設定", true)?.Add(new LongIndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min: 1225000, max: 1460000, def: 1396983, displayMag: 10000));   //取得時の配列の数
                 GetGroup("ユーザー設定", true)?.Add(new ReadonlyIndexData("USER_Pos_Result", "該当地域名", "緯度・経度に対応されるであろう該当地域名です。"));
-                GetGroup("ユーザー設定",true)?.Add(new BoolIndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示","強震モニタに非表示"));   //取得時の配列の数
-                GetGroup("通信設定",true)?.Add(new FunctionIndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", workingTitle: "時刻調整中...", action:new Action(async() => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
+                GetGroup("ユーザー設定", true)?.Add(new BoolIndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示", "強震モニタに非表示"));   //取得時の配列の数
+                GetGroup("通信設定", true)?.Add(new FunctionIndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", workingTitle: "時刻調整中...", action: new Action(async () => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
                 GetGroup("通信設定", true)?.Add(new ReadonlyIndexData("Kyoshin_Time", "強震モニタ時刻", "強震モニタ上の最終更新時刻です。"));
                 GetGroup("Project DM-Data Service", true)?.Add(new FunctionIndexData("DMDATA_AuthFunction", "アプリ連携", "MisakiEQでDMDATAの緊急地震速報データを取得できるようにします。", "認証", workingTitle: "ブラウザで認証中..."));
 #if ADMIN||DEBUG
-                GetGroup("SNS設定",true)?.Add(new FunctionIndexData("Twitter_Auth", "Twitter認証", "アカウント認証します","認証",workingTitle:"認証中..."));
+                GetGroup("SNS設定", true)?.Add(new FunctionIndexData("Twitter_Auth", "Twitter認証", "アカウント認証します", "認証", workingTitle: "認証中..."));
                 GetGroup("SNS設定", true)?.Add(new ReadonlyIndexData("Twitter_Auth_Info", "Twitter認証情報", ""));
                 GetGroup("SNS設定", true)?.Add(new ReadonlyIndexData("Twitter_Auth_UserID", "ユーザーID", ""));
                 GetGroup("SNS設定", true)?.Add(new ReadonlyIndexData("Twitter_Auth_UserName", "ユーザー名", ""));
@@ -286,20 +304,20 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("SNS設定", true)?.Add(new BoolIndexData("Misskey_EEW_Delay_IsInter", "遅延の割り込み", "パブリック投稿時に割り込んで投稿します。", def: false, "割り込み処理が有効", "割り込み処理が無効"));
 
 #endif
-                GetGroup("サウンド設定",true)?.Add(new LongIndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
-                GetGroup("サウンド設定",true)?.Add(new LongIndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
-                GetGroup("サウンド設定",true)?.Add(new LongIndexData("Sound_Volume_Tsunami", "津波情報の通知音量", "津波情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
-                GetGroup("サウンド設定",true)?.Add(new BoolIndexData("Sound_All_Mute", "完全ミュート", "音声デバイスがない時などはこのチェックボックスを有効にすることで軽量化されます。", def: false, "有効(再生されません)","無効"));
+                GetGroup("サウンド設定", true)?.Add(new LongIndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
+                GetGroup("サウンド設定", true)?.Add(new LongIndexData("Sound_Volume_Earthquake", "地震情報の通知音量", "地震情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
+                GetGroup("サウンド設定", true)?.Add(new LongIndexData("Sound_Volume_Tsunami", "津波情報の通知音量", "津波情報発表時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));
+                GetGroup("サウンド設定", true)?.Add(new BoolIndexData("Sound_All_Mute", "完全ミュート", "音声デバイスがない時などはこのチェックボックスを有効にすることで軽量化されます。", def: false, "有効(再生されません)", "無効"));
 
                 GetGroup("緊急地震速報発表時", true)?.Add(new BoolIndexData("GUI_Popup_EEW_Compact", "簡易情報のポップ表示", "緊急地震速報が発令されると簡易ウィンドウがポップアップされます。", true, "ポップアップ表示", "ポップアップ非表示"));
                 GetGroup("緊急地震速報発表時", true)?.Add(new BoolIndexData("GUI_TopMost_EEW_Compact", "簡易情報の表示モード", "簡易ウィンドウが前面表示されます。", true, "前面表示", "標準表示"));
                 GetGroup("J-ALERT", true)?.Add(new BoolIndexData("GUI_Popup_J-ALERT", "全画面ポップアップ", "Jアラート発令時に自動的に全画面でポップアップ表示されます。", true, "表示する", "表示しない"));
                 GetGroup("アプリ情報", true)?.Add(new ReadonlyIndexData("AppInfo_Uptime", "アプリ起動時間", "起動してからの経過時間です。"));
                 GetGroup("アプリ情報", true)?.Add(new ReadonlyIndexData("AppInfo_UsingAPI", "使用中のEEW API", "EEW APIの使用状況"));
-                GetGroup("通知設定", true)?.Add(new ComboIndexData("Notification_EEW_Nationwide", "EEW全国通知条件", "全国共通で緊急地震速報を通知する条件を設定します", 9,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "ALL","Warning only","None"}));
-                GetGroup("通知設定", true)?.Add(new ComboIndexData("Notification_EEW_Area", "EEW地域通知条件", "お住まいの地域で緊急地震速報を通知する条件を設定します", 8,new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "≧0", "None"}));
-                GetGroup("通知設定", true)?.Add(new BoolIndexData("Notification_Popup_Notify", "トースト通知タイプ", "通知タイプを設定します。", def:false, "Windows プッシュ通知", "Windows Form標準通知"));
-                GetGroup("Debug Mode", true)?.Add(new StringIndexData("Debug_Input", "Misskey", "デバック用",""));
+                GetGroup("通知設定", true)?.Add(new ComboIndexData("Notification_EEW_Nationwide", "EEW全国通知条件", "全国共通で緊急地震速報を通知する条件を設定します", 9, new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "ALL", "Warning only", "None" }));
+                GetGroup("通知設定", true)?.Add(new ComboIndexData("Notification_EEW_Area", "EEW地域通知条件", "お住まいの地域で緊急地震速報を通知する条件を設定します", 8, new string[] { "7", "≧6+", "≧6-", "≧5+", "≧5-", "≧4", "≧3", "≧2", "≧1", "≧0", "None" }));
+                GetGroup("通知設定", true)?.Add(new BoolIndexData("Notification_Popup_Notify", "トースト通知タイプ", "通知タイプを設定します。", def: false, "Windows プッシュ通知", "Windows Form標準通知"));
+                GetGroup("Debug Mode", true)?.Add(new StringIndexData("Debug_Input", "Misskey", "デバック用", ""));
                 GetGroup("Debug Mode", true)?.Add(new FunctionIndexData("Debug_Function", "ノート投稿", "デバック用", "Execute", workingTitle: "Working..."));
 
             }
@@ -322,7 +340,7 @@ namespace MisakiEQ.Lib.Config
             public List<IndexData>? GetGroup(string name, bool Create = false)
             {
                 var instance = Data.Find(a => a.Name == name);
-                if(instance == null)
+                if (instance == null)
                 {
                     if (Create)
                     {
@@ -336,13 +354,14 @@ namespace MisakiEQ.Lib.Config
             }
             public class ConfigGroup
             {
-                public ConfigGroup(string name){
+                public ConfigGroup(string name)
+                {
                     _name = name;
                 }
-                
-                readonly string _name="";
+
+                readonly string _name = "";
                 public string Name { get => _name; }
-                public readonly List<IndexData> Setting=new();
+                public readonly List<IndexData> Setting = new();
             }
         }
         public abstract class IndexData
@@ -374,6 +393,9 @@ namespace MisakiEQ.Lib.Config
             {
                 throw new InvalidDataException();
             }
+            public virtual void SetValue(object value)
+            {
+            }
             // 共通のメソッドやプロパティを定義する場合はここに追加する
         }
         public class LongIndexData : IndexData
@@ -384,14 +406,15 @@ namespace MisakiEQ.Lib.Config
             private long _value;
             public long Value
             {
-                get { return _value; } set
+                get { return _value; }
+                set
                 {
                     if (value < Min) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} < {Min}");
                     if (value > Max) throw new ArgumentOutOfRangeException($"[{Name}]セットされた値が範囲外です。{value} > {Max}");
                     if (_value != value)
                     {
                         _value = value;
-                        ValueChanged?.Invoke(this,EventArgs.Empty);
+                        ValueChanged?.Invoke(this, EventArgs.Empty);
                     }
                 }
 
@@ -412,7 +435,7 @@ namespace MisakiEQ.Lib.Config
 
             public override string GetConfigString()
             {
-                return Name + "=" + Value.ToString()+ Environment.NewLine;
+                return Name + "=" + Value.ToString() + Environment.NewLine;
             }
 
             public override bool SetConfigString(string value)
@@ -431,6 +454,14 @@ namespace MisakiEQ.Lib.Config
             {
                 return Value.ToString();
             }
+            public override void SetValue(object value)
+            {
+                if (value is long || value is int || value is short)
+                {
+                    Value = (long)value;
+                }
+                else throw new InvalidCastException($"{value}は整数型ではありません。Type:{value.GetType()}");
+            }
             // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
         }
         public class StringIndexData : IndexData
@@ -438,8 +469,11 @@ namespace MisakiEQ.Lib.Config
             public int MaxLength { get; set; }
             public string DefaultValue { get; set; }
             string _value;
-            public string Value { get=>_value; set
+            public string Value
+            {
+                get => _value; set
                 {
+                    if (value.Length > MaxLength) throw new InvalidDataException("value is out of max length.");
                     if (!string.Equals(_value, value))
                     {
                         _value = value;
@@ -453,7 +487,7 @@ namespace MisakiEQ.Lib.Config
             {
                 MaxLength = maxLength;
                 DefaultValue = defaultValue;
-                _value= defaultValue;
+                _value = defaultValue;
             }
             public override string GetConfigString()
             {
@@ -473,6 +507,14 @@ namespace MisakiEQ.Lib.Config
             public override string GetValue()
             {
                 return Value.ToString();
+            }
+            public override void SetValue(object value)
+            {
+                if (value is string)
+                {
+                    Value = (string)value;
+                }
+                else throw new InvalidCastException($"{value}はstring型ではありません。Type:{value.GetType()}");
             }
             // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
         }
@@ -504,7 +546,7 @@ namespace MisakiEQ.Lib.Config
             }
             public string GetToggleText(bool Is)
             {
-                return Is?BoolToggleOn:BoolToggleOff;
+                return Is ? BoolToggleOn : BoolToggleOff;
             }
             public override string GetConfigString()
             {
@@ -534,8 +576,18 @@ namespace MisakiEQ.Lib.Config
             {
                 return Value.ToString();
             }
-            // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
+
+            public override void SetValue(object value)
+            {
+                if (value is bool)
+                {
+                    Value = (bool)value;
+                }
+                else throw new InvalidCastException($"{value}はboolean型ではありません。Type:{value.GetType()}");
+            }
         }
+        // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
+
         public class FunctionIndexData : IndexData
         {
             private Action? FunctionAction { get; set; }
@@ -620,11 +672,18 @@ namespace MisakiEQ.Lib.Config
         }
         public class ReadonlyIndexData : IndexData
         {
-            public string Value { get; set; }
+            string _value;
+            public string Value { get=>_value; set {
+                    if (!string.Equals(value, _value))
+                    {
+                        _value = value;
+                        ValueChanged?.Invoke(this, EventArgs.Empty);
+                    }
+                } }
             public ReadonlyIndexData(string name, string title, string description)
                 : base(name, title, description)
             {
-                Value = "";
+                _value = "";
             }
 
             // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
@@ -649,7 +708,7 @@ namespace MisakiEQ.Lib.Config
 
             public override string GetConfigString()
             {
-                return Name + "=" + ComboStrings[Value].Replace("%", "%%").Replace("=", "%3D").Replace("\n", "%0D")+ Environment.NewLine;
+                return Name + "=" + ComboStrings[Value].Replace("%", "%%").Replace("=", "%3D").Replace("\n", "%0D") + Environment.NewLine;
             }
             public override bool SetConfigString(string value)
             {
@@ -683,7 +742,7 @@ namespace MisakiEQ.Lib.Config
                 }
                 return false;
             }
-            
+
             public override bool ValueDefaultable()
             {
                 return true;
