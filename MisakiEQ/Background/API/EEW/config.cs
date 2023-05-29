@@ -8,11 +8,11 @@ namespace MisakiEQ.Background.API.EEW
     public class Config
     {
         ///<summary>通常時の遅延(ms)/summary>
-        public uint Delay;
+        public long Delay;
         ///<summary>検出時の遅延(ms)/summary>
-        public uint DelayDetectMode;
+        public long DelayDetectMode;
         ///<summary>検出から通常時に戻る時間(ms)</summary>
-        public uint DelayDetectCoolDown;
+        public long DelayDetectCoolDown;
         ///<summary>DMDATAでの警報のみ受け取るか</summary>
         public bool IsWarningOnlyInDMDATA { 
             get => Background.APIs.GetInstance().EEW.DMData.IsWarnOnly; 

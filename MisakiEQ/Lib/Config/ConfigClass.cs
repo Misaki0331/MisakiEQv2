@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -120,44 +121,68 @@ namespace MisakiEQ.Lib.Config
         public void ApplyConfig()
         {
             var api = APIs.GetInstance();
-            api.EEW.Config.Delay = (uint)(GetConfigValue("API_EEW_Delay") as long? ?? long.MaxValue);
-            api.EEW.Config.DelayDetectMode = (uint)(GetConfigValue("API_EEW_DelayDetectMode") as long? ?? long.MaxValue);
-            api.EEW.Config.DelayDetectCoolDown = (uint)(GetConfigValue("API_EEW_DelayDetectCoolDown") as long? ?? long.MaxValue);
-            api.EEW.Config.IsWarningOnlyInDMDATA = (GetConfigValue("API_EEW_DMDATA_OnlyWarn") as bool? ?? false);
-            api.EQInfo.Config.Delay = (uint)(GetConfigValue("API_EQInfo_Delay") as long? ?? long.MaxValue);
-            api.EQInfo.Config.Limit = (uint)(GetConfigValue("API_EQInfo_Limit") as long? ?? long.MaxValue);
-            api.KyoshinAPI.Config.KyoshinDelayTime = (int)(GetConfigValue("API_K-moni_Delay") as long? ?? long.MaxValue);
-            api.KyoshinAPI.Config.KyoshinFrequency = (int)(GetConfigValue("API_K-moni_Frequency") as long? ?? long.MaxValue);
-            api.KyoshinAPI.Config.AutoAdjustKyoshinTime = (int)(GetConfigValue("API_K-moni_Adjust") as long? ?? long.MaxValue) * 60;
-            api.Jalert.Config.Delay = (uint)(GetConfigValue("API_J-ALERT_Delay") as long? ?? long.MaxValue) * 1000;
-            api.Jalert.Config.IsDisplay = (bool)(GetConfigValue("GUI_Popup_J-ALERT") as bool? ?? true);
+            SetValue("API_EEW_Delay", (e) => { api.EEW.Config.Delay = (int)(long)e;});
+            SetValue("API_EEW_DelayDetectMode", (e) => { api.EEW.Config.DelayDetectMode = (int)(long)e;});
+            SetValue("API_EEW_DelayDetectCoolDown", (e) => { api.EEW.Config.DelayDetectCoolDown = (int)(long)e;});
+            SetValue("API_EEW_DMDATA_OnlyWarn", (e) => { api.EEW.Config.IsWarningOnlyInDMDATA = (bool)e;});
+            SetValue("API_EQInfo_Delay", (e) => { api.EQInfo.Config.Delay = (uint)(long)e; });
+            SetValue("API_EQInfo_Limit", (e) => { api.EQInfo.Config.Limit = (uint)(long)e; });
+            SetValue("API_K-moni_Delay", (e) => { api.KyoshinAPI.Config.KyoshinDelayTime = (int)(long)e; });
+            SetValue("API_K-moni_Frequency", (e) => { api.KyoshinAPI.Config.KyoshinFrequency = (int)(long)e; });
+            SetValue("API_K-moni_Adjust", (e) => { api.KyoshinAPI.Config.AutoAdjustKyoshinTime = (int)(long)e; });
+            SetValue("API_J-ALERT_Delay", (e) => { api.Jalert.Config.Delay = (uint)(long)e; });
+            SetValue("GUI_Popup_J-ALERT", (e) => { api.Jalert.Config.IsDisplay = (bool)e; });
             var gui = APIs.GetInstance().KyoshinAPI.Config;
-            gui.UserLong = (int)(GetConfigValue("USER_Pos_Long") as long? ?? long.MaxValue) / 10000.0;
-            gui.UserLat = (int)(GetConfigValue("USER_Pos_Lat") as long? ?? long.MaxValue) / 10000.0;
-            gui.UserDisplay = GetConfigValue("USER_Pos_Display") as bool? ?? false;
+            SetValue("USER_Pos_Long", (e) => { gui.UserLong = (int)(long)e; });
+            SetValue("USER_Pos_Lat", (e) => { gui.UserLat = (int)(long)e; });
+            SetValue("USER_Pos_Display", (e) => { gui.UserDisplay = (bool)e; });
             var snd = Sound.Sounds.GetInstance().Config;
-            snd.EEWVolume = (int)(GetConfigValue("Sound_Volume_EEW") as long? ?? 100);
-            snd.EarthquakeVolume = (int)(GetConfigValue("Sound_Volume_Earthquake") as long? ?? 100);
-            snd.TsunamiVolume = (int)(GetConfigValue("Sound_Volume_Tsunami") as long? ?? 100);
-            snd.IsMute = GetConfigValue("Sound_All_Mute") as bool? ?? false;
+
+            SetValue("Sound_Volume_EEW", (e) => { snd.EEWVolume = (int)(long)e; });
+            SetValue("Sound_Volume_Earthquake", (e) => { snd.EarthquakeVolume = (int)(long)e; });
+            SetValue("Sound_Volume_Tsunami", (e) => { snd.TsunamiVolume = (int)(long)e; });
+            SetValue("Sound_All_Mute", (e) => { snd.IsMute = (bool)e; });
             var tray = GUI.TrayHub.GetInstance()?.ConfigData;
             if (tray != null)
             {
-                tray.IsWakeSimpleEEW = GetConfigValue("GUI_Popup_EEW_Compact") as bool? ?? true;
-                tray.IsTopSimpleEEW = GetConfigValue("GUI_TopMost_EEW_Compact") as bool? ?? true;
-                tray.NoticeNationWide = Struct.ConfigBox.Notification_EEW_Nationwide.GetIndex(GetConfigValue("Notification_EEW_Nationwide") as long? ?? 9);
-                tray.NoticeArea = Struct.ConfigBox.Notification_EEW_Area.GetIndex(GetConfigValue("Notification_EEW_Area") as long? ?? 8);
+                SetValue("GUI_Popup_EEW_Compact", (e) => { tray.IsWakeSimpleEEW = (bool)e; });
+                SetValue("GUI_TopMost_EEW_Compact", (e) => { tray.IsTopSimpleEEW = (bool)e; });
+                SetValue("Notification_EEW_Nationwide", (e) => { tray.NoticeNationWide = Struct.ConfigBox.Notification_EEW_Nationwide.GetIndex((int)e); });
+                SetValue("Notification_EEW_Area", (e) => { tray.NoticeArea = Struct.ConfigBox.Notification_EEW_Area.GetIndex((int)e); });
             }
-            Lib.ToastNotification.IsNewNotification = (bool)(GetConfigValue("Notification_Popup_Notify") as bool? ?? false);
+            SetValue("Notification_Popup_Notify", (e) => { ToastNotification.IsNewNotification = (bool)e; });
 #if DEBUG||ADMIN
-            Twitter.APIs.GetInstance().Config.TweetEnabled = (GetConfigValue("Twitter_Enable_Tweet") as bool? ?? true);
-            Twitter.APIs.GetInstance().Config.IsTweetJ_ALERT = (GetConfigValue("Twitter_J-ALERT_Tweet") as bool? ?? true);
+            SetValue("Twitter_Enable_Tweet", (e) => { Twitter.APIs.GetInstance().Config.TweetEnabled = (bool)e; });
+            SetValue("Twitter_J-ALERT_Tweet", (e) => { Twitter.APIs.GetInstance().Config.IsTweetJ_ALERT = (bool)e; });
 
-            Lib.Misskey.APIData.Config.IsEnableEarthquakeNote = (GetConfigValue("Misskey_Enable_Note") as bool? ?? true);
-            Lib.Misskey.APIData.Config.IsEnableJAlertNote = (GetConfigValue("Misskey_J-ALERT_Note") as bool? ?? true);
-            MisakiEQ.Funcs.Misskey.GetInstance().EEWDelayTime = (int)(GetConfigValue("Misskey_EEW_Delay") as long? ?? 2000);
-            MisakiEQ.Funcs.Misskey.GetInstance().IsInterSend = (GetConfigValue("Misskey_EEW_Delay_IsInter") as bool? ?? true);
+
+            SetValue("Misskey_Enable_Note", (e) => { Misskey.APIData.Config.IsEnableEarthquakeNote = (bool)e; });
+            SetValue("Misskey_J-ALERT_Note", (e) => { Misskey.APIData.Config.IsEnableJAlertNote = (bool)e; });
+            SetValue("Misskey_EEW_Delay", (e) => { MisakiEQ.Funcs.Misskey.GetInstance().EEWDelayTime = (int)(long)e; });
+            SetValue("Misskey_EEW_Delay_IsInter", (e) => { MisakiEQ.Funcs.Misskey.GetInstance().IsInterSend = (bool)e; });
 #endif
+        }
+        private bool SetValue(string id,Action<object> act)
+        {
+            try
+            {
+                var c = GetConfigClass(id);
+                if (c == null)
+                {
+                    Log.Instance.Error($"「{id}」は存在しません。");
+                    return false;
+                }
+                if (c.GetType() == typeof(LongIndexData)) act(((LongIndexData)c).Value);
+                else if (c.GetType() == typeof(StringIndexData)) act(((StringIndexData)c).Value);
+                else if (c.GetType() == typeof(BoolIndexData)) act(((BoolIndexData)c).Value);
+                else if (c.GetType() == typeof(ComboIndexData)) act(((ComboIndexData)c).Value);
+                else return false;
+                return true;
+            }catch(Exception ex)
+            {
+                Log.Instance.Error($"「{id}」は読み込めませんでした。理由:{ex.Message}");
+                return false;
+            }
         }
         /// <summary>
         /// 設定中のコンフィグから元に戻すときのクローンを作成する
@@ -206,10 +231,10 @@ namespace MisakiEQ.Lib.Config
         /// </summary>
         /// <param name="name">取得するコンフィグの名前</param>
         /// <returns>名前に対応する値<br/>無ければnullが返ります。</returns>
-        object? GetConfigValue(string name)
+        string GetConfigValue(string name)
         {
             var cls = GetConfigClass(name);
-            if (cls == null) return null;
+            if (cls == null) return string.Empty;
             return cls.GetConfigString();
         }
 
@@ -264,7 +289,7 @@ namespace MisakiEQ.Lib.Config
                         i++;
                         try
                         {
-                            Log.Instance.Debug($"No.{i.ToString().PadLeft(4, ' ')}: \"{d.Name}\".\"{e.Name}\" Value=\"{e.GetValue()}\"");
+                            Log.Instance.Debug($"No.{i,4}: \"{d.Name}\".\"{e.Name}\" Value=\"{e.GetValue()}\"");
                         }
                         catch  { }
                     }
@@ -366,16 +391,20 @@ namespace MisakiEQ.Lib.Config
         }
         public abstract class IndexData
         {
+            public Func<object, bool>? ApplyAction = null; 
             public EventHandler? ValueChanged = null;
             public string Name { get; }
             public string Title { get; }
             public string Description { get; }
-
             protected internal IndexData(string name, string title, string description)
             {
                 Name = name;
                 Title = title;
                 Description = description;
+            }
+            public virtual bool Apply()
+            {
+                return false;
             }
             public virtual string GetConfigString()
             {
@@ -391,7 +420,7 @@ namespace MisakiEQ.Lib.Config
             }
             public virtual string GetValue()
             {
-                throw new InvalidDataException();
+                return string.Empty;
             }
             public virtual void SetValue(object value)
             {
@@ -462,6 +491,20 @@ namespace MisakiEQ.Lib.Config
                 }
                 else throw new InvalidCastException($"{value}は整数型ではありません。Type:{value.GetType()}");
             }
+            public override bool Apply()
+            {
+                if (ApplyAction == null) return false;
+                try
+                {
+                    ApplyAction(Value);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Log.Instance.Error($"{ex.Message}");
+                }
+                return false;
+            }
             // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
         }
         public class StringIndexData : IndexData
@@ -515,6 +558,20 @@ namespace MisakiEQ.Lib.Config
                     Value = (string)value;
                 }
                 else throw new InvalidCastException($"{value}はstring型ではありません。Type:{value.GetType()}");
+            }
+            public override bool Apply()
+            {
+                if (ApplyAction == null) return false;
+                try
+                {
+                    ApplyAction(Value);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Log.Instance.Error($"{ex.Message}");
+                }
+                return false;
             }
             // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
         }
@@ -584,6 +641,20 @@ namespace MisakiEQ.Lib.Config
                     Value = (bool)value;
                 }
                 else throw new InvalidCastException($"{value}はboolean型ではありません。Type:{value.GetType()}");
+            }
+            public override bool Apply()
+            {
+                if (ApplyAction == null) return false;
+                try
+                {
+                    ApplyAction(Value);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Log.Instance.Error($"{ex.Message}");
+                }
+                return false;
             }
         }
         // 必要に応じて派生クラス固有のメソッドやプロパティを追加する
@@ -673,7 +744,8 @@ namespace MisakiEQ.Lib.Config
         public class ReadonlyIndexData : IndexData
         {
             string _value;
-            public string Value { get=>_value; set {
+            public string Value { get=>_value; set
+                {
                     if (!string.Equals(value, _value))
                     {
                         _value = value;
@@ -684,6 +756,19 @@ namespace MisakiEQ.Lib.Config
                 : base(name, title, description)
             {
                 _value = "";
+            }
+
+            public override string GetValue()
+            {
+                return Value.ToString();
+            }
+            public override void SetValue(object value)
+            {
+                if (value is string)
+                {
+                    Value = (string)value;
+                }
+                else throw new InvalidCastException($"{value}はstring型ではありません。Type:{value.GetType()}");
             }
 
             // 必要に応じて派生クラス固有のメソッドやプロパティを追加する

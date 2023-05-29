@@ -1,5 +1,4 @@
-﻿using MisakiEQ.Lib.ConfigV2.Components;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -111,7 +110,7 @@ namespace MisakiEQ.Lib.ConfigController
         {
             Box = gb;
             Box.Text = name;
-            gb.Size=new Size(gb.Width, 22+23*list.Count+12);
+            gb.Size = new Size(gb.Width, 22 + 23 * list.Count + 12);
             gb.SizeChanged += SizeChanged;
             for (int i = 0; i < list.Count; i++)
             {
@@ -319,8 +318,8 @@ namespace MisakiEQ.Lib.ConfigController
         void UpdateText(object? sender, EventArgs e)
         {
             string text = "";
-            if (cl is StringIndexData str) text = str.Value;
-            else if (cl is ReadonlyIndexData read) text = read.Value;
+            if (cl is StringIndexData str) text = str.GetValue();
+            else if (cl is ReadonlyIndexData read) text = read.GetValue();
             if (gp.InvokeRequired)
             {
                 gp.Invoke(() =>

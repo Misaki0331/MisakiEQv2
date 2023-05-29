@@ -15,7 +15,7 @@ namespace MisakiEQ.Lib
         {
             try
             {
-                if (URL == "")
+                if (string.IsNullOrWhiteSpace(URL))
                     throw new ArgumentException("ダウンロード先のURLが指定されていません。");
                 using HttpClient webClient = new();
                 Task<byte[]> stream;
@@ -161,8 +161,8 @@ namespace MisakiEQ.Lib
             return ex.StatusCode switch
             {
                 null => $"{ex.Message}",
-                HttpStatusCode.BadRequest => "400 - リクエスト構文が無効です。",
-                HttpStatusCode.Unauthorized => "401 - 認証の必要があります。",
+                HttpStatusCode.BadRequest => "400 - リクエストが無効です。",
+                HttpStatusCode.Unauthorized => "401 - 認証に失敗しました。",
                 HttpStatusCode.PaymentRequired => "402 - 決済が必要です。(実験的機能)",
                 HttpStatusCode.Forbidden => "403 - アクセス拒否",
                 HttpStatusCode.NotFound => "404 - リソースが存在しません。",
@@ -190,6 +190,7 @@ namespace MisakiEQ.Lib
                 HttpStatusCode.TooManyRequests => "429 - リクエストのレート制限に到達しました。時間をおいて再度実行してください。",
                 HttpStatusCode.RequestHeaderFieldsTooLarge => "431 - ヘッダーフィールドが大きすぎる為、リクエストを拒否しました。",
                 HttpStatusCode.UnavailableForLegalReasons => "451 - 検閲されたサーバーにリクエストしようとしました。",
+                (HttpStatusCode)499 => "499 - CloudFlare:要求処理中にクライアントが閉じられました。これは通常発生しないメッセージです。",
                 HttpStatusCode.InternalServerError => "500 - サーバー内部エラー",
                 HttpStatusCode.NotImplemented => "501 - サーバーがリクエストメゾットに対応していません。",
                 HttpStatusCode.BadGateway => "502 - サーバー内での通信エラー",
@@ -202,6 +203,15 @@ namespace MisakiEQ.Lib
                 (HttpStatusCode)509 => "509 - サーバーの転送量が上限に達しました。",
                 HttpStatusCode.NotExtended => "510 - サーバーがリクエストを処理するために、リクエストをさらに拡張することが必要です。",
                 HttpStatusCode.NetworkAuthenticationRequired => "511 - ネットワークにアクセスするには認証が必要です。",
+                (HttpStatusCode)520 => "520 - CloudFlare:Webサーバーが不明なエラーを返しました。",
+                (HttpStatusCode)521 => "521 - CloudFlare:サーバーはオフラインです。",
+                (HttpStatusCode)522 => "522 - CloudFlare:サーバーへの接続がタイムアウトしました。",
+                (HttpStatusCode)523 => "523 - CloudFlare:発信元に到達することができませんでした。",
+                (HttpStatusCode)524 => "524 - CloudFlare:内部サーバー処理がタイムアウトしました。",
+                (HttpStatusCode)525 => "525 - CloudFlare:SSLハンドシェイクに失敗しました。",
+                (HttpStatusCode)526 => "526 - CloudFlare:無効なSSL証明書です。",
+                (HttpStatusCode)527 => "527 - CloudFlare:Railgun Listener to origin error",
+                (HttpStatusCode)530 => $"530 - CloudFlare:CloudFlareによるエラーです。情報は利用できません。",
                 _ => $"{(int)ex.StatusCode} - {ex.StatusCode}",
             };
         }

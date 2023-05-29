@@ -26,8 +26,10 @@ namespace MisakiEQ.Lib.Misskey
         public static Config Config = new();
         static HttpClient client = new HttpClient();
 #if ADMIN
+        //本番環境
         const string baseUrl = "https://misskey.io/api";
 #elif DEBUG
+        //デバッグ環境(ねのはいさんのサーバーをお借り)
         const string baseUrl = "https://msk.nenohi.net/api";
 #else
         const string baseUrl = "";
@@ -60,46 +62,31 @@ namespace MisakiEQ.Lib.Misskey
                 }
                 try
                 {
-                    var api = new API.CreateNote();
-                    api.Text = text;
-                    api.I = accessToken;
-                    api.Visibility = visibility.ToString().ToLower();
+                    var api = new CreateNote
+                    {
+                        Text = text,
+                        I = accessToken,
+                        Visibility = visibility.ToString().ToLower()
+                    };
 
-                    if (!String.IsNullOrEmpty(fileid))
-                    {
-                        api.FileId = new();
-                        api.FileId.Add(fileid);
-                    }
+                    if (!string.IsNullOrEmpty(fileid))
+                        api.FileId = new(){fileid};
                     if (!string.IsNullOrEmpty(replyid))
-                    {
                         api.replyId = replyid;
-                    }
                     string sendText = JsonConvert.SerializeObject(api);
 
                     //また暴走を行うことを防ぐ為に
                     //重大インシデントを忘れるな 2023/5/4
-                    for (int i = 0; i < SendNotes.Count; i++)
-                    {
-                        if (SendNotes[i].NoteString == text)
-                        {
-                            SendNotes[i].NotedTime = DateTime.Now;
-                            Log.Instance.Warn("誤動作防止：送信するテキストが同じである為失敗しました。");
-                            return "";
-                        }
+                    var dep = SendNotes.Find(note => note.NoteString == text);
+                    if(dep != null) {
+                        dep.NotedTime = DateTime.Now;
+                        Log.Instance.Warn("誤動作防止：送信するテキストが同じである為失敗しました。");
+                        return "";
                     }
                     var b = new List<Note>();
-
-                    foreach (var a in SendNotes)
-                    {
-                        if (a.NotedTime.AddHours(1) < DateTime.Now)
-                        {
-                            b.Add(a);
-                        }
-                    }
+                    b.AddRange(SendNotes.FindAll(a => a.NotedTime.AddHours(1) < DateTime.Now));
                     foreach (var a in b)
-                    {
                         SendNotes.Remove(a);
-                    }
                     var content = new StringContent(sendText, Encoding.UTF8, @"application/json");
 
                     Log.Instance.Debug("Misskey API Posting...");
@@ -107,7 +94,7 @@ namespace MisakiEQ.Lib.Misskey
                     var responce = await client.PostAsync(baseUrl + "/notes/create", content);
 
                     //レスポンスコードを返す
-                    Log.Instance.Debug($"Status Code : {(int)responce.StatusCode} - {responce.StatusCode.ToString()}");
+                    Log.Instance.Debug($"Status Code : {(int)responce.StatusCode} - {responce.StatusCode}");
                     //返り値をそのまま出す
                     string output = await responce.Content.ReadAsStringAsync();
                     Log.Instance.Debug($"Contents : \"{output}\"");
@@ -116,7 +103,7 @@ namespace MisakiEQ.Lib.Misskey
                         Log.Instance.Warn("リクエストが正常に送信できませんでした。");
                         return string.Empty;
                     }
-                    var rs = JsonConvert.DeserializeObject<API.CreateNoteResponse.Root>(output);
+                    var rs = JsonConvert.DeserializeObject<CreateNoteResponse.Root>(output);
                     if (rs == null)
                     {
                         Log.Instance.Error("Misskey APIは何も返しませんでした。");

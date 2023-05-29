@@ -232,7 +232,7 @@ namespace MisakiEQ.Struct
                 Prefectures.Gunma=>"群馬",
                 Prefectures.Saitama=>"埼玉",
                 Prefectures.Chiba=>"千葉",
-                Prefectures.Tokyo=>"東京都",
+                Prefectures.Tokyo=>"東京",
                 Prefectures.Kanagawa=>"神奈川",
                 Prefectures.Niigata=>"新潟",
                 Prefectures.Toyama=>"富山",

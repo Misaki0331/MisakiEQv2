@@ -49,11 +49,18 @@ namespace MisakiEQ.Lib.Twitter
         private string AccessTokenSecret = "";
         public async Task<string> GetAuthURL()
         {
-            var keys = Resources.API.API.TwitterAPI.Split('\n');
-            keys[0] = keys[0].Replace("\r", "");
-            AuthClient = new TwitterClient(keys[0], keys[1]);
-            AuthReq = await AuthClient.Auth.RequestAuthenticationUrlAsync();
-            return AuthReq.AuthorizationURL;
+            try
+            {
+                var keys = Resources.API.API.TwitterAPI.Split('\n');
+                keys[0] = keys[0].Replace("\r", "");
+                AuthClient = new TwitterClient(keys[0], keys[1]);
+                AuthReq = await AuthClient.Auth.RequestAuthenticationUrlAsync();
+                return AuthReq.AuthorizationURL;
+            }catch(Exception ex)
+            {
+                Log.Instance.Error($"Twitterの認証中にエラーが発生しました。\n{ex.Message}");
+                throw;
+            }
         }
         public async Task<bool> AuthFromPincode(string pincode)
         {
