@@ -129,7 +129,7 @@ namespace MisakiEQ.Lib.Config
             SetValue("API_EQInfo_Limit", (e) => { api.EQInfo.Config.Limit = (uint)(long)e; });
             SetValue("API_K-moni_Delay", (e) => { api.KyoshinAPI.Config.KyoshinDelayTime = (int)(long)e; });
             SetValue("API_K-moni_Frequency", (e) => { api.KyoshinAPI.Config.KyoshinFrequency = (int)(long)e; });
-            SetValue("API_K-moni_Adjust", (e) => { api.KyoshinAPI.Config.AutoAdjustKyoshinTime = (int)(long)e; });
+            SetValue("API_K-moni_Adjust", (e) => { api.KyoshinAPI.Config.AutoAdjustKyoshinTime = (int)(long)e*60; });
             SetValue("API_J-ALERT_Delay", (e) => { api.Jalert.Config.Delay = (uint)(long)e; });
             SetValue("GUI_Popup_J-ALERT", (e) => { api.Jalert.Config.IsDisplay = (bool)e; });
             var gui = APIs.GetInstance().KyoshinAPI.Config;
