@@ -321,8 +321,7 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         }
                         
 
-
-                        eew.EarthQuake.ForecastArea.Regions.Add(areaInfo.Name);
+                        if(areaInfo.Intensity>=Struct.Common.Intensity.Int5Down) eew.EarthQuake.ForecastArea.Regions.Add(areaInfo.Name);
                         eew.AreasInfo.Add(areaInfo);
                     }
 
