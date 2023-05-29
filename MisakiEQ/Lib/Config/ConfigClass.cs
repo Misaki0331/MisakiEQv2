@@ -391,7 +391,7 @@ namespace MisakiEQ.Lib.Config
         }
         public abstract class IndexData
         {
-            public Func<object, bool>? ApplyAction = null; 
+            public Action<object>? ApplyAction = null; 
             public EventHandler? ValueChanged = null;
             public string Name { get; }
             public string Title { get; }
@@ -402,26 +402,51 @@ namespace MisakiEQ.Lib.Config
                 Title = title;
                 Description = description;
             }
+            /// <summary>
+            /// 指定したクラスのコンフィグに値を入れる予定(未実装)
+            /// </summary>
+            /// <returns></returns>
             public virtual bool Apply()
             {
                 return false;
             }
+            /// <summary>
+            /// Configに保存するとき用の文字列に変換
+            /// </summary>
+            /// <returns></returns>
             public virtual string GetConfigString()
             {
                 return string.Empty;
             }
+            /// <summary>
+            /// Configから読み出すとき用の関数
+            /// </summary>
+            /// <param name="value"></param>
+            /// <returns></returns>
             public virtual bool SetConfigString(string value)
             {
                 return false;
             }
+            /// <summary>
+            /// デフォルト値が使用できるか
+            /// </summary>
+            /// <returns></returns>
             public virtual bool ValueDefaultable()
             {
                 return false;
             }
+            /// <summary>
+            /// 現在の値をStringで取得
+            /// </summary>
+            /// <returns></returns>
             public virtual string GetValue()
             {
                 return string.Empty;
             }
+            /// <summary>
+            /// 値を設定する
+            /// </summary>
+            /// <param name="value"></param>
             public virtual void SetValue(object value)
             {
             }

@@ -317,7 +317,7 @@ namespace MisakiEQ.Lib.ConfigController
         }
         void UpdateText(object? sender, EventArgs e)
         {
-            string text = "";
+            string text = string.Empty;
             if (cl is StringIndexData str) text = str.GetValue();
             else if (cl is ReadonlyIndexData read) text = read.GetValue();
             if (gp.InvokeRequired)
