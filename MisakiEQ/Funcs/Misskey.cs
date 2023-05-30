@@ -148,9 +148,9 @@ namespace MisakiEQ.Funcs
                 {
                     TweetIndex += "$[bg.color=FF0 $[fg.color=F00 ⚠️以下の地域は強い揺れに注意⚠️]]\n";
                     string line = "**";
-                    for (int i = 0; i < eew.EarthQuake.ForecastArea.Regions.Count; i++)
+                    for (int i = 0; i < eew.EarthQuake.ForecastArea.LocalAreas.Count; i++)
                     {
-                        line += $"{eew.EarthQuake.ForecastArea.Regions[i]}";
+                        line += $"{Struct.EEWArea.LocalAreasToStr(eew.EarthQuake.ForecastArea.LocalAreas[i])}";
                         if (i + 1 != eew.EarthQuake.ForecastArea.Regions.Count)
                         {
                             if (line.Length > 16)
@@ -172,7 +172,12 @@ namespace MisakiEQ.Funcs
             {
                 TweetIndex += $"この緊急地震速報は取り消されました。\n";
             }
-            TweetIndex += $"発表時刻 : <plain>{eew.Serial.UpdateTime:M/dd HH:mm:ss}</plain>\n";
+            var time = "";
+            if(eew.EarthQuake.OriginTime != DateTime.MinValue)
+            {
+                time = $"({(eew.Serial.UpdateTime - eew.EarthQuake.OriginTime).TotalSeconds} 秒前)";
+            }
+            TweetIndex += $"発表時刻 : <plain>{eew.Serial.UpdateTime:M/dd HH:mm:ss}</plain>{time}\n";
             if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
             {
                 TweetIndex += "\n**【エリア予測情報】**\n";

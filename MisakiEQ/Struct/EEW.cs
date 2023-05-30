@@ -105,11 +105,11 @@ namespace MisakiEQ.Struct
             if (Data.WarnForecast != null)
             {
                 for (int i = 0; i < Data.WarnForecast.District.Count; i++)
-                    from.EarthQuake.ForecastArea.District.Add(Data.WarnForecast.District[i]);
+                    from.EarthQuake.ForecastArea.District.Add(EEWArea.StrToDistrict(Data.WarnForecast.District[i]));
                 for (int i = 0; i < Data.WarnForecast.LocalAreas.Count; i++)
-                    from.EarthQuake.ForecastArea.LocalAreas.Add(Data.WarnForecast.LocalAreas[i]);
+                    from.EarthQuake.ForecastArea.LocalAreas.Add(EEWArea.StrToLocal(Data.WarnForecast.LocalAreas[i]));
                 for (int i = 0; i < Data.WarnForecast.Regions.Count; i++)
-                    from.EarthQuake.ForecastArea.Regions.Add(Data.WarnForecast.Regions[i]);
+                    from.EarthQuake.ForecastArea.Regions.Add(EEWArea.StrToRegion(Data.WarnForecast.Regions[i]));
             }
             return from;
         }
@@ -263,17 +263,17 @@ namespace MisakiEQ.Struct.cEEW
         /// 範囲がその地方全域になる場合は地方名に置き換わる場合があります。<br/>
         /// ※NHKの緊急地震速報本家と同じ
         /// </para></summary>
-        public List<string> District = new();
+        public List<EEWArea.District> District = new();
         /// <summary><para>
         /// 都道府県名<br/>
         /// 都道府県単位での発令地域です。
         /// </para></summary>
-        public List<string> LocalAreas = new();
+        public List<EEWArea.LocalAreas> LocalAreas = new();
         /// <summary><para>
         /// 地域名<br/>
         /// 各地域毎にあるのでリストされるデータは大きくなります。
         /// </para></summary>
-        public List<string> Regions = new();
+        public List<EEWArea.Regions> Regions = new();
     }
     ///<summary>エリア情報</summary>
     public class AreaInfo

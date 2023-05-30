@@ -313,18 +313,27 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         //Log.Instance.Debug(root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Name\"]", nsManager)?.Value??"");
                         if (!DateTime.TryParse(root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Area\"]/*[local-name()=\"ArrivalTime\"]", nsManager)?.Value, out areaInfo.ExpectedArrival)) areaInfo.ExpectedArrival = DateTime.MinValue;
                         var text = root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Area\"]/*[\"Category\"]/*[\"Kind\"]/*[\"Name\"]", nsManager)?.Value;
-                        if(text== "緊急地震速報（警報）")
+                        if(string.Equals(text,"緊急地震速報（警報）"))
                         {
                             eew.Serial.Infomation = Struct.EEW.InfomationLevel.Warning;
-                            if (!eew.EarthQuake.ForecastArea.LocalAreas.Contains(Struct.Common.PrefecturesToString(areaInfo.Prefectures))) eew.EarthQuake.ForecastArea.LocalAreas.Add(Struct.Common.PrefecturesToString(areaInfo.Prefectures));
-
                         }
                         
 
-                        if(areaInfo.Intensity>=Struct.Common.Intensity.Int5Down) eew.EarthQuake.ForecastArea.Regions.Add(areaInfo.Name);
+                        if(areaInfo.Intensity>=Struct.Common.Intensity.Int5Down) eew.EarthQuake.ForecastArea.Regions.Add(Struct.EEWArea.StrToRegion(areaInfo.Name));
                         eew.AreasInfo.Add(areaInfo);
                     }
-
+                    foreach( var area in eew.EarthQuake.ForecastArea.Regions)
+                    {
+                        var n = Struct.EEWArea.RegionToLocal(area);
+                        if (eew.EarthQuake.ForecastArea.LocalAreas.Find(a => a == n) == default)
+                            eew.EarthQuake.ForecastArea.LocalAreas.Add(n);
+                    }
+                    foreach (var area in eew.EarthQuake.ForecastArea.LocalAreas)
+                    {
+                        var n = Struct.EEWArea.LocalToDistrict(area);
+                        if (eew.EarthQuake.ForecastArea.District.Find(a => a == n) == default)
+                            eew.EarthQuake.ForecastArea.District.Add(n);
+                    }
                     Log.Instance.Debug($"地震識別ID : {eew.Serial.EventID}\n" +
                         $"情報番号 : {eew.Serial.Number}\n" +
                         $"最終報 : {(eew.Serial.IsFinal ? "はい" : "いいえ")}\n" +

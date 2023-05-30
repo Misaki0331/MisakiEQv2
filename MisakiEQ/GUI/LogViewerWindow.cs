@@ -135,8 +135,7 @@ namespace MisakiEQ.GUI
                         Lib.Config.Funcs.GetInstance().Configs.OutputLog();
                         break;
                     case "/crash":
-                        throw new NullReferenceException();
-                        break;
+                        throw new NullReferenceException(); 
                     default:
                         Log.Instance.Warn("不明なコマンドです。" + commands[0]);
                         break;

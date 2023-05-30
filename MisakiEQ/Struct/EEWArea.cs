@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MisakiEQ.Struct
 {
-    internal class EEWArea
+    public class EEWArea
     {
         #region Enum list
         public enum Regions
@@ -512,6 +512,118 @@ namespace MisakiEQ.Struct
         {
             /// <summary>不明</summary>
             Unknown = -1,
+            /// <summary>北海道道央</summary>
+            Area9011 = 9011,
+            /// <summary>北海道道南</summary>
+            Area9012 = 9012,
+            /// <summary>北海道道北</summary>
+            Area9013 = 9013,
+            /// <summary>北海道道東</summary>
+            Area9014 = 9014,
+            /// <summary>青森</summary>
+            Area9020 = 9020,
+            /// <summary>岩手</summary>
+            Area9030 = 9030,
+            /// <summary>宮城</summary>
+            Area9040 = 9040,
+            /// <summary>秋田</summary>
+            Area9050 = 9050,
+            /// <summary>山形</summary>
+            Area9060 = 9060,
+            /// <summary>福島</summary>
+            Area9070 = 9070,
+            /// <summary>茨城</summary>
+            Area9080 = 9080,
+            /// <summary>栃木</summary>
+            Area9090 = 9090,
+            /// <summary>群馬</summary>
+            Area9100 = 9100,
+            /// <summary>埼玉</summary>
+            Area9110 = 9110,
+            /// <summary>千葉</summary>
+            Area9120 = 9120,
+            /// <summary>東京</summary>
+            Area9131 = 9131,
+            /// <summary>伊豆諸島</summary>
+            Area9132 = 9132,
+            /// <summary>小笠原</summary>
+            Area9133 = 9133,
+            /// <summary>神奈川</summary>
+            Area9140 = 9140,
+            /// <summary>新潟</summary>
+            Area9150 = 9150,
+            /// <summary>富山</summary>
+            Area9160 = 9160,
+            /// <summary>石川</summary>
+            Area9170 = 9170,
+            /// <summary>福井</summary>
+            Area9180 = 9180,
+            /// <summary>山梨</summary>
+            Area9190 = 9190,
+            /// <summary>長野</summary>
+            Area9200 = 9200,
+            /// <summary>岐阜</summary>
+            Area9210 = 9210,
+            /// <summary>静岡</summary>
+            Area9220 = 9220,
+            /// <summary>愛知</summary>
+            Area9230 = 9230,
+            /// <summary>三重</summary>
+            Area9240 = 9240,
+            /// <summary>滋賀</summary>
+            Area9250 = 9250,
+            /// <summary>京都</summary>
+            Area9260 = 9260,
+            /// <summary>大阪</summary>
+            Area9270 = 9270,
+            /// <summary>兵庫</summary>
+            Area9280 = 9280,
+            /// <summary>奈良</summary>
+            Area9290 = 9290,
+            /// <summary>和歌山</summary>
+            Area9300 = 9300,
+            /// <summary>鳥取</summary>
+            Area9310 = 9310,
+            /// <summary>島根</summary>
+            Area9320 = 9320,
+            /// <summary>岡山</summary>
+            Area9330 = 9330,
+            /// <summary>広島</summary>
+            Area9340 = 9340,
+            /// <summary>徳島</summary>
+            Area9360 = 9360,
+            /// <summary>香川</summary>
+            Area9370 = 9370,
+            /// <summary>愛媛</summary>
+            Area9380 = 9380,
+            /// <summary>高知</summary>
+            Area9390 = 9390,
+            /// <summary>山口</summary>
+            Area9350 = 9350,
+            /// <summary>福岡</summary>
+            Area9400 = 9400,
+            /// <summary>佐賀</summary>
+            Area9410 = 9410,
+            /// <summary>長崎</summary>
+            Area9420 = 9420,
+            /// <summary>熊本</summary>
+            Area9430 = 9430,
+            /// <summary>大分</summary>
+            Area9440 = 9440,
+            /// <summary>宮崎</summary>
+            Area9450 = 9450,
+            /// <summary>鹿児島</summary>
+            Area9461 = 9461,
+            /// <summary>奄美(群島)</summary>
+            Area9462 = 9462,
+            /// <summary>沖縄本島</summary>
+            Area9471 = 9471,
+            /// <summary>大東島</summary>
+            Area9472 = 9472,
+            /// <summary>宮古島</summary>
+            Area9473 = 9473,
+            /// <summary>八重山</summary>
+            Area9474 = 9474,
             /// <summary>北海道</summary>
             Area9910 = 9910,
             /// <summary>東北</summary>
@@ -637,6 +749,11 @@ namespace MisakiEQ.Struct
                 LocalAreas.Area9471 or LocalAreas.Area9472 or LocalAreas.Area9473 or LocalAreas.Area9474 => District.Area9960,
                 _ => District.Unknown,
             };
+        }
+        public static bool IsExistLocalName(District value)
+        {
+            if (value == District.Unknown) return false;
+            return (int)value < 9900;
         }
         #endregion
         #region String to Enum
