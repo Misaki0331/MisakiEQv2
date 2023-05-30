@@ -752,7 +752,7 @@ namespace MisakiEQ.Struct
         }
         public static bool IsExistLocalName(District value)
         {
-            if (value == District.Unknown) return false;
+            if (value == District.Unknown||value==default) return false;
             return (int)value < 9900;
         }
         #endregion
