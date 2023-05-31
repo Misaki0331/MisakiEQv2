@@ -1,8 +1,11 @@
-﻿using System;
+﻿using MisakiEQ.Background.API.EQInfo.JSON;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Navigation;
+using static MisakiEQ.Struct.EEWArea;
 
 namespace MisakiEQ.Struct
 {
@@ -729,26 +732,62 @@ namespace MisakiEQ.Struct
         /// </summary>
         /// <param name="reg"></param>
         /// <returns></returns>
-        public static District LocalToDistrict(LocalAreas reg)
+        class DistrictConvert
         {
-            return reg switch
+            private DistrictConvert(List<LocalAreas> list,District area) {
+                this.area = new();
+                foreach (var l in list) this.area.Add(l);
+                OutArea = area;
+            }
+            private List<LocalAreas> area;
+            public List<LocalAreas> Areas { get { var a = new List<LocalAreas>(); foreach(var l in area)a.Add(l); return a; } }
+            public District OutArea { get; private set; }
+            internal static List<DistrictConvert> Get()
             {
-                LocalAreas.Area9011 or LocalAreas.Area9012 or LocalAreas.Area9013 or LocalAreas.Area9014 => District.Area9910,
-                LocalAreas.Area9020 or LocalAreas.Area9030 or LocalAreas.Area9040 or LocalAreas.Area9050 or LocalAreas.Area9060 or LocalAreas.Area9070 => District.Area9920,
-                LocalAreas.Area9080 or LocalAreas.Area9090 or LocalAreas.Area9100 or LocalAreas.Area9110 or LocalAreas.Area9120 or LocalAreas.Area9131 or LocalAreas.Area9140 => District.Area9931,
-                LocalAreas.Area9132 => District.Area9932,
-                LocalAreas.Area9133 => District.Area9933,
-                LocalAreas.Area9160 or LocalAreas.Area9170 or LocalAreas.Area9180 => District.Area9934,
-                LocalAreas.Area9150 or LocalAreas.Area9190 or LocalAreas.Area9200 => District.Area9935,
-                LocalAreas.Area9210 or LocalAreas.Area9220 or LocalAreas.Area9230 or LocalAreas.Area9240 => District.Area9936,
-                LocalAreas.Area9250 or LocalAreas.Area9260 or LocalAreas.Area9270 or LocalAreas.Area9280 or LocalAreas.Area9290 or LocalAreas.Area9300 => District.Area9941,
-                LocalAreas.Area9310 or LocalAreas.Area9320 or LocalAreas.Area9330 or LocalAreas.Area9340 or LocalAreas.Area9350 => District.Area9942,
-                LocalAreas.Area9360 or LocalAreas.Area9370 or LocalAreas.Area9380 or LocalAreas.Area9390 => District.Area9943,
-                LocalAreas.Area9400 or LocalAreas.Area9410 or LocalAreas.Area9420 or LocalAreas.Area9430 or LocalAreas.Area9440 or LocalAreas.Area9450 or LocalAreas.Area9461 => District.Area9951,
-                LocalAreas.Area9462 => District.Area9952,
-                LocalAreas.Area9471 or LocalAreas.Area9472 or LocalAreas.Area9473 or LocalAreas.Area9474 => District.Area9960,
-                _ => District.Unknown,
-            };
+                var l = new List<DistrictConvert>
+                {
+                    new(new() { LocalAreas.Area9011, LocalAreas.Area9012, LocalAreas.Area9013, LocalAreas.Area9014 }, District.Area9910),
+                    new(new() { LocalAreas.Area9020, LocalAreas.Area9030, LocalAreas.Area9040, LocalAreas.Area9050, LocalAreas.Area9060, LocalAreas.Area9070 }, District.Area9920),
+                    new(new() { LocalAreas.Area9080, LocalAreas.Area9090, LocalAreas.Area9100, LocalAreas.Area9110, LocalAreas.Area9120, LocalAreas.Area9131, LocalAreas.Area9140 }, District.Area9931),
+                    new(new() { LocalAreas.Area9132 }, District.Area9932),
+                    new(new() { LocalAreas.Area9133 }, District.Area9933),
+                    new(new() { LocalAreas.Area9160, LocalAreas.Area9170, LocalAreas.Area9180 }, District.Area9934),
+                    new(new() { LocalAreas.Area9150, LocalAreas.Area9190, LocalAreas.Area9200 }, District.Area9935),
+                    new(new() { LocalAreas.Area9210, LocalAreas.Area9220, LocalAreas.Area9230, LocalAreas.Area9240 }, District.Area9936),
+                    new(new() { LocalAreas.Area9250, LocalAreas.Area9260, LocalAreas.Area9270, LocalAreas.Area9280, LocalAreas.Area9290, LocalAreas.Area9300 }, District.Area9941),
+                    new(new() { LocalAreas.Area9310, LocalAreas.Area9320, LocalAreas.Area9330, LocalAreas.Area9340, LocalAreas.Area9350 }, District.Area9942),
+                    new(new() { LocalAreas.Area9360, LocalAreas.Area9370, LocalAreas.Area9380, LocalAreas.Area9390 }, District.Area9943),
+                    new(new() { LocalAreas.Area9400, LocalAreas.Area9410, LocalAreas.Area9420, LocalAreas.Area9430, LocalAreas.Area9440, LocalAreas.Area9450, LocalAreas.Area9461 }, District.Area9951),
+                    new(new() { LocalAreas.Area9462 }, District.Area9952),
+                    new(new() { LocalAreas.Area9471, LocalAreas.Area9472, LocalAreas.Area9473, LocalAreas.Area9474 }, District.Area9960)
+                };
+                return l;
+            } 
+        }
+        public static List<District> LocalToDistrict(List<LocalAreas> area)
+        {
+            List<LocalAreas> r = new();
+            foreach (var j in area) r.Add(j);
+            var list = new List<District>();
+            foreach(var def in DistrictConvert.Get())
+            {
+                bool Is = true;
+                foreach(var dex in def.Areas)
+                {
+                    if (!r.Contains(dex))
+                    {
+                        Is = false;
+                        break;
+                    }
+                }
+                if (Is)
+                {
+                    foreach (var dex in def.Areas) r.Remove(dex);
+                    list.Add(def.OutArea);
+                }
+            }
+            foreach (var l in r) list.Add((District)l);
+            return list;
         }
         public static bool IsExistLocalName(District value)
         {
@@ -1329,7 +1368,7 @@ namespace MisakiEQ.Struct
                 District.Area9951 => "九州",
                 District.Area9952 => "奄美",
                 District.Area9960 => "沖縄",
-                _ => "不明",
+                _ => LocalAreasToStr((LocalAreas)area),
             };
         }
         #endregion

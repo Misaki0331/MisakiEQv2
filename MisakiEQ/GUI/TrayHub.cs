@@ -158,10 +158,10 @@ namespace MisakiEQ.GUI
                 {
                     if (((int)ConfigData.NoticeNationWide <= (int)e.eew.EarthQuake.MaxIntensity ||
                     (ConfigData.NoticeNationWide == Struct.ConfigBox.Notification_EEW_Nationwide.Enums.WarnOnly && e.eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning) ||
-                    (int)ConfigData.NoticeArea <= (int)e.eew.UserInfo.LocalIntensity)||
-                    ConfigData.NoticeNationWide==Struct.ConfigBox.Notification_EEW_Nationwide.Enums.ALL)
-                {
-                    Toast.Post(e.eew);
+                    (int)ConfigData.NoticeArea <= (int)e.eew.UserInfo.LocalIntensity) ||
+                    ConfigData.NoticeNationWide == Struct.ConfigBox.Notification_EEW_Nationwide.Enums.ALL)
+                    {
+                        Toast.Post(e.eew);
                         /*
                         if (e.eew.UserInfo.LocalIntensity >= Struct.Common.Intensity.Int1)
                         {
@@ -175,7 +175,7 @@ namespace MisakiEQ.GUI
                                 ESTWindow.Activate();
                             });
                         }*/
-                        var a=SoundCollective.GetInstance().SoundEEW(e.eew).Result;
+                        var a = SoundCollective.GetInstance().SoundEEW(e.eew).Result;
                         Log.Instance.Debug($"サウンド再生処理完了");
                     }
 
@@ -218,10 +218,10 @@ namespace MisakiEQ.GUI
         {
             try
             {
-                if (e.data == null||!e.data.IsValid) return;
+                if (e.data == null || !e.data.IsValid) return;
                 Log.Instance.Debug($"Jアラートのイベントが発生: {e.data.AnnounceTime:d日HH:mm} {e.data.Title}");
-                #if DEBUG||ADMIN
-                if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled&& Lib.Twitter.APIs.GetInstance().Config.IsTweetJ_ALERT) Tweets.GetInstance().JALERTPost(e.data);
+#if DEBUG || ADMIN
+                if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled && Lib.Twitter.APIs.GetInstance().Config.IsTweetJ_ALERT) Tweets.GetInstance().JALERTPost(e.data);
                 if (Lib.Misskey.APIData.Config.IsEnableJAlertNote) Funcs.Misskey.GetInstance().JALERTPost(e.data);
 #endif
                 Funcs.DiscordRPC.PostJAlert(e.data);
@@ -229,11 +229,11 @@ namespace MisakiEQ.GUI
                 if (Background.APIs.GetInstance().Jalert.Config.IsDisplay)
                 {
                     Toast.Post(e.data);
-                    J_ALERT_Display.Invoke(()=> { J_ALERT_Display.TopShow(); });
+                    J_ALERT_Display.Invoke(() => { J_ALERT_Display.TopShow(); });
                 }
                 if (JAlert != null && !JAlert.IsDisposed) JAlert.Invoke(() => { JAlert.UpdateData(); });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Instance.Error(ex);
             }
@@ -306,21 +306,21 @@ namespace MisakiEQ.GUI
         }
         public void KyoshinResponseGraphRelease()
         {
-            for(int i = KyoshinResponseGraph.Count - 1; i >= 0; i--)
+            for (int i = KyoshinResponseGraph.Count - 1; i >= 0; i--)
             {
                 if (KyoshinResponseGraph[i].IsDisposed)
                 {
                     KyoshinResponseGraph.RemoveAt(i);
-                    Log.Instance.Debug($"グラフウィンドウ#{i+1}を削除しました。");
+                    Log.Instance.Debug($"グラフウィンドウ#{i + 1}を削除しました。");
                 }
             }
         }
-        public ExApp.KyoshinGraphWindow.Main KyoshinResponseGraphCreate(int value=-1)
+        public ExApp.KyoshinGraphWindow.Main KyoshinResponseGraphCreate(int value = -1)
         {
             KyoshinResponseGraphRelease();
             if (KyoshinResponseGraph.Count > 0 && (value < 0 || value > 9999))
             {
-                value = KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].ConfigNumber+1;
+                value = KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].ConfigNumber + 1;
                 if (value > 9999) value = -1;
             }
             var app = new ExApp.KyoshinGraphWindow.Main(value);
@@ -360,7 +360,7 @@ namespace MisakiEQ.GUI
             else
             {
                 JAlert.Show();
-                JAlert.WindowState=FormWindowState.Normal;
+                JAlert.WindowState = FormWindowState.Normal;
                 JAlert.Activate();
             }
         }

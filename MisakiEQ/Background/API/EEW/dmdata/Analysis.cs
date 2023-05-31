@@ -9,6 +9,8 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using DmdataSharp;
 using DmdataSharp.Authentication.OAuth;
+using MisakiEQ.Background.API.EQInfo.JSON;
+using MisakiEQ.Struct;
 
 namespace MisakiEQ.Background.API.EEW.dmdata
 {
@@ -328,12 +330,15 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         if (eew.EarthQuake.ForecastArea.LocalAreas.Find(a => a == n) == default)
                             eew.EarthQuake.ForecastArea.LocalAreas.Add(n);
                     }
-                    foreach (var area in eew.EarthQuake.ForecastArea.LocalAreas)
-                    {
-                        var n = Struct.EEWArea.LocalToDistrict(area);
-                        if (eew.EarthQuake.ForecastArea.District.Find(a => a == n) == default)
-                            eew.EarthQuake.ForecastArea.District.Add(n);
-                    }
+                    var district = Struct.EEWArea.LocalToDistrict(eew.EarthQuake.ForecastArea.LocalAreas);
+                    eew.EarthQuake.ForecastArea.District.AddRange(district);
+
+                    /*var t = "";
+                    foreach (var area in eew.EarthQuake.ForecastArea.District) t += $"{EEWArea.DistrictToStr(area)} ";
+                    t += "\n";
+                    foreach (var area in eew.EarthQuake.ForecastArea.LocalAreas) t += $"{EEWArea.LocalAreasToStr(area)} ";
+                    t += "\n";
+                    foreach (var area in eew.EarthQuake.ForecastArea.Regions) t += $"{EEWArea.RegionsToStr(area)} ";*/
                     Log.Instance.Debug($"地震識別ID : {eew.Serial.EventID}\n" +
                         $"情報番号 : {eew.Serial.Number}\n" +
                         $"最終報 : {(eew.Serial.IsFinal ? "はい" : "いいえ")}\n" +
@@ -346,7 +351,12 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         $"震源の深さ : {eew.EarthQuake.Depth} km\n" +
                         $"海域 : {(eew.EarthQuake.IsSea ? "はい" : "いいえ")}\n" +
                         $"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n" +
-                        $"地域ポイント数 : {eew.AreasInfo.Count}");
+                        $"地域ポイント数 : {eew.AreasInfo.Count}\n" +
+                        $"警報地域数 : {eew.EarthQuake.ForecastArea.Regions.Count} / {eew.EarthQuake.ForecastArea.LocalAreas.Count} / {eew.EarthQuake.ForecastArea.District.Count}\n" +
+                        $""); // $"{t}");
+
+
+
                     TempData = eew;
                     //イベントの発生
                     if (UpdateHandler != null)
