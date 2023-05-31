@@ -288,7 +288,7 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         {
                             eew.EarthQuake.Location.Lat = double.NaN;
                             eew.EarthQuake.Location.Long = double.NaN;
-                            eew.EarthQuake.Depth = 0;
+                            eew.EarthQuake.Depth = -1;
                         }
                     }
                     //海域かどうか
@@ -324,21 +324,48 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         if(areaInfo.Intensity>=Struct.Common.Intensity.Int5Down) eew.EarthQuake.ForecastArea.Regions.Add(Struct.EEWArea.StrToRegion(areaInfo.Name));
                         eew.AreasInfo.Add(areaInfo);
                     }
-                    foreach( var area in eew.EarthQuake.ForecastArea.Regions)
+                    for(int i = 0; i < 100; i++)
+                    {
+                        var t= root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("Headline")}/{GetName("Information")}[@type='緊急地震速報（地方予報区）']/{GetName("Item")}/{GetName("Areas")}/{GetName("Area",i)}", nsManager);
+                        if (t == null) break;
+                        string pos = t.XPathSelectElement($"{GetName("Code")}")?.Value??"";
+                        Log.Instance.Debug(pos);
+                        if (int.TryParse(pos, out var id))
+                            eew.EarthQuake.ForecastArea.District.Add((EEWArea.District)id);
+                    }
+                    for (int i = 0; i < 100; i++)
+                    {
+                        var t = root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("Headline")}/{GetName("Information")}[@type='緊急地震速報（府県予報区）']/{GetName("Item")}/{GetName("Areas")}/{GetName("Area", i)}", nsManager);
+                        if (t == null) break;
+                        string pos = t.XPathSelectElement($"{GetName("Code")}")?.Value ?? "";
+                        Log.Instance.Debug(pos);
+                        if (int.TryParse(pos, out var id))
+                            eew.EarthQuake.ForecastArea.LocalAreas.Add((EEWArea.LocalAreas)id);
+                    }
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        var t = root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("Headline")}/{GetName("Information")}[@type='緊急地震速報（細分区域）']/{GetName("Item")}/{GetName("Areas")}/{GetName("Area", i)}", nsManager);
+                        if (t == null) break;
+                        string pos = t.XPathSelectElement($"{GetName("Code")}")?.Value ?? "";
+                        Log.Instance.Debug(pos);
+                        if (int.TryParse(pos, out var id))
+                            eew.EarthQuake.ForecastArea.Regions.Add((EEWArea.Regions)id);
+                    }
+                    /*foreach ( var area in eew.EarthQuake.ForecastArea.Regions)
                     {
                         var n = Struct.EEWArea.RegionToLocal(area);
                         if (eew.EarthQuake.ForecastArea.LocalAreas.Find(a => a == n) == default)
                             eew.EarthQuake.ForecastArea.LocalAreas.Add(n);
                     }
                     var district = Struct.EEWArea.LocalToDistrict(eew.EarthQuake.ForecastArea.LocalAreas);
-                    eew.EarthQuake.ForecastArea.District.AddRange(district);
+                    eew.EarthQuake.ForecastArea.District.AddRange(district);*/
 
-                    /*var t = "";
-                    foreach (var area in eew.EarthQuake.ForecastArea.District) t += $"{EEWArea.DistrictToStr(area)} ";
-                    t += "\n";
-                    foreach (var area in eew.EarthQuake.ForecastArea.LocalAreas) t += $"{EEWArea.LocalAreasToStr(area)} ";
-                    t += "\n";
-                    foreach (var area in eew.EarthQuake.ForecastArea.Regions) t += $"{EEWArea.RegionsToStr(area)} ";*/
+                    var n = "";
+                    foreach (var area in eew.EarthQuake.ForecastArea.District) n += $"{EEWArea.DistrictToStr(area)} ";
+                    n += "\n";
+                    foreach (var area in eew.EarthQuake.ForecastArea.LocalAreas) n += $"{EEWArea.LocalAreasToStr(area)} ";
+                    n += "\n";
+                    foreach (var area in eew.EarthQuake.ForecastArea.Regions) n += $"{EEWArea.RegionsToStr(area)} ";
                     Log.Instance.Debug($"地震識別ID : {eew.Serial.EventID}\n" +
                         $"情報番号 : {eew.Serial.Number}\n" +
                         $"最終報 : {(eew.Serial.IsFinal ? "はい" : "いいえ")}\n" +
@@ -353,7 +380,7 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         $"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n" +
                         $"地域ポイント数 : {eew.AreasInfo.Count}\n" +
                         $"警報地域数 : {eew.EarthQuake.ForecastArea.Regions.Count} / {eew.EarthQuake.ForecastArea.LocalAreas.Count} / {eew.EarthQuake.ForecastArea.District.Count}\n" +
-                        $""); // $"{t}");
+                        /*$""); //*/ $"{n}");
 
 
 
