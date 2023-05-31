@@ -133,7 +133,7 @@ namespace MisakiEQ.GUI
         {
             try
             {
-                Log.Instance.Debug("EEWイベント受信");
+                Log.Instance.Info("EEWイベント受信");
                 if (e.eew == null) return;
                 if (e.eew.Serial.Infomation == Struct.EEW.InfomationLevel.OldForecast)
                 {
@@ -219,7 +219,7 @@ namespace MisakiEQ.GUI
             try
             {
                 if (e.data == null || !e.data.IsValid) return;
-                Log.Instance.Debug($"Jアラートのイベントが発生: {e.data.AnnounceTime:d日HH:mm} {e.data.Title}");
+                Log.Instance.Info($"Jアラートのイベントが発生: {e.data.AnnounceTime:d日HH:mm} {e.data.Title}");
 #if DEBUG || ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled && Lib.Twitter.APIs.GetInstance().Config.IsTweetJ_ALERT) Tweets.GetInstance().JALERTPost(e.data);
                 if (Lib.Misskey.APIData.Config.IsEnableJAlertNote) Funcs.Misskey.GetInstance().JALERTPost(e.data);
@@ -243,7 +243,7 @@ namespace MisakiEQ.GUI
             try
             {
                 if (e.data == null) return;
-                Log.Instance.Debug($"地震情報のイベントが発生: {e.data.Details.OriginTime:d日HH:mm} {Struct.EarthQuake.TypeToString(e.data.Issue.Type)}");
+                Log.Instance.Info($"地震情報のイベントが発生: {e.data.Details.OriginTime:d日HH:mm} {Struct.EarthQuake.TypeToString(e.data.Issue.Type)}");
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EarthquakePost(e.data);
 
@@ -263,7 +263,7 @@ namespace MisakiEQ.GUI
             try
             {
                 if (e.data == null) return;
-                Log.Instance.Debug($"津波情報のイベントが発生: {e.data.CreatedAt:d日HH:mm} 津波発表エリア数:{e.data.Areas.Count}件");
+                Log.Instance.Info($"津波情報のイベントが発生: {e.data.CreatedAt:d日HH:mm} 津波発表エリア数:{e.data.Areas.Count}件");
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().TsunamiPost(e.data);
                 if (Lib.Misskey.APIData.Config.IsEnableEarthquakeNote) Funcs.Misskey.GetInstance().TsunamiPost(e.data);
