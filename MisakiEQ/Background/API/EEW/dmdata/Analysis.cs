@@ -329,7 +329,6 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         var t= root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("Headline")}/{GetName("Information")}[@type='緊急地震速報（地方予報区）']/{GetName("Item")}/{GetName("Areas")}/{GetName("Area",i)}", nsManager);
                         if (t == null) break;
                         string pos = t.XPathSelectElement($"{GetName("Code")}")?.Value??"";
-                        Log.Instance.Debug(pos);
                         if (int.TryParse(pos, out var id))
                             eew.EarthQuake.ForecastArea.District.Add((EEWArea.District)id);
                     }
@@ -338,7 +337,6 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         var t = root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("Headline")}/{GetName("Information")}[@type='緊急地震速報（府県予報区）']/{GetName("Item")}/{GetName("Areas")}/{GetName("Area", i)}", nsManager);
                         if (t == null) break;
                         string pos = t.XPathSelectElement($"{GetName("Code")}")?.Value ?? "";
-                        Log.Instance.Debug(pos);
                         if (int.TryParse(pos, out var id))
                             eew.EarthQuake.ForecastArea.LocalAreas.Add((EEWArea.LocalAreas)id);
                     }
@@ -347,7 +345,6 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         var t = root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("Headline")}/{GetName("Information")}[@type='緊急地震速報（細分区域）']/{GetName("Item")}/{GetName("Areas")}/{GetName("Area", i)}", nsManager);
                         if (t == null) break;
                         string pos = t.XPathSelectElement($"{GetName("Code")}")?.Value ?? "";
-                        Log.Instance.Debug(pos);
                         if (int.TryParse(pos, out var id))
                             eew.EarthQuake.ForecastArea.Regions.Add((EEWArea.Regions)id);
                     }
