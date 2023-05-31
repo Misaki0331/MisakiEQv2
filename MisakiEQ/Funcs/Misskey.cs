@@ -183,7 +183,7 @@ namespace MisakiEQ.Funcs
                 TweetIndex += "\n**【エリア予測情報】**\n";
                 for (int i = 0; i < eew.AreasInfo.Count; i++)
                 {
-                    string intensity = $"{IntensityColor(eew.AreasInfo[i].Intensity, $"震度{Struct.Common.IntToStringLong(eew.AreasInfo[i].Intensity).PadRight(2, 't').Replace("t", "  ")}")}";
+                    string intensity = $"{IntensityColor(eew.AreasInfo[i].Intensity, $"震度{Struct.Common.IntToStringLong(eew.AreasInfo[i].Intensity).PadRight(2, 't').Replace("t", "  ")} ")}";
                     TweetIndex += $"**{intensity}{(eew.AreasInfo[i].ExpectedArrival == DateTime.MinValue ? "$[bg.color=F00 $[fg.color=FFF 到達済み]]" : $"{eew.AreasInfo[i].ExpectedArrival:HH:mm:ss}")}** {eew.AreasInfo[i].Name}";
                     if (TweetIndex.Length > 2850||eew.AreasInfo.Count-1==i) break;
                     TweetIndex += "\n";
@@ -535,7 +535,7 @@ namespace MisakiEQ.Funcs
                     index.Add(data.Detail);
 
                     string areas = "";
-                    if (data.Areas.Count != 0) areas = "発令地区: ";
+                    if (data.Areas.Count != 0) areas = "対象区域: ";
                     for (int i = 0; i < data.Areas.Count; i++)
                     {
                         areas += data.Areas[i];

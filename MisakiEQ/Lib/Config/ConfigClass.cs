@@ -133,8 +133,8 @@ namespace MisakiEQ.Lib.Config
             SetValue("API_J-ALERT_Delay", (e) => { api.Jalert.Config.Delay = (uint)(long)e; });
             SetValue("GUI_Popup_J-ALERT", (e) => { api.Jalert.Config.IsDisplay = (bool)e; });
             var gui = APIs.GetInstance().KyoshinAPI.Config;
-            SetValue("USER_Pos_Long", (e) => { gui.UserLong = (int)(long)e; });
-            SetValue("USER_Pos_Lat", (e) => { gui.UserLat = (int)(long)e; });
+            SetValue("USER_Pos_Long", (e) => { gui.UserLong = (double)(long)e / 10000.0; });
+            SetValue("USER_Pos_Lat", (e) => { gui.UserLat = (double)(long)e / 10000.0; });
             SetValue("USER_Pos_Display", (e) => { gui.UserDisplay = (bool)e; });
             var snd = Sound.Sounds.GetInstance().Config;
 
