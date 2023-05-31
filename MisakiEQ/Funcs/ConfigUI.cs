@@ -33,7 +33,7 @@ namespace MisakiEQ.Funcs
                 Par = par;
                 button = new()
                 {
-                    Size = new Size(88, 23),
+                    Size = new Size(98, 23),
                 };
                 Point = point;
                 Name = name;
@@ -47,7 +47,7 @@ namespace MisakiEQ.Funcs
                 Par = par;
                 button = new()
                 {
-                    Size = new Size(88, 23),
+                    Size = new Size(98, 23),
                 };
                 Point = point;
                 Name = name;

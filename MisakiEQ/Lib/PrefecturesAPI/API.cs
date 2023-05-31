@@ -18,6 +18,10 @@ namespace MisakiEQ.Lib.PrefecturesAPI
                 var raw = await WebAPI.GetString($"https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat={lal.Lat:0.0000}&lon={lal.Lon:0.0000}&output=json&appid={Resources.API.API.YahooAPI}");
                 var json = JsonConvert.DeserializeObject<PrefecturesAPI.JSON>(raw);
                 if (json == null) return new PrefData(Common.Prefectures.Unknown, string.Empty);
+                if (json.Feature.Count == 0)
+                {
+                    return new PrefData(Common.Prefectures.Unknown, string.Empty);
+                }
                 var pref = Common.StringToPrefectures(json.Feature[0].Property.AddressElement[0].Name);
                 string city = json.Feature[0].Property.Address;
                 return new PrefData(pref, city);
