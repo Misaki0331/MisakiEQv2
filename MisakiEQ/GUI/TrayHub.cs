@@ -149,8 +149,9 @@ namespace MisakiEQ.GUI
 #endif
                 e.eew.UserInfo.LocalIntensity = await Background.API.KyoshinAPI.KyoshinAPI.GetUserIntensity();
                 e.eew.UserInfo.IntensityRaw = await Background.API.KyoshinAPI.KyoshinAPI.GetUserRawIntensity();
-                Funcs.EventLog.EEW(e.eew);
-                Log.Instance.Debug($"イベントログ書き込み完了");
+                var LogSuccess = Funcs.EventLog.EEW(e.eew);
+                if (LogSuccess) Log.Instance.Debug($"イベントログ書き込み完了");
+                else Log.Instance.Warn("イベントログの書込に失敗しました。");
                 Funcs.DiscordRPC.PostEEW(e.eew);
                 Log.Instance.Debug($"DiscordRPC書き込み完了");
                 ESTWindow.ESTTime = e.eew.UserInfo.ArrivalTime;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace MisakiEQ.Funcs
             }
             EventLogOut(1, data);
         }
-        public static void EEW(Struct.EEW eew)
+        public static bool EEW(Struct.EEW eew)
         {
             string data = $"緊急地震速報が発報されました。\n" +
                 $"発報時刻:{eew.Serial.UpdateTime}\n" +
@@ -40,24 +41,26 @@ namespace MisakiEQ.Funcs
                     data += $"{eew.AreasInfo[i].Name} - 予測震度{Struct.Common.IntToStringLong(eew.AreasInfo[i].Intensity)} {(eew.AreasInfo[i].ExpectedArrival == DateTime.MinValue ? "到達済みの可能性" : eew.AreasInfo[i].ExpectedArrival)}\n";
                 }
             }
-            EventLogOut(1, data);
+            return EventLogOut(1, data);
         }
-        static void EventLogOut(short id, string data)
+        static bool EventLogOut(short id, string data)
         {
             try
             {
                 string sourceName = "MisakiEQ";
-                if (!System.Diagnostics.EventLog.SourceExists(sourceName))
-                {
-                    System.Diagnostics.EventLog.CreateEventSource(sourceName, "");
-                }
                 System.Diagnostics.EventLog.WriteEntry(
                     sourceName, data,
                     System.Diagnostics.EventLogEntryType.Information, id, 32767);
+                return true;
+            }
+            catch (SecurityException)
+            {
+                return false;
             }
             catch (Exception ex)
             {
                 Log.Instance.Error(ex);
+                return false;
             }
         }
     }

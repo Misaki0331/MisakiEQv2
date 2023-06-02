@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Security;
+using System.Windows.Markup;
 
 namespace MisakiEQ
 {
@@ -95,10 +97,34 @@ namespace MisakiEQ
 #endif
             InitialTask_ReportFunction(95, "イベントを設定", new(() =>
             {
-#pragma warning disable CS8602 // null 参照の可能性があるものの逆参照です。
-                GUI.TrayHub.GetInstance(false).SetEvent();
-#pragma warning restore CS8602 // null 参照の可能性があるものの逆参照です。
+                GUI.TrayHub.GetInstance(false)?.SetEvent();
             }),stw);
+            InitialTask_ReportFunction(99, "イベントログ関連確認", new(() =>
+            {
+                string sourceName = "MisakiEQ";
+                if (Lib.WinAPI.IsAdministrator())
+                {
+                    if (!EventLog.SourceExists(sourceName))
+                    {
+                        EventLog.CreateEventSource(sourceName, sourceName);
+                    }
+                }
+                try
+                {
+                    EventLog.WriteEntry(
+                        sourceName, $"{DateTime.Now} 起動しました。",
+                        EventLogEntryType.Information, 0, 32767);
+                }
+                catch (SecurityException)
+                {
+                    Log.Instance.Warn("イベントログ出力機能は利用できません。利用するには一度管理者権限で再起動してください。");
+                }
+                catch (Exception ex)
+                {
+                    Log.Instance.Error($"Error: {ex.Message}");
+
+                }
+            }), stw);
             e.Result = "OK";
             await Task.Delay(2000);
         }
