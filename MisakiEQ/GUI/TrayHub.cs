@@ -253,6 +253,14 @@ namespace MisakiEQ.GUI
                 Toast.Post(e.data);
                 Funcs.DiscordRPC.PostEarthquake(e.data);
                 SoundCollective.SoundEarthquake(e.data);
+                //テスト用
+                string shindodata = "<各地の震度>";
+                foreach(var item in e.data.Details.cityPoints)
+                {
+                    shindodata += $"\n{Struct.Common.PrefecturesToString(item.City.Prefectures)} {item.City.Name} : {Struct.Common.IntToStringLong(item.Intensity)}";
+                } 
+                Log.Instance.Debug(shindodata);
+                //テスト終了
             }
             catch (Exception ex)
             {

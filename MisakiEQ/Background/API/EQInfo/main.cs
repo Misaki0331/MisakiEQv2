@@ -95,7 +95,7 @@ namespace MisakiEQ.Background.API
                         if (task.IsCompletedSuccessfully && !string.IsNullOrEmpty(task.Result))
                         { 
                             json = task.Result;
-                            if (OldTemp != json)
+                            if (!string.Equals(OldTemp,json))
                             {
                                 OldTemp = json;
                                 IsUpdatedData = true; 

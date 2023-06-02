@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MisakiEQ.Lib.PrefecturesAPI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -221,13 +222,19 @@ namespace MisakiEQ.Struct
                     Address = point.addr,
                     IsArea = point.isArea,
                     Scale = GetP2PIntensity(point.scale),
-                    Pref = Common.StringToPrefectures(point.pref)
+                    Pref = Common.StringToPrefectures(point.pref),
+                    ObservationPoint = jma.Area.Static.EarthquakePos.Instance.GetObservation(point.addr)
                 };
                 if (from.Details.PrefIntensity.GetIntensity(args.Pref) < args.Scale)
                 {
                     from.Details.PrefIntensity.SetIntensity(args.Pref,args.Scale);
                 }
                 from.Details.Points.Add(args);
+                if (args.ObservationPoint != null&& args.ObservationPoint.City!=null) {
+                    var city = from.Details.cityPoints.Find(a => a.City == args.ObservationPoint.City); ;
+                    if (city == null) from.Details.cityPoints.Add(new(args.ObservationPoint.City, args.Scale));
+                    else if (args.Scale > city.Intensity) city.Intensity = args.Scale;
+                }
             }
             return from;
         }
@@ -428,6 +435,18 @@ namespace MisakiEQ.Struct.cEarthQuake
         /// <para>都道府県ごとの震度情報</para>
         /// </summary>
         public Prefs PrefIntensity = new();
+
+        public List<CityPoint> cityPoints = new();
+    }
+    public class CityPoint
+    {
+        public CityPoint(jma.Area.Static.EarthquakePos.AreaInfomationCity city,Common.Intensity intensity)
+        {
+            City = city;
+            Intensity = intensity;
+        }
+        public Common.Intensity Intensity = Common.Intensity.Unknown;
+        public jma.Area.Static.EarthquakePos.AreaInfomationCity City;
     }
     public class Point
     {
@@ -447,6 +466,11 @@ namespace MisakiEQ.Struct.cEarthQuake
         /// 震度情報
         /// </summary>
         public Common.Intensity Scale = Common.Intensity.Unknown;
+        /// <summary>
+        /// 観測点の情報
+        /// </summary>
+        public jma.Area.Static.EarthquakePos.ObservationPoint? ObservationPoint = null;
+
     }
 
     public class Prefs

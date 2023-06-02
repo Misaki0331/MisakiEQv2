@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ABI.Windows.Media.Protection.PlayReady;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -59,6 +60,8 @@ namespace MisakiEQ.Struct.jma.Area.Static
             public int ObservationCode { get; private set; }
             public string Name { get; private set; }
             public string CallName { get; private set; }
+            public AreaForecastLocalE? Local { get => Instance.GetForecastLocal(LocalCode); }
+            public AreaInfomationCity? City { get => Instance.GetInfomationCity(CityCode); }
             public Common.Prefectures Prefectures
             {
                 get
@@ -78,6 +81,7 @@ namespace MisakiEQ.Struct.jma.Area.Static
             }
 
             public int LocalCode { get; private set; }
+            public AreaForecastLocalE? Local { get => Instance.GetForecastLocal(LocalCode); }
             public int CityCode { get; private set; }
             public string Name { get; private set; }
             public string CallName { get; private set; }
