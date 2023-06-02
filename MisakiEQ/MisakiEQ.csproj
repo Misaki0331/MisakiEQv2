@@ -79,6 +79,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>API.resx</DependentUpon>
     </Compile>
+    <Compile Update="Struct\jma\Area\static\Resource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -101,6 +106,10 @@
     <EmbeddedResource Update="Resources\API\API.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>API.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Struct\jma\Area\static\Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

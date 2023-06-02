@@ -12,6 +12,11 @@ namespace MisakiEQ.Lib.Discord.WebHooks
 {
     public class Main
     {
+        Token token;
+        public Main(string webhookURL)
+        {
+            token = new(webhookURL);
+        }
         public class Token
         {
             //public Token(Uri uri) { Token(uri.OriginalString); }
@@ -41,6 +46,8 @@ namespace MisakiEQ.Lib.Discord.WebHooks
         }
         public class Content
         {
+            public string username { get; set; } = "MisakiEQ - 地震情報";
+            public string avatar_url { get; set; } = "https://github.com/Misaki0331/MisakiEQ/blob/main/Resources/icon/main_big.png?raw=true";
             public string content { get; set; } = string.Empty;
             public bool tts { get; set; }
             public List<JSON.Embed> embeds { get; set; } = new();
