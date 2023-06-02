@@ -28,13 +28,14 @@ namespace MisakiEQ.GUI
             ConfigSetting = new Lib.ConfigController.Controller(tabPage1);
             Icon = Properties.Resources.Logo_MainIcon;
             string[] objects = {"GitHub", "https://github.com/Misaki0331/MisakiEQv2",
-            "Twitter Bot","https://twitter.com/MisakiEQ",
             "Devs Twitter","https://twitter.com/0x7FF",
+            "Devs Misskey","https://misskey.io/@ms",
+            "Misskey Bot","https://misskey.io/@MisakiEQ",
             "Ko-Fi","https://ko-fi.com/misaki0331"
             };
             for (int i = 0; i < objects.Length; i += 2)
             {
-                var a = new Funcs.ConfigUI.LinkButton(tabPage3, new(48 * i, 157), objects[i], objects[i + 1]);
+                var a = new Funcs.ConfigUI.LinkButton(tabPage3, new(50 * i, 157), objects[i], objects[i + 1]);
                 LinkButtons.Add(a);
             }
             LabelVersion.Text = $"バージョン : {Properties.Version.Name}";
@@ -48,31 +49,32 @@ namespace MisakiEQ.GUI
             if (fc != null)
                 ((FunctionIndexData)fc).SetAction(() =>
                 {
-                    ((FunctionIndexData)fc).ButtonEnable = false;
-                    Process.Start(new ProcessStartInfo(Lib.Twitter.APIs.GetInstance().GetAuthURL().Result)
+                    try
                     {
-                        UseShellExecute = true
-                    });
-                    this.Invoke(() =>
-                    {
-                        try
+                        ((FunctionIndexData)fc).ButtonEnable = false;
+                        Process.Start(new ProcessStartInfo(Lib.Twitter.APIs.GetInstance().GetAuthURL().Result)
+                        {
+                            UseShellExecute = true
+                        });
+                        this.Invoke(() =>
                         {
                             if (TwitterAuthGUI != null && TwitterAuthGUI.Visible) TwitterAuthGUI.Close();
                             TwitterAuthGUI = new();
                             TwitterAuthGUI.ShowDialog();
                             Funcs.GUI.TwitterGUI.SetInfotoConfigUI();
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Instance.Error(ex);
-                        }
-                    });
+
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Instance.Error(ex);
+                    }
                     ((FunctionIndexData)fc).ButtonEnable = true;
                 });
             Funcs.GUI.TwitterGUI.SetInfotoConfigUI();
 #endif
             var fd = Lib.Config.Funcs.GetInstance().GetConfigClass("DMDATA_AuthFunction");
-            if(fd!=null)
+            if (fd != null)
                 ((FunctionIndexData)fd).SetAction(() =>
             {
                 this.Invoke(() =>
@@ -85,21 +87,21 @@ namespace MisakiEQ.GUI
             UpdatePos.Tick += UpdateGeo;
             var lat = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Lat");
             var lon = Lib.Config.Funcs.GetInstance().GetConfigClass("USER_Pos_Long");
-            if(lat!=null)lat.ValueChanged+= (s,e) => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } };
-            if(lon!=null)lon.ValueChanged += (s, e) => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } };
+            if (lat != null) lat.ValueChanged += (s, e) => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } };
+            if (lon != null) lon.ValueChanged += (s, e) => { if (!IsUpdatePosBusy) { UpdatePos.Stop(); UpdatePos.Start(); } };
             UpdateGeo(null, EventArgs.Empty);
-//#if DEBUG
+            //#if DEBUG
             var function = Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Function");
-            if(function!=null)((FunctionIndexData)function).SetAction(async () =>
+            if (function != null) ((FunctionIndexData)function).SetAction(async () =>
             {
-                await Lib.Misskey.APIData.CreateNote(Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.GetValue() ?? "",Setting.Visibility.Followers);
-               });
-//#endif
+                await Lib.Misskey.APIData.CreateNote(Lib.Config.Funcs.GetInstance().GetConfigClass("Debug_Input")?.GetValue() ?? "", Setting.Visibility.Followers);
+            });
+            //#endif
         }
 
         System.Windows.Forms.Timer UpdatePos = new();
         bool IsUpdatePosBusy = false;
-        async void UpdateGeo(object? sender,EventArgs e)
+        async void UpdateGeo(object? sender, EventArgs e)
         {
             try
             {
@@ -125,7 +127,7 @@ namespace MisakiEQ.GUI
                 }
                 IsUpdatePosBusy = false;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Instance.Error(ex);
             }
@@ -192,9 +194,9 @@ namespace MisakiEQ.GUI
             //796,596
             LabelTime.Location = new Point(Width - 140, 27);
             LabelDate.Location = new Point(Width - 203, 0);
-            ButtonOK.Location = new Point(Width - 255, Height-64);
+            ButtonOK.Location = new Point(Width - 255, Height - 64);
             ButtonCancel.Location = new Point(Width - 175, Height - 64);
-            ButtonApply.Location = new Point(Width-95, Height - 64);
+            ButtonApply.Location = new Point(Width - 95, Height - 64);
         }
 
         private void SizeChange_Tick(object sender, EventArgs e)
