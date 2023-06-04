@@ -39,6 +39,7 @@ namespace MisakiEQ
         {
             var stw = new Stopwatch();
             stw.Start();
+            
             InitialTask_ReportFunction(11, "APIの起動処理", new(() => { _=Background.APIs.GetInstance(); }), stw);
             InitialTask_ReportFunction(22, "設定データ読込", new(() => {
                 var config = Lib.Config.Funcs.GetInstance();
@@ -59,6 +60,7 @@ namespace MisakiEQ
             InitialTask_ReportFunction(67, "強震モニタのポイントを取得", new(() => {
                 Lib.KyoshinAPI.KyoshinObervation.Init();
             }), stw);
+            InitialTask_ReportFunction(70, "地震情報データ取得", new(() => { _ = Struct.jma.Area.Static.EarthquakePos.Instance; }), stw);
 
             InitialTask_ReportFunction(78, "サウンドの読込", new(() => {
                 Funcs.SoundCollective.Init();

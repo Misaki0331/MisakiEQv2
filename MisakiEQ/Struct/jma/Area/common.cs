@@ -24,18 +24,21 @@ namespace MisakiEQ.Struct.jma.Area.Static
             var data = @static.Resource.ObservationPoint.Split(Environment.NewLine);
             foreach (var item in data)
             {
+                if(string.IsNullOrEmpty(item)) continue;
                 var columns=item.Split(',');
                 ObservePoint.Add(new(int.Parse(columns[0]), int.Parse(columns[1]), int.Parse(columns[2]), columns[3], columns[4]));
             }
             data = @static.Resource.AreaInformationCity.Split(Environment.NewLine);
             foreach (var item in data)
             {
+                if (string.IsNullOrEmpty(item)) continue;
                 var columns = item.Split(',');
                 InfomationCites.Add(new(int.Parse(columns[0]), int.Parse(columns[1]), columns[2], columns[3]));
             }
             data = @static.Resource.AreaForecastLocalE.Split(Environment.NewLine);
             foreach (var item in data)
             {
+                if (string.IsNullOrEmpty(item)) continue;
                 var columns = item.Split(',');
                 ForecastLocal.Add(new(int.Parse(columns[0]), columns[1], columns[2]));
             }
