@@ -96,6 +96,22 @@ namespace MisakiEQ
                 Lib.Misskey.APIData.accessToken = text;
 
             }), stw);
+
+            InitialTask_ReportFunction(91, "Discord WebHook連携", new(() =>
+            {
+                if (!File.Exists("DiscordWebHookToken.cfg"))
+                {
+                    Log.Instance.Warn("Discord WebHookのアクセストークンが設定されていません。\nアクセストークンを「DiscordWebHookToken.cfg」に設定してください。");
+                    return;
+                }
+                using var reader = new StreamReader("DiscordWebHookToken.cfg");
+                var text = reader.ReadToEnd();
+                if (!Lib.Discord.WebHooks.Main.SetToken(text))
+                {
+                    Log.Instance.Warn("Discord WebHookが連携できませんでした。");
+                }
+
+            }), stw);
 #endif
             InitialTask_ReportFunction(95, "イベントを設定", new(() =>
             {

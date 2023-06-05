@@ -160,6 +160,7 @@ namespace MisakiEQ.Lib.Config
             SetValue("Misskey_J-ALERT_Note", (e) => { Misskey.APIData.Config.IsEnableJAlertNote = (bool)e; });
             SetValue("Misskey_EEW_Delay", (e) => { MisakiEQ.Funcs.Misskey.GetInstance().EEWDelayTime = (int)(long)e; });
             SetValue("Misskey_EEW_Delay_IsInter", (e) => { MisakiEQ.Funcs.Misskey.GetInstance().IsInterSend = (bool)e; });
+            SetValue("Discord_WebHook_Enable", (e) => { MisakiEQ.Lib.Discord.WebHooks.Main.Instance.Config.EnablePost = (bool)e; });
 #endif
         }
         private bool SetValue(string id,Action<object> act)
@@ -327,6 +328,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("SNS設定", true)?.Add(new BoolIndexData("Misskey_J-ALERT_Note", "J-ALERT配信有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ノートが有効", "Misskeyへの自動ノートが無効"));
                 GetGroup("SNS設定", true)?.Add(new LongIndexData("Misskey_EEW_Delay", "EEWノート遅延", unitName: "秒", displayMag: 1000, description: "遅延時間です。", min: 0, max: 10000, def: 2000));   //通常時の遅延(ms)
                 GetGroup("SNS設定", true)?.Add(new BoolIndexData("Misskey_EEW_Delay_IsInter", "遅延の割り込み", "パブリック投稿時に割り込んで投稿します。", def: false, "割り込み処理が有効", "割り込み処理が無効"));
+                GetGroup("SNS設定", true)?.Add(new BoolIndexData("Discord_WebHook_Enable", "Discord WebHook", "Discordのチャットに投稿します", def: false, "WebHook投稿が有効", "WebHook投稿が無効"));
 
 #endif
                 GetGroup("サウンド設定", true)?.Add(new LongIndexData("Sound_Volume_EEW", "EEWの通知音量", "緊急地震速報発生時に通知される音量を設定します。", def: 100, min: 0, max: 100, unitName: "%"));

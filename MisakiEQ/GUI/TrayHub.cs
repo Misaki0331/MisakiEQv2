@@ -146,6 +146,7 @@ namespace MisakiEQ.GUI
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EEWPost(e.eew);
                 if (Lib.Misskey.APIData.Config.IsEnableEarthquakeNote) Funcs.Misskey.GetInstance().EEWPost(e.eew);
+                if (Lib.Discord.WebHooks.Main.Instance.Config.EnablePost) Funcs.DiscordWebHook.EEW(e.eew);
 #endif
                 e.eew.UserInfo.LocalIntensity = await Background.API.KyoshinAPI.KyoshinAPI.GetUserIntensity();
                 e.eew.UserInfo.IntensityRaw = await Background.API.KyoshinAPI.KyoshinAPI.GetUserRawIntensity();
@@ -247,7 +248,6 @@ namespace MisakiEQ.GUI
                 Log.Instance.Info($"地震情報のイベントが発生: {e.data.Details.OriginTime:d日HH:mm} {Struct.EarthQuake.TypeToString(e.data.Issue.Type)}");
 #if DEBUG||ADMIN
                 if (Lib.Twitter.APIs.GetInstance().Config.TweetEnabled) Tweets.GetInstance().EarthquakePost(e.data);
-
                 if (Lib.Misskey.APIData.Config.IsEnableEarthquakeNote) Funcs.Misskey.GetInstance().EarthquakePost(e.data);
 #endif
                 Toast.Post(e.data);

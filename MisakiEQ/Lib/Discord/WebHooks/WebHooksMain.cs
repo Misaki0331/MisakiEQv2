@@ -12,10 +12,29 @@ namespace MisakiEQ.Lib.Discord.WebHooks
 {
     public class Main
     {
-        Token token;
-        public Main(string webhookURL)
+        public static Token? TokenData { get => token; }
+        static Token token=new(0,"");
+        public static bool SetToken(string url)
         {
-            token = new(webhookURL);
+            try
+            {
+                token = new(url);
+            }catch(Exception e)
+            {
+                Log.Instance.Error(e);
+                return false;
+            }
+            return true;
+        }
+
+        static private Main? instance;
+        static public Main Instance { get {
+                instance ??= new();
+                return instance;
+            } }
+        public Config Config = new();
+        private Main()
+        {
         }
         public class Token
         {
