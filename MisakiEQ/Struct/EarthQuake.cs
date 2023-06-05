@@ -223,19 +223,39 @@ namespace MisakiEQ.Struct
                     IsArea = point.isArea,
                     Scale = GetP2PIntensity(point.scale),
                     Pref = Common.StringToPrefectures(point.pref),
-                    ObservationPoint = jma.Area.Static.EarthquakePos.Instance.GetObservation(point.addr)
+                   
                 };
+                if (args.IsArea) args.areaForecastLocal = jma.Area.Static.EarthquakePos.Instance.GetForecastLocal(point.addr);
+                else
+                {
+                    args.ObservationPoint = jma.Area.Static.EarthquakePos.Instance.GetObservation(point.addr);
+                    args.areaForecastLocal = args.ObservationPoint?.Local;
+                }
                 if (from.Details.PrefIntensity.GetIntensity(args.Pref) < args.Scale)
                 {
                     from.Details.PrefIntensity.SetIntensity(args.Pref,args.Scale);
                 }
                 from.Details.Points.Add(args);
                 if (args.ObservationPoint != null&& args.ObservationPoint.City!=null) {
-                    var city = from.Details.cityPoints.Find(a => a.City == args.ObservationPoint.City); ;
+                    var city = from.Details.cityPoints.Find(a => a.City == args.ObservationPoint.City); 
                     if (city == null) from.Details.cityPoints.Add(new(args.ObservationPoint.City, args.Scale));
                     else if (args.Scale > city.Intensity) city.Intensity = args.Scale;
                 }
+                if (args.ObservationPoint != null && args.ObservationPoint.Local != null)
+                {
+                    var area = from.Details.localAreaPoints.Find(a => a.Area == args.ObservationPoint.Local); 
+                    if (area == null) from.Details.localAreaPoints.Add(new(args.ObservationPoint.Local, args.Scale));
+                    else if (args.Scale > area.Intensity) area.Intensity = args.Scale;
+                }
+                if (args.IsArea && args.areaForecastLocal != null)
+                {
+                    var area = from.Details.localAreaPoints.Find(a => a.Area == args.areaForecastLocal);
+                    if (area == null) from.Details.localAreaPoints.Add(new(args.areaForecastLocal, args.Scale));
+                    else if (args.Scale > area.Intensity) area.Intensity = args.Scale;
+                }
             }
+            from.Details.cityPoints.Sort((x, y) => y.Intensity - x.Intensity);
+            from.Details.localAreaPoints.Sort((x, y) => y.Intensity - x.Intensity);
             return from;
         }
         /// <summary>
@@ -437,6 +457,7 @@ namespace MisakiEQ.Struct.cEarthQuake
         public Prefs PrefIntensity = new();
 
         public List<CityPoint> cityPoints = new();
+        public List<LocalAreaPoint> localAreaPoints = new();
     }
     public class CityPoint
     {
@@ -447,6 +468,16 @@ namespace MisakiEQ.Struct.cEarthQuake
         }
         public Common.Intensity Intensity = Common.Intensity.Unknown;
         public jma.Area.Static.EarthquakePos.AreaInfomationCity City;
+    }
+    public class LocalAreaPoint
+    {
+        public LocalAreaPoint(jma.Area.Static.EarthquakePos.AreaForecastLocalE area, Common.Intensity intensity)
+        {
+            Area = area;
+            Intensity = intensity;
+        }
+        public Common.Intensity Intensity = Common.Intensity.Unknown;
+        public jma.Area.Static.EarthquakePos.AreaForecastLocalE Area;
     }
     public class Point
     {
@@ -470,6 +501,9 @@ namespace MisakiEQ.Struct.cEarthQuake
         /// 観測点の情報
         /// </summary>
         public jma.Area.Static.EarthquakePos.ObservationPoint? ObservationPoint = null;
+
+
+        public jma.Area.Static.EarthquakePos.AreaForecastLocalE? areaForecastLocal = null;
 
     }
 

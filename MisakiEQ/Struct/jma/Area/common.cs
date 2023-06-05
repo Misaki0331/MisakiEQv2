@@ -24,8 +24,8 @@ namespace MisakiEQ.Struct.jma.Area.Static
             var data = @static.Resource.ObservationPoint.Split(Environment.NewLine);
             foreach (var item in data)
             {
-                if(string.IsNullOrEmpty(item)) continue;
-                var columns=item.Split(',');
+                if (string.IsNullOrEmpty(item)) continue;
+                var columns = item.Split(',');
                 ObservePoint.Add(new(int.Parse(columns[0]), int.Parse(columns[1]), int.Parse(columns[2]), columns[3], columns[4]));
             }
             data = @static.Resource.AreaInformationCity.Split(Environment.NewLine);
@@ -35,13 +35,15 @@ namespace MisakiEQ.Struct.jma.Area.Static
                 var columns = item.Split(',');
                 InfomationCites.Add(new(int.Parse(columns[0]), int.Parse(columns[1]), columns[2], columns[3]));
             }
+            
             data = @static.Resource.AreaForecastLocalE.Split(Environment.NewLine);
             foreach (var item in data)
             {
                 if (string.IsNullOrEmpty(item)) continue;
                 var columns = item.Split(',');
-                ForecastLocal.Add(new(int.Parse(columns[0]), columns[1], columns[2]));
+                ForecastLocal.Add(new(int.Parse(columns[0]), columns[1], columns[2],InfomationCites));
             }
+
         } 
         public readonly List<ObservationPoint> ObservePoint;
         public readonly List<AreaInfomationCity> InfomationCites;
@@ -98,15 +100,17 @@ namespace MisakiEQ.Struct.jma.Area.Static
         }
         public class AreaForecastLocalE
         {
-            internal AreaForecastLocalE(int areaForecastLocalCode, string areaForecastLocalName, string areaForecastLocalCallName)
+            internal AreaForecastLocalE(int areaForecastLocalCode, string areaForecastLocalName, string areaForecastLocalCallName, List<AreaInfomationCity> InfomationCites)
             {
                 LocalCode = areaForecastLocalCode;
                 Name = areaForecastLocalName;
                 CallName = areaForecastLocalCallName;
+                Cities = InfomationCites.FindAll(a=>a.LocalCode== LocalCode);
             }
             public int LocalCode { get; private set; }
             public string Name { get; private set; }
             public string CallName { get; private set; }
+            public List<AreaInfomationCity> Cities { get; private set; }
         }
         #endregion
         #region コンバーター

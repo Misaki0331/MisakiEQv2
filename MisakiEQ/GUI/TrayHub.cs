@@ -255,9 +255,9 @@ namespace MisakiEQ.GUI
                 SoundCollective.SoundEarthquake(e.data);
                 //テスト用
                 string shindodata = "<各地の震度>";
-                foreach(var item in e.data.Details.cityPoints)
+                foreach(var item in e.data.Details.localAreaPoints)
                 {
-                    shindodata += $"\n{Struct.Common.PrefecturesToString(item.City.Prefectures)} {item.City.Name} : {Struct.Common.IntToStringLong(item.Intensity)}";
+                    shindodata += $"\n{item.Area.Name} : {Struct.Common.IntToStringLong(item.Intensity)}";
                 } 
                 Log.Instance.Debug(shindodata);
                 //テスト終了
