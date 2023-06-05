@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static MisakiEQ.Struct.EEWArea;
 
 namespace MisakiEQ.Funcs
 {
@@ -53,15 +54,15 @@ namespace MisakiEQ.Funcs
                     case Struct.EEW.InfomationLevel.Warning:
 
                         content.embeds[0].color = 0xff0000;
-                        content.embeds[0].title = $"⚠緊急地震速報(警報) {(eew.Serial.IsFinal ? "最終報" : $"第 {eew.Serial.Number} 報")}";
-                        content.embeds[0].description = $"震源地 : {eew.EarthQuake.Hypocenter} 深さ : {Struct.Common.DepthToString(eew.EarthQuake.Depth)}\n" +
+                        content.embeds[0].title = $"\u26A0\uFE0F緊急地震速報(警報) {(eew.Serial.IsFinal ? "最終報" : $"第 {eew.Serial.Number} 報")}";
+                        content.embeds[0].description = $"震源地 : {eew.EarthQuake.Hypocenter}\n" +
                             $"地震の規模 : Ｍ{eew.EarthQuake.Magnitude:0.0}  最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n" +
-                            $"⚠対象地域：";
-                        foreach (var area in eew.EarthQuake.ForecastArea.LocalAreas) content.embeds[0].description += $"{area} ";
+                            $"\u26A0\uFE0F対象地域：";
+                        foreach (var area in eew.EarthQuake.ForecastArea.LocalAreas) content.embeds[0].description += $"{LocalAreasToStr(area)} ";
                         content.embeds[0].fields.Add(new()
                         {
                             name = "震源の場所",
-                            value = $"{eew.EarthQuake.Hypocenter} ({eew.EarthQuake.Location.Long:0.0}E {eew.EarthQuake.Location.Lat:0.0}N) 深さ:{Struct.Common.DepthToString(eew.EarthQuake.Depth)}"
+                            value = $"**{eew.EarthQuake.Hypocenter}** ({eew.EarthQuake.Location.Long:0.0}E {eew.EarthQuake.Location.Lat:0.0}N) 深さ:{Struct.Common.DepthToString(eew.EarthQuake.Depth)}"
                         });
                         var TweetIndex = "";
                         for (int i = 0; i < eew.AreasInfo.Count; i++)
@@ -85,7 +86,7 @@ namespace MisakiEQ.Funcs
                         content.embeds[0].fields.Add(new()
                         {
                             name = "発生時刻",
-                            value = $"{(eew.EarthQuake.OriginTime != DateTime.MinValue ? "不明" : $"{eew.EarthQuake.OriginTime:MM/dd HH:mm:ss}")}",
+                            value = $"{(eew.EarthQuake.OriginTime == DateTime.MinValue ? "不明" : $"{eew.EarthQuake.OriginTime:MM/dd HH:mm:ss}")}",
                             inline = true
                         });
                         break;
@@ -107,6 +108,8 @@ namespace MisakiEQ.Funcs
                 }
                 content.embeds[0].timestamp = eew.Serial.UpdateTime.AddHours(-9);
                 Lib.Discord.WebHooks.Main.Sent(token, content);
+                Log.Instance.Debug("送信完了");
+
             }catch(Exception ex)
             {
                 Log.Instance.Error(ex);

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Media.Protection.PlayReady;
 
 namespace MisakiEQ.Lib
 {
@@ -106,6 +108,8 @@ namespace MisakiEQ.Lib
 
         public static async Task<string> PostJson(string URL, string json, CancellationToken? token = null)
         {
+            Log.Instance.Debug(URL);
+            Log.Instance.Debug(json);
             try
             {
                 if (URL == "")
@@ -113,28 +117,19 @@ namespace MisakiEQ.Lib
                 if (json == "")
                     throw new ArgumentException("アップロードするjsonが指定されていません。");
                 using HttpClient webClient = new();
-                Task<HttpResponseMessage> stream;
+                HttpResponseMessage stream;
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
                 if (token != null)
                 {
-                    stream = webClient.PostAsync(new Uri(URL), new StringContent(json, Encoding.UTF8), (CancellationToken)token);
+                    stream = await webClient.PostAsync(new Uri(URL), content, (CancellationToken)token);
                 }
                 else
                 {
-                    stream = webClient.PostAsync(new Uri(URL), new StringContent(json, Encoding.UTF8));
+                    stream = await webClient.PostAsync(new Uri(URL), content);
+
                 }
-                await stream;
-                if (stream.IsFaulted)
-                {
-                    if (stream.Exception != null)
-                    {
-                        throw stream.Exception;
-                    }
-                    else
-                    {
-                        throw new ArgumentException("例外エラーが発生しましたが、例外は返されませんでした。");
-                    }
-                }
-                var text = stream.Result.Content.ToString();
+                var text = await stream.Content.ReadAsStringAsync();
+                Log.Instance.Debug(text);
                 if (text == null) return "";
                 return text;
             }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MisakiEQ.Background.API.EQInfo.JSON;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -79,7 +80,7 @@ namespace MisakiEQ.GUI
             string args = "";
             for(int i=0;i< eew.EarthQuake.ForecastArea.LocalAreas.Count&&eew.Serial.Infomation==Struct.EEW.InfomationLevel.Warning; i++)
             {
-                args += $"{eew.EarthQuake.ForecastArea.LocalAreas[i]} ";
+                args += $"{MisakiEQ.Struct.EEWArea.LocalAreasToStr(eew.EarthQuake.ForecastArea.LocalAreas[i])} ";
             }
             Forecasts.Text=args;
             /*

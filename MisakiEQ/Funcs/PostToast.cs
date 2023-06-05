@@ -119,19 +119,19 @@ namespace MisakiEQ.Funcs
         private static void PostEEWWarning(EEW data)
         {
             var attribution = $"緊急地震速報(警報) 第 {data.Serial.Number} 報 {(data.Serial.IsFinal ? "(最終報)" : string.Empty)}";
-            var title = $"(⚠️警報) 最大震度{Common.IntToStringLong(data.EarthQuake.MaxIntensity)} {data.EarthQuake.Hypocenter}";
+            var title = $"(\u26A0\uFE0F警報) 最大震度{Common.IntToStringLong(data.EarthQuake.MaxIntensity)} {data.EarthQuake.Hypocenter}";
             var index = $"規模 : M {data.EarthQuake.Magnitude:0.0} 深さ : {Common.DepthToString(data.EarthQuake.Depth)}\n"
                 + "次の地域は強い揺れに注意してください\n";
             if (data.EarthQuake.ForecastArea.Regions.Count < 6)
             {
-                for (int i = 0; i < data.EarthQuake.ForecastArea.Regions.Count; i++) index += data.EarthQuake.ForecastArea.Regions[i] + " ";
+                for (int i = 0; i < data.EarthQuake.ForecastArea.Regions.Count; i++) index += MisakiEQ.Struct.EEWArea.RegionsToStr(data.EarthQuake.ForecastArea.Regions[i]) + " ";
             } else if (data.EarthQuake.ForecastArea.LocalAreas.Count < 10)
             {
-                for (int i = 0; i < data.EarthQuake.ForecastArea.LocalAreas.Count; i++) index += data.EarthQuake.ForecastArea.LocalAreas[i] + " ";
+                for (int i = 0; i < data.EarthQuake.ForecastArea.LocalAreas.Count; i++) index += MisakiEQ.Struct.EEWArea.LocalAreasToStr(data.EarthQuake.ForecastArea.LocalAreas[i]) + " ";
             }
             else
             {
-                for (int i = 0; i < data.EarthQuake.ForecastArea.District.Count; i++) index += data.EarthQuake.ForecastArea.District[i] + " ";
+                for (int i = 0; i < data.EarthQuake.ForecastArea.District.Count; i++) index += MisakiEQ.Struct.EEWArea.DistrictToStr(data.EarthQuake.ForecastArea.District[i]) + " ";
             }
             if (data.EarthQuake.IsSea && data.EarthQuake.Depth < 40 && data.EarthQuake.Depth >= 0 && data.EarthQuake.Magnitude >= 6.0)
             {

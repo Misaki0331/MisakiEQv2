@@ -81,7 +81,7 @@ namespace MisakiEQ.Funcs
                     TweetIndex += "\n⚠️以下の地域は強い揺れに注意⚠️\n";
                     for (int i = 0; i < eew.EarthQuake.ForecastArea.LocalAreas.Count; i++)
                     {
-                        TweetIndex += $"{eew.EarthQuake.ForecastArea.LocalAreas[i]}";
+                        TweetIndex += $"{MisakiEQ.Struct.EEWArea.LocalAreasToStr(eew.EarthQuake.ForecastArea.LocalAreas[i])}";
                         if (i + 1 != eew.EarthQuake.ForecastArea.LocalAreas.Count)
                         {
                             if (i % 5 == 4) TweetIndex += "\n";
