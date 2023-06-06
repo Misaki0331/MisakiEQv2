@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 using static MisakiEQ.Struct.EEWArea;
 
 namespace MisakiEQ.Funcs
@@ -118,7 +119,7 @@ namespace MisakiEQ.Funcs
             }
             return true;
         }
-        public bool Earthquake(Struct.EarthQuake eq)
+        public static bool Earthquake(Struct.EarthQuake eq)
         {
             try
             {
@@ -283,7 +284,7 @@ namespace MisakiEQ.Funcs
             return true;
         }
 
-        public bool Tsunami(Struct.Tsunami tsunami)
+        public static bool Tsunami(Struct.Tsunami tsunami)
         {
             try
             {
@@ -374,6 +375,53 @@ namespace MisakiEQ.Funcs
             }
             return true;
         }
+        public static bool Jalert(Struct.cJAlert.J_Alert j)
+        {
+            try
+            {
+                var token = Lib.Discord.WebHooks.Main.TokenData;
+                if (token == null)
+                {
+                    Log.Instance.Warn("トークンが設定されていない為送信できませんでした。");
+                    return false;
+                }
+                var content = new Lib.Discord.WebHooks.Main.Content();
 
+                content.embeds.Add(new());
+                content.embeds[0].title = $"J-ALERT【{j.Title}】";
+                content.embeds[0].description = j.Detail;
+                var areas = "";
+                foreach (var str in j.Areas) areas += $"{str} ";
+                areas = areas.Trim();
+                content.embeds[0].fields.Add(new()
+                {
+                    name = "対象地域",
+                    value = areas
+                });
+                content.embeds[0].fields.Add(new()
+                {
+                    name = "発表元",
+                    value = j.SourceName,
+                    inline = true
+                });
+                content.embeds[0].fields.Add(new()
+                {
+                    name = "発表時刻",
+                    value = $"{j.AnnounceTime:yyyy/MM/dd HH:mm}",
+                    inline = true
+                });
+                content.embeds[0].timestamp = j.AnnounceTime.AddHours(-9);
+                content.embeds[0].color = 0xFF0000;
+
+                Lib.Discord.WebHooks.Main.Sent(token, content);
+                Log.Instance.Debug("送信完了");
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Error(ex);
+                return false;
+            }
+            return true;
+        }
     }
 }
