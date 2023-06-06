@@ -5,8 +5,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
+using Microsoft.VisualBasic.Devices;
 using MisakiEQ.Properties;
 using NAudio.Wave;
+using Windows.Devices.Radios;
 
 namespace MisakiEQ.Lib.Sound
 {
@@ -14,68 +16,41 @@ namespace MisakiEQ.Lib.Sound
     {
         class Reader
         {
-            AudioFileReader? audio = null;
-            WaveFileReader? wav = null;
-            Mp3FileReader? mp3 = null;
-            void ClearReader()
+            public virtual double Position { get; set; }
+            public virtual double Length { get; }
+        }
+        class AudioReader : Reader
+        {
+            readonly AudioFileReader aud;
+            public AudioReader(AudioFileReader audio)
             {
-                audio = null;
-                wav = null;
-                mp3 = null;
+                aud = audio;
             }
-            public void Init(AudioFileReader aud)
+            public override double Position { get => aud.CurrentTime.TotalSeconds; set => aud.CurrentTime = TimeSpan.FromSeconds(value); }
+            public override double Length { get => aud.TotalTime.TotalSeconds; }
+        }
+        class WaveReader : Reader
+        {
+            readonly WaveFileReader aud;
+            public WaveReader(WaveFileReader audio)
             {
-                ClearReader();
-                audio = aud;
+                aud = audio;
             }
-            public void Init(WaveFileReader aud)
+            public override double Position { get => aud.CurrentTime.TotalSeconds; set => aud.CurrentTime = TimeSpan.FromSeconds(value); }
+            public override double Length { get => aud.TotalTime.TotalSeconds; }
+        }
+        class Mp3Reader : Reader
+        {
+            readonly Mp3FileReader aud;
+            public Mp3Reader(Mp3FileReader audio)
             {
-                ClearReader();
-                wav = aud;
+                aud = audio;
             }
-            public void Init(Mp3FileReader aud)
-            {
-                ClearReader();
-                mp3 = aud;
-            }
-            public void SetPosition(double sec)
-            {
-                try
-                {
-                    if (audio != null) audio.CurrentTime = TimeSpan.FromSeconds(sec);
-                    if (wav != null) wav.CurrentTime = TimeSpan.FromSeconds(sec);
-                    if (mp3 != null) mp3.CurrentTime = TimeSpan.FromSeconds(sec);
-                }
-                catch (Exception ex)
-                {
-                    Log.Instance.Error(ex);
-                }
-            }
-            public double GetPosition()
-            {
-                if (audio != null) return audio.CurrentTime.TotalSeconds;
-                if (wav != null) return wav.CurrentTime.TotalSeconds;
-                if (mp3 != null) return mp3.CurrentTime.TotalSeconds;
-                return double.NaN;
-            }
-            public double GetLength()
-            {
-                if (audio != null) return audio.TotalTime.TotalSeconds;
-                if (wav != null) return wav.TotalTime.TotalSeconds;
-                if (mp3 != null) return mp3.TotalTime.TotalSeconds;
-                return double.NaN;
-            }
-            public bool CanPlay
-            {
-                get
-                {
-                    if (audio != null || wav != null || mp3 != null) return true;
-                    return false;
-                }
-            }
+            public override double Position { get => aud.CurrentTime.TotalSeconds; set => aud.CurrentTime = TimeSpan.FromSeconds(value); }
+            public override double Length { get => aud.TotalTime.TotalSeconds; }
         }
         readonly WaveOut wav = new();
-        readonly Reader readers = new();
+        Reader readers = new();
         public SoundController()
         {
         }
@@ -90,7 +65,7 @@ namespace MisakiEQ.Lib.Sound
             {
 
                 var reader = new AudioFileReader(FileName);
-                readers.Init(reader);
+                readers = new AudioReader(reader);
                 wav.Init(reader);
                 Log.Instance.Debug($"\"{FileName}\"のwaveファイルを読み込みました。");
                 return true;
@@ -108,7 +83,7 @@ namespace MisakiEQ.Lib.Sound
             {
                 streams = new MemoryStream(stream);
                 var reader = new WaveFileReader(streams);
-                readers.Init(reader);
+                readers = new WaveReader(reader);
                 wav.Init(reader);
                 Log.Instance.Debug($"waveストリームを読み込みました。");
                 return true;
@@ -125,7 +100,7 @@ namespace MisakiEQ.Lib.Sound
             {
                 streams = new MemoryStream(stream);
                 var reader = new Mp3FileReader(streams);
-                readers.Init(reader);
+                readers = new Mp3Reader(reader);
                 wav.Init(reader);
                 Log.Instance.Debug($"mp3ストリームを読み込みました。");
                 return true;
@@ -144,7 +119,7 @@ namespace MisakiEQ.Lib.Sound
         public bool IsPaused { get { return wav.PlaybackState == PlaybackState.Paused; } }
         public void Play()
         {
-            if (!Sounds.GetInstance().Config.IsMute&& readers.CanPlay)
+            if (!Sounds.GetInstance().Config.IsMute)
             {
                 if (IsPaused) wav.Resume();
                 else wav.Play();
@@ -152,9 +127,9 @@ namespace MisakiEQ.Lib.Sound
         }
         public void Replay()
         {
-            if (!Sounds.GetInstance().Config.IsMute && readers.CanPlay)
+            if (!Sounds.GetInstance().Config.IsMute)
             {
-                readers.SetPosition(0);
+                readers.Position = 0;
                 wav.Play();
             }
         }
@@ -164,11 +139,8 @@ namespace MisakiEQ.Lib.Sound
         }
         public void Stop()
         {
-            if (readers.CanPlay)
-            {
-                wav.Stop();
-                readers.SetPosition(0);
-            }
+            wav.Stop();
+            readers.Position = 0;
         }
         public void SetDeviceID(int ID,string DeviceName)
         {
@@ -182,8 +154,8 @@ namespace MisakiEQ.Lib.Sound
             wav.DeviceNumber = ID;
         }
         public int DeviceID { get { return wav.DeviceNumber; } }
-        public double Position { get { return readers.GetPosition(); } set { readers.SetPosition(value); } }
-        public double Length { get { return readers.GetLength(); } }
+        public double Position { get { return readers.Position; } set { readers.Position = value; } }
+        public double Length { get { return readers.Length; } }
         public float Volume { get { return wav.Volume; } set { wav.Volume = value; } }
 
 
@@ -223,10 +195,8 @@ namespace MisakiEQ.Lib.Sound
         {
             return await Task.Run(() =>
             {
-                for (int i = 0; i < sounds.Count; i++)
-                {
-                    if (sounds[i].Name == str) return sounds[i].controller;
-                }
+                var id = sounds.Find(a => a.Name == str);
+                if (id != null) return id.controller;
                 sounds.Add(new(str));
                 return sounds[^1].controller;
             });
@@ -236,15 +206,10 @@ namespace MisakiEQ.Lib.Sound
         {
             return await Task.Run(() =>
             {
-                for (int i = 0; i < sounds.Count; i++)
-                {
-                    if (sounds[i].Name == str)
-                    {
-                        sounds.RemoveAt(i);
-                        return true;
-                    }
-                }
-                return false;
+                var id = sounds.Find(a => a.Name == str);
+                if (id == null) return false;
+                sounds.Remove(id);
+                return true;
             });
         }
         //Todo:デバイスデータを返すようにする。GUIDで指定する予定
@@ -273,7 +238,7 @@ namespace MisakiEQ.Lib.Sound
         public List<string> GetSoundList()
         {
             List<string> list = new();
-            for (int i = 0; i < sounds.Count; i++) list.Add(sounds[i].Name);
+            foreach (var sound in sounds) list.Add(sound.Name);
             return list;
         }
         public void AllDeleteSound()
