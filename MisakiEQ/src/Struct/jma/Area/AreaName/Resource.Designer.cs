@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MisakiEQ.Struct.jma.Area.@static {
+namespace MisakiEQ.src.Struct.jma.Area.AreaName {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace MisakiEQ.Struct.jma.Area.@static {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MisakiEQ.Struct.jma.Area.static.Resource", typeof(Resource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MisakiEQ.src.Struct.jma.Area.AreaName.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -92,32 +92,27 @@ namespace MisakiEQ.Struct.jma.Area.@static {
         }
         
         /// <summary>
-        ///   110100,札幌中央区,さっぽろちゅうおうく
-        ///110200,札幌北区,さっぽろきたく
-        ///110300,札幌東区,さっぽろひがしく
-        ///110400,札幌白石区,さっぽろしろいしく
-        ///110500,札幌豊平区,さっぽろとよひらく
-        ///110600,札幌南区,さっぽろみなみく
-        ///110700,札幌西区,さっぽろにしく
-        ///110800,札幌厚別区,さっぽろあつべつく
-        ///110900,札幌手稲区,さっぽろていねく
-        ///111000,札幌清田区,さっぽろきよたく
-        ///120200,函館市,はこだてし
-        ///120300,小樽市,おたるし
-        ///120400,旭川市,あさひかわし
-        ///120500,室蘭市,むろらんし
-        ///120600,釧路市,くしろし
-        ///120700,帯広市,おびひろし
-        ///120800,北見市,きたみし
-        ///120900,夕張市,ゆうばりし
-        ///121000,岩見沢市,いわみざわし
-        ///121100,網走市,あばしりし
-        ///121200,留萌市,るもいし
-        ///121300,苫小牧市,とまこまいし
-        ///121400,稚内市,わっかないし
-        ///121500,美唄市,びばいし
-        ///121600,芦別市,あしべつし
-        ///121700,江別市,え [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///   100,123500,石狩市,いしかりし
+        ///100,130300,当別町,とうべつちょう
+        ///100,130400,新篠津村,しんしのつむら
+        ///101,110100,札幌中央区,さっぽろちゅうおうく
+        ///101,110200,札幌北区,さっぽろきたく
+        ///101,110300,札幌東区,さっぽろひがしく
+        ///101,110400,札幌白石区,さっぽろしろいしく
+        ///101,110500,札幌豊平区,さっぽろとよひらく
+        ///101,110600,札幌南区,さっぽろみなみく
+        ///101,110700,札幌西区,さっぽろにしく
+        ///101,110800,札幌厚別区,さっぽろあつべつく
+        ///101,110900,札幌手稲区,さっぽろていねく
+        ///101,111000,札幌清田区,さっぽろきよたく
+        ///101,121700,江別市,えべつし
+        ///102,122400,千歳市,ちとせし
+        ///102,123100,恵庭市,えにわし
+        ///102,123400,北広島市,きたひろしまし
+        ///105,134600,八雲町,やくもちょう
+        ///105,134700,長万部町,おしゃまんべちょう
+        ///106,120200,函館市,はこだてし
+        ///106,123600,渡 [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string AreaInformationCity {
             get {

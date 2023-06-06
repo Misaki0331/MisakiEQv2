@@ -27,9 +27,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Background\API\TsunamiInfo\**" />
-    <EmbeddedResource Remove="Background\API\TsunamiInfo\**" />
-    <None Remove="Background\API\TsunamiInfo\**" />
+    <Compile Remove="src\Background\API\TsunamiInfo\**" />
+    <EmbeddedResource Remove="src\Background\API\TsunamiInfo\**" />
+    <None Remove="src\Background\API\TsunamiInfo\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -79,7 +79,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>API.resx</DependentUpon>
     </Compile>
-    <Compile Update="Struct\jma\Area\static\Resource.Designer.cs">
+    <Compile Update="src\Struct\jma\Area\AreaName\Resource.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resource.resx</DependentUpon>
@@ -107,7 +107,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>API.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Update="Struct\jma\Area\static\Resource.resx">
+    <EmbeddedResource Update="src\Struct\jma\Area\AreaName\Resource.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>

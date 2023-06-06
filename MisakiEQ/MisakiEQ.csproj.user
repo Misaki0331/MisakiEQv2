@@ -4,52 +4,52 @@
     <_LastSelectedProfileId>C:\Users\Misaki\fev\MisakiEQ\Properties\PublishProfiles\FolderProfile1.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Update="GUI\Earthquake_Info.cs">
+    <Compile Update="src\GUI\Earthquake_Info.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\EEW_Compact.cs">
+    <Compile Update="src\GUI\EEW_Compact.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\ExApp\J-ALERTDataWindow.cs">
+    <Compile Update="src\GUI\ExApp\J-ALERTDataWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\ExApp\KyoshinResponseGraph\Main.cs">
+    <Compile Update="src\GUI\ExApp\KyoshinResponseGraph\Main.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\ExApp\KyoshinResponseGraph\Setting.cs">
+    <Compile Update="src\GUI\ExApp\KyoshinResponseGraph\Setting.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\ExApp\KyoshinWindow.cs">
+    <Compile Update="src\GUI\ExApp\KyoshinWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\Error\UnhandledException.cs">
+    <Compile Update="src\GUI\Error\UnhandledException.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\ExApp\UserESTWindow.cs">
+    <Compile Update="src\GUI\ExApp\UserESTWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\Config_Menu.cs">
+    <Compile Update="src\GUI\Config_Menu.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\InitWindow.cs">
+    <Compile Update="src\GUI\InitWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\LogViewerWindow.cs">
+    <Compile Update="src\GUI\LogViewerWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\Overlay\FullScreenWarning.cs">
+    <Compile Update="src\GUI\Overlay\FullScreenWarning.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\Overlay\Notification.cs">
+    <Compile Update="src\GUI\Overlay\Notification.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\Sub\AuthDmdata.cs">
+    <Compile Update="src\GUI\Sub\AuthDmdata.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\TrayHub.cs">
+    <Compile Update="src\GUI\TrayHub.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="GUI\Twitter\Auth.cs">
+    <Compile Update="src\GUI\Twitter\Auth.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>

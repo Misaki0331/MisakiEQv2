@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static MisakiEQ.Struct.jma.Area.Static.EarthquakePos;
+using MisakiEQ.src.Struct.jma.Area.AreaName;
 
 namespace MisakiEQ.Struct.jma.Area.Static
 {
@@ -21,14 +22,14 @@ namespace MisakiEQ.Struct.jma.Area.Static
             ObservePoint = new();
             InfomationCites = new();
             ForecastLocal = new();
-            var data = @static.Resource.ObservationPoint.Split(Environment.NewLine);
+            var data = Resource.ObservationPoint.Split(Environment.NewLine);
             foreach (var item in data)
             {
                 if (string.IsNullOrEmpty(item)) continue;
                 var columns = item.Split(',');
                 ObservePoint.Add(new(int.Parse(columns[0]), int.Parse(columns[1]), int.Parse(columns[2]), columns[3], columns[4]));
             }
-            data = @static.Resource.AreaInformationCity.Split(Environment.NewLine);
+            data = Resource.AreaInformationCity.Split(Environment.NewLine);
             foreach (var item in data)
             {
                 if (string.IsNullOrEmpty(item)) continue;
@@ -36,7 +37,7 @@ namespace MisakiEQ.Struct.jma.Area.Static
                 InfomationCites.Add(new(int.Parse(columns[0]), int.Parse(columns[1]), columns[2], columns[3]));
             }
             
-            data = @static.Resource.AreaForecastLocalE.Split(Environment.NewLine);
+            data = Resource.AreaForecastLocalE.Split(Environment.NewLine);
             foreach (var item in data)
             {
                 if (string.IsNullOrEmpty(item)) continue;
