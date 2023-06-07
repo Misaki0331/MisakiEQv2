@@ -117,7 +117,7 @@ namespace MisakiEQ.GUI
                                 Log.Debug($"{commands[1]}のデータ読込中...");
                                 var reader = new StreamReader(commands[1]);
                                 var str = reader.ReadToEnd();
-                                APIs.GetInstance().EEW.DMData.Test(str);
+                                APIs.Instance.EEW.DMData.Test(str);
                                 reader.Close();
                                 Log.Debug($"Done");
                             });

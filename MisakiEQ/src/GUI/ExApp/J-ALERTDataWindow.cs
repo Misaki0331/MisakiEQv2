@@ -19,7 +19,7 @@ namespace MisakiEQ.GUI.ExApp
         }
         public void UpdateData()
         {
-            var data = Background.APIs.GetInstance().Jalert.LatestJAlert;
+            var data = Background.APIs.Instance.Jalert.LatestJAlert;
             if (data.IsValid)
             {
                 BarLine.BackColor = Color.FromArgb(184, 0, 2);

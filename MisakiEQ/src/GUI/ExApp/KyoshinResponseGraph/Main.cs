@@ -17,7 +17,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
         {
             SettingWindow = new(ConfigNum);
             InitializeComponent();
-            Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin += UpdateImage;
+            Background.APIs.Instance.KyoshinAPI.UpdatedKyoshin += UpdateImage;
             Icon = Properties.Resources.Logo_MainIcon;
             if (SettingWindow.NeedMove)
             {
@@ -252,7 +252,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
 
         private void KyoshinResponseGraph_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin -= UpdateImage;
+            Background.APIs.Instance.KyoshinAPI.UpdatedKyoshin -= UpdateImage;
             var instance = TrayHub.GetInstance();
             if (instance != null) instance.KyoshinResponseGraphRelease();
         }

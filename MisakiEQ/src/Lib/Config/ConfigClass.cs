@@ -112,7 +112,7 @@ namespace MisakiEQ.Lib.Config
         /// </summary>
         public void ApplyConfig()
         {
-            var api = APIs.GetInstance();
+            var api = APIs.Instance;
             SetValue("API_EEW_Delay", (e) => { api.EEW.Config.Delay = (int)(long)e;});
             SetValue("API_EEW_DelayDetectMode", (e) => { api.EEW.Config.DelayDetectMode = (int)(long)e;});
             SetValue("API_EEW_DelayDetectCoolDown", (e) => { api.EEW.Config.DelayDetectCoolDown = (int)(long)e;});
@@ -124,7 +124,7 @@ namespace MisakiEQ.Lib.Config
             SetValue("API_K-moni_Adjust", (e) => { api.KyoshinAPI.Config.AutoAdjustKyoshinTime = (int)(long)e*60; });
             SetValue("API_J-ALERT_Delay", (e) => { api.Jalert.Config.Delay = (uint)(long)e; });
             SetValue("GUI_Popup_J-ALERT", (e) => { api.Jalert.Config.IsDisplay = (bool)e; });
-            var gui = APIs.GetInstance().KyoshinAPI.Config;
+            var gui = APIs.Instance.KyoshinAPI.Config;
             SetValue("USER_Pos_Long", (e) => { gui.UserLong = (double)(long)e / 10000.0; });
             SetValue("USER_Pos_Lat", (e) => { gui.UserLat = (double)(long)e / 10000.0; });
             SetValue("USER_Pos_Display", (e) => { gui.UserDisplay = (bool)e; });
@@ -287,7 +287,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("ユーザー設定", true)?.Add(new LongIndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min: 1225000, max: 1460000, def: 1396983, displayMag: 10000));   //取得時の配列の数
                 GetGroup("ユーザー設定", true)?.Add(new ReadonlyIndexData("USER_Pos_Result", "該当地域名", "緯度・経度に対応されるであろう該当地域名です。"));
                 GetGroup("ユーザー設定", true)?.Add(new BoolIndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示", "強震モニタに非表示"));   //取得時の配列の数
-                GetGroup("通信設定", true)?.Add(new FunctionIndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", workingTitle: "時刻調整中...", action: new Action(async () => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
+                GetGroup("通信設定", true)?.Add(new FunctionIndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", workingTitle: "時刻調整中...", action: new Action(async () => { await APIs.Instance.KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
                 GetGroup("通信設定", true)?.Add(new ReadonlyIndexData("Kyoshin_Time", "強震モニタ時刻", "強震モニタ上の最終更新時刻です。"));
                 GetGroup("Project DM-Data Service", true)?.Add(new FunctionIndexData("DMDATA_AuthFunction", "アプリ連携", "MisakiEQでDMDATAの緊急地震速報データを取得できるようにします。", "認証", workingTitle: "ブラウザで認証中..."));
 #if ADMIN||DEBUG

@@ -24,7 +24,7 @@ namespace MisakiEQ.GUI.Sub
 
         private async void AuthDmdata_Load(object sender, EventArgs e)
         {
-            string? token = await Background.APIs.GetInstance().EEW.DMData.Authentication(cancel.Token);
+            string? token = await Background.APIs.Instance.EEW.DMData.Authentication(cancel.Token);
             if(token == null)
             {
                 Log.Warn("トークンの取得に失敗しました。");

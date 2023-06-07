@@ -195,10 +195,10 @@ namespace MisakiEQ.GUI
         {
             if (Visible)
             {
-                Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin += EEW_Compact_KyoshinEvent;
+                Background.APIs.Instance.KyoshinAPI.UpdatedKyoshin += EEW_Compact_KyoshinEvent;
                 SetColor(true, await Background.API.KyoshinAPI.KyoshinAPI.GetUserIntensity());
             }
-            else Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin -= EEW_Compact_KyoshinEvent;
+            else Background.APIs.Instance.KyoshinAPI.UpdatedKyoshin -= EEW_Compact_KyoshinEvent;
         }
         private void EEW_Compact_KyoshinEvent(object? sender, EventArgs e)
         {

@@ -159,8 +159,8 @@ namespace MisakiEQ.GUI
             var uptime = Lib.Config.Funcs.GetInstance().GetConfigClass("AppInfo_Uptime");
             if (uptime != null) uptime.SetValue($"{TrayHub.GetInstance()?.AppTimer.ToString(@"dd\.hh\:mm\:ss")}");
             var usingapi = Lib.Config.Funcs.GetInstance().GetConfigClass("AppInfo_UsingAPI");
-            if (usingapi != null) usingapi.SetValue($"{Background.APIs.GetInstance().EEW.CurrentAPI}");
-            var kyoshin = Background.APIs.GetInstance().KyoshinAPI;
+            if (usingapi != null) usingapi.SetValue($"{Background.APIs.Instance.EEW.CurrentAPI}");
+            var kyoshin = Background.APIs.Instance.KyoshinAPI;
             uptime = Lib.Config.Funcs.GetInstance().GetConfigClass("Kyoshin_Time");
             if (kyoshin.KyoshinLatest.Year > 2000)
             {

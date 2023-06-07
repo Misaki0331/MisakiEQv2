@@ -112,13 +112,13 @@ namespace MisakiEQ.Background.API.KyoshinAPI
         {
             try
             {
-                var api = await APIs.GetInstance().KyoshinAPI.GetImage(KyoshinImageType.EstShindoImg);
+                var api = await APIs.Instance.KyoshinAPI.GetImage(KyoshinImageType.EstShindoImg);
                 if (api == null)
                 {
                     Log.Warn("強震モニタの推定震度マップを取得できませんでした。");
                     return double.NaN;
                 }
-                Struct.Common.LAL lal = new(APIs.GetInstance().KyoshinAPI.Config.UserLong, APIs.GetInstance().KyoshinAPI.Config.UserLat);
+                Struct.Common.LAL lal = new(APIs.Instance.KyoshinAPI.Config.UserLong, APIs.Instance.KyoshinAPI.Config.UserLat);
                 var pnt = Lib.KyoshinLib.LALtoKyoshinMap(lal);
                 if (api.Width <= (int)pnt.X || api.Height <= (int)pnt.Y)
                 {

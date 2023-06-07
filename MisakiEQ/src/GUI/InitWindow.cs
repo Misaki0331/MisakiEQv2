@@ -40,7 +40,7 @@ namespace MisakiEQ
             var stw = new Stopwatch();
             stw.Start();
             
-            InitialTask_ReportFunction(11, "APIの起動処理", new(() => { _=Background.APIs.GetInstance(); }), stw);
+            InitialTask_ReportFunction(11, "APIの起動処理", new(() => { _=Background.APIs.Instance; }), stw);
             InitialTask_ReportFunction(22, "設定データ読込", new(() => {
                 var config = Lib.Config.Funcs.GetInstance();
                 config.ReadConfig();
@@ -50,7 +50,7 @@ namespace MisakiEQ
                 config.ApplyConfig();
             }), stw);
             InitialTask_ReportFunction(44, "APIスレッド起動", new(() => {
-                Background.APIs.GetInstance().Run();
+                Background.APIs.Instance.Run();
             }), stw);
             InitialTask_ReportFunction(56, "Discord RPC接続", new(() => {
                 var discord = Lib.Discord.RichPresence.GetInstance();

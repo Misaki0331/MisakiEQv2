@@ -62,18 +62,18 @@ namespace MisakiEQ.GUI
         }
         public void SetEvent()
         {
-            Background.APIs.GetInstance().EEW.UpdateHandler -= EventEEW;
-            Background.APIs.GetInstance().EQInfo.EarthQuakeUpdateHandler -= EventEarthQuake;
-            Background.APIs.GetInstance().EQInfo.TsunamiUpdateHandler -= EventTsunami;
-            Background.APIs.GetInstance().EEW.UpdateHandler += EventEEW;
-            Background.APIs.GetInstance().EQInfo.EarthQuakeUpdateHandler += EventEarthQuake;
-            Background.APIs.GetInstance().EQInfo.TsunamiUpdateHandler += EventTsunami;
-            Background.APIs.GetInstance().Jalert.J_AlertUpdateHandler += EventJAlert;
+            Background.APIs.Instance.EEW.UpdateHandler -= EventEEW;
+            Background.APIs.Instance.EQInfo.EarthQuakeUpdateHandler -= EventEarthQuake;
+            Background.APIs.Instance.EQInfo.TsunamiUpdateHandler -= EventTsunami;
+            Background.APIs.Instance.EEW.UpdateHandler += EventEEW;
+            Background.APIs.Instance.EQInfo.EarthQuakeUpdateHandler += EventEarthQuake;
+            Background.APIs.Instance.EQInfo.TsunamiUpdateHandler += EventTsunami;
+            Background.APIs.Instance.Jalert.J_AlertUpdateHandler += EventJAlert;
         }
         public void ResetEventEEW()
         {
-            Background.APIs.GetInstance().EEW.UpdateHandler -= EventEEW;
-            Background.APIs.GetInstance().EEW.UpdateHandler += EventEEW;
+            Background.APIs.Instance.EEW.UpdateHandler -= EventEEW;
+            Background.APIs.Instance.EEW.UpdateHandler += EventEEW;
         }
         public static void DisposeInstance()
         {
@@ -92,7 +92,7 @@ namespace MisakiEQ.GUI
             if (EEW_Compact != null && !EEW_Compact.IsDisposed) EEW_Compact.Close();
             if (Init != null && !Init.IsDisposed) Init.Close();
             Log.Debug("APIスレッドを終了中です...");
-            var ApiStop = Background.APIs.GetInstance().Abort();
+            var ApiStop = Background.APIs.Instance.Abort();
             await ApiStop;
             Log.Debug("APIスレッド終了完了");
         }
@@ -107,7 +107,7 @@ namespace MisakiEQ.GUI
         {
             if (Init != null && !Init.IsDisposed) Init.Close();
             Log.Debug("APIスレッドを終了中です...");
-            var ApiStop = Background.APIs.GetInstance().Abort();
+            var ApiStop = Background.APIs.Instance.Abort();
             await ApiStop;
             Log.Debug("APIスレッド終了完了");
             TrayIcon.Visible = false;
@@ -126,7 +126,7 @@ namespace MisakiEQ.GUI
         {
             EEW_Compact.TopMost = ConfigData.IsTopSimpleEEW;
             EEW_Compact.Show();
-            EEW_Compact.SetInfomation(Background.APIs.GetInstance().EEW.GetData());
+            EEW_Compact.SetInfomation(Background.APIs.Instance.EEW.GetData());
             EEW_Compact.Activate();
         }
         private async void EventEEW(object? sender, Background.API.EEWEventArgs e)
@@ -140,7 +140,7 @@ namespace MisakiEQ.GUI
                     Log.Debug("古いフォーマット方式の為スキップしました。");
                     return;
                 }
-                double distance = Struct.EEW.GetDistance(e.eew, new(Background.APIs.GetInstance().KyoshinAPI.Config.UserLong, Background.APIs.GetInstance().KyoshinAPI.Config.UserLat));
+                double distance = Struct.EEW.GetDistance(e.eew, new(Background.APIs.Instance.KyoshinAPI.Config.UserLong, Background.APIs.Instance.KyoshinAPI.Config.UserLat));
                 e.eew.UserInfo.ArrivalTime = e.eew.EarthQuake.OriginTime.AddSeconds(distance / 4.2);
                 Log.Debug($"距離 = {distance} km");
 #if DEBUG||ADMIN
@@ -229,7 +229,7 @@ namespace MisakiEQ.GUI
 #endif
                 Funcs.DiscordRPC.PostJAlert(e.data);
                 Funcs.EventLog.J_ALERT(e.data);
-                if (Background.APIs.GetInstance().Jalert.Config.IsDisplay)
+                if (Background.APIs.Instance.Jalert.Config.IsDisplay)
                 {
                     Toast.Post(e.data);
                     J_ALERT_Display.Invoke(() => { J_ALERT_Display.TopShow(); });
@@ -318,28 +318,26 @@ namespace MisakiEQ.GUI
         }
         public void KyoshinResponseGraphRelease()
         {
-            for (int i = KyoshinResponseGraph.Count - 1; i >= 0; i--)
-            {
-                if (KyoshinResponseGraph[i].IsDisposed)
+            KyoshinResponseGraph.FindAll(a=>a.IsDisposed)
+                .ForEach(a=>
                 {
-                    KyoshinResponseGraph.RemoveAt(i);
-                    Log.Debug($"グラフウィンドウ#{i + 1}を削除しました。");
-                }
-            }
+                    Log.Debug($"グラフウィンドウを削除しました。");
+                    KyoshinResponseGraph.Remove(a);
+                });
         }
         public ExApp.KyoshinGraphWindow.Main KyoshinResponseGraphCreate(int value = -1)
         {
             KyoshinResponseGraphRelease();
             if (KyoshinResponseGraph.Count > 0 && (value < 0 || value > 9999))
             {
-                value = KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].ConfigNumber + 1;
+                value = KyoshinResponseGraph[^1].ConfigNumber + 1;
                 if (value > 9999) value = -1;
             }
             var app = new ExApp.KyoshinGraphWindow.Main(value);
             KyoshinResponseGraph.Add(app);
-            KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].Show();
-            KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].Activate();
-            Log.Debug($"グラフウィンドウ#{KyoshinResponseGraph.Count}を作成しました。");
+            KyoshinResponseGraph[^1].Show();
+            KyoshinResponseGraph[^1].Activate();
+            Log.Debug($"グラフウィンドウを作成しました。");
             return app;
         }
         LogViewerWindow? LogViewer = null;
@@ -388,8 +386,8 @@ namespace MisakiEQ.GUI
             }
             else
             {
-                KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].Show();
-                KyoshinResponseGraph[KyoshinResponseGraph.Count - 1].Activate();
+                KyoshinResponseGraph[^1].Show();
+                KyoshinResponseGraph[^1].Activate();
             }
         }
     }
