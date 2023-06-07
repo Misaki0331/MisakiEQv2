@@ -125,9 +125,9 @@ namespace MisakiEQ.Lib.KyoshinAPI
                 }
                 double toNearDistance = double.PositiveInfinity;
                 double maxvalue = double.NegativeInfinity;
-                for (int i = 0; i < Points.Length; i++)
+                foreach (var point in Points)
                 {
-                    var d = Points[i];
+                    var d = point;
                     
                     if (d.Point != null)
                     {

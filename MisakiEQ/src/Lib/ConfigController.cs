@@ -57,7 +57,7 @@ namespace MisakiEQ.Lib.ConfigController
                     if (config is ReadonlyIndexData read) read.Value = string.Empty;
             foreach (var control in controllGroups) control.Dispose();
             sw.Stop();
-            Log.Info($"フォームイベントを破棄しました。計測:{sw.Elapsed}");
+            Log.Info("ConfigWindow",$"フォームイベントを破棄しました。計測:{sw.Elapsed}");
         }
         void SizeChanged(object? sender, EventArgs e)
         {

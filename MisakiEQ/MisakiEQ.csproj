@@ -42,6 +42,7 @@
     <PackageReference Include="KyoshinMonitorLib" Version="0.4.5" />
     <PackageReference Include="KyoshinMonitorLib.Images" Version="0.4.3" />
     <PackageReference Include="KyoshinMonitorLib.SkiaImages" Version="0.4.3" />
+    <PackageReference Include="LiveChartsCore" Version="2.0.0-beta.710" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     <PackageReference Include="NAudio" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
