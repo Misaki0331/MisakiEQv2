@@ -470,7 +470,7 @@ namespace MisakiEQ.Funcs
                         else
                         if (i != data.Areas.Count - 1) areas += " ";
                     }
-                    if (areas != "") index.Add(areas);
+                    if (!string.IsNullOrEmpty(areas)) index.Add(areas);
                     int cnt = 0;
                     string tweet = "";
                     for(int i = 0; i < index.Count; i++)
@@ -485,7 +485,7 @@ namespace MisakiEQ.Funcs
                         tweet += $"{index[i]}\n";
 
                     }
-                    if (tweet != "")
+                    if (!string.IsNullOrEmpty(tweet))
                     {
                         TweetList.Add(tweet);
                     }

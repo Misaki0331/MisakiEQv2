@@ -187,22 +187,22 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                                     comboBox1.SelectedIndex = c;
                                 break;
                             case "Check1":
-                                if (cmd[1] == "1") checkBox1.Checked = true;
+                                if (string.Equals(cmd[1],"1")) checkBox1.Checked = true;
                                 break;
                             case "Check2":
-                                if (cmd[1] == "1") checkBox2.Checked = true;
+                                if (string.Equals(cmd[1],"1")) checkBox2.Checked = true;
                                 break;
                             case "Check3":
-                                if (cmd[1] == "1") checkBox3.Checked = true;
+                                if (string.Equals(cmd[1], "1")) checkBox3.Checked = true;
                                 break;
                             case "Check4":
-                                if (cmd[1] == "1") checkBox4.Checked = true;
+                                if (string.Equals(cmd[1], "1")) checkBox4.Checked = true;
                                 break;
                             case "MaxValue":
-                                if (cmd[1] == "1") checkBox5.Checked = true;
+                                if (string.Equals(cmd[1], "1")) checkBox5.Checked = true;
                                 break;
                             case "Linear":
-                                if (cmd[1] == "1") checkBox6.Checked = true;
+                                if (string.Equals(cmd[1], "1")) checkBox6.Checked = true;
                                 break;
                             case "WindowX":
                                 if(int.TryParse(cmd[1], out int data))WindowX=data;

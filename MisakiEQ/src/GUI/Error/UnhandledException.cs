@@ -131,7 +131,7 @@ namespace MisakiEQ.GUI.ErrorInfo
                 if (ErrCnt > 4) ErrorInfomation.ForeColor = System.Drawing.Color.Red;
                 label2.Text = "特定の手順で発生する場合は開発者にご報告ください。";
             }
-            if (CrashMethod == "Void CauseException()")
+            if (string.Equals(CrashMethod,"Void CauseException()"))
             {
                 ErrorInfomation.Text = "MisakiEQを意図的にクラッシュさせました。";
                 ErrorInfomation.ForeColor = System.Drawing.Color.Black;
@@ -153,7 +153,7 @@ namespace MisakiEQ.GUI.ErrorInfo
         private void button1_Click(object sender, EventArgs e)
         {
             string UserReportStr = string.Join("\n", UserReport.Text);
-            if (UserReport.Text == "") UserReportStr = "[未入力]\n";
+            if (string.IsNullOrEmpty(UserReport.Text)) UserReportStr = "[未入力]\n";
             string link = HttpUtility.UrlEncode($"----------ユーザー報告----------\n"
                     + $"{UserReportStr}\n"
                     + $"----------エラーの内容----------\n"
