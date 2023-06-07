@@ -98,7 +98,7 @@ namespace MisakiEQ.GUI.ExApp
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Warn($"強震モニタ描画中にエラー : {ex}");
+                    Log.Warn($"強震モニタ描画中にエラー : {ex}");
                 }
             }
         }

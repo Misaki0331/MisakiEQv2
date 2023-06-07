@@ -80,7 +80,7 @@ namespace MisakiEQ.Lib.Discord
             if (LImgText != null) DiscordLImageText = LImgText;
             if(SImgKey != null) DiscordSImagePath = SImgKey;
             if(SImgText != null) DiscordSImageText = SImgText;
-            if (DiscordLImagePath == "") DiscordLImagePath = "default_main";
+            if (string.IsNullOrEmpty(DiscordLImagePath)) DiscordLImagePath = "default_main";
             client.SetPresence(new DiscordRPC.RichPresence()
             {
                 Details = DiscordDetail,

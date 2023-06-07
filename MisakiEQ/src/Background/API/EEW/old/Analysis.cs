@@ -90,17 +90,14 @@ Loop(Config config, EventHandler<EEWEventArgs>? UpdateHandler, CancellationToken
         }
         public Struct.EEW GetData(Struct.EEW? from = null)
         {
-            if (from == null) from = new();
+            from ??= new();
             if (Data != null)
             {
                 Log.Debug("汎用クラスに変換中...");
                 from = Struct.EEW.GetData(Data, from);
                 Log.Debug("汎用クラスに変換完了");
             }
-            else
-            {
-                Log.Warn("APIの情報がありませんでした。");
-            }
+            else Log.Warn("APIの情報がありませんでした。");
             return from;
 
         }

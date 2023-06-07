@@ -46,7 +46,7 @@ namespace MisakiEQ.GUI.Twitter
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error(ex.Message);
+                    Log.Error(ex.Message);
                 }
             }
             else

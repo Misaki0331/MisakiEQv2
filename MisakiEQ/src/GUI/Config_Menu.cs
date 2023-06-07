@@ -67,7 +67,7 @@ namespace MisakiEQ.GUI
                     }
                     catch (Exception ex)
                     {
-                        Log.Instance.Error(ex);
+                        Log.Error(ex);
                     }
                     ((FunctionIndexData)fc).ButtonEnable = true;
                 });
@@ -129,7 +129,7 @@ namespace MisakiEQ.GUI
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
             }
         }
 
@@ -204,14 +204,14 @@ namespace MisakiEQ.GUI
             Stopwatch st = new();
             st.Start();
             SettingTabs.Visible = false;
-            Log.Instance.Debug($"リサイズ開始");
+            Log.Debug($"リサイズ開始");
             tabPage1.AutoScroll = false;
             tabPage1.AutoScrollOffset = new Point(0, 0);
-            Log.Instance.Debug($"再リサイズ中 : {st.Elapsed}");
+            Log.Debug($"再リサイズ中 : {st.Elapsed}");
             SettingTabs.Size = new Size(Width - 7, Height - 121);
             tabPage1.AutoScroll = true;
             st.Stop();
-            Log.Instance.Debug($"リサイズ完了 : {st.Elapsed}");
+            Log.Debug($"リサイズ完了 : {st.Elapsed}");
             SettingTabs.Visible = true;
             SizeChange.Stop();
         }

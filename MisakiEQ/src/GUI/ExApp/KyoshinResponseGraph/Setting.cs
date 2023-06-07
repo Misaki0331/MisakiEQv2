@@ -58,11 +58,11 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                 writer.WriteLine($"WindowH={WindowH}");
                 writer.Close();
                 CurrentNum = (int)numericUpDown1.Value;
-                Log.Instance.Debug($"No.{(int)numericUpDown1.Value}のメモリを書き込みました。");
+                Log.Debug($"No.{(int)numericUpDown1.Value}のメモリを書き込みました。");
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
             }
         }
         private void CheckBoxTextChanging(object sender, EventArgs e)
@@ -225,7 +225,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                     }
                     CurrentNum = ConfigNum;
                     reader.Close();
-                    Log.Instance.Debug($"No.{ConfigNum}のメモリを読み込みました。");
+                    Log.Debug($"No.{ConfigNum}のメモリを読み込みました。");
                 }
                 else
                 {
@@ -245,7 +245,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
             }
         }
         bool IsWillClose = false;

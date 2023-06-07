@@ -73,7 +73,7 @@ namespace MisakiEQ.Lib.Config
                 while (true)
                 {
                     var line = sr.ReadLine();
-                    if (line == null) break;
+                    if (string.IsNullOrEmpty(line)) break;
                     var lines = line.Split('=');
                     if (lines.Length == 2)
                     {
@@ -197,8 +197,11 @@ namespace MisakiEQ.Lib.Config
         /// 存在しない場合はnullが返ります</returns>
         public IndexData? GetConfigClass(string name)
         {
-            foreach (var data in Configs.Data) foreach (var config in data.Setting)
-                if (config.Name == name) return config;
+            foreach (var data in Configs.Data)
+            {
+                var config=data.Setting.Find(a => string.Equals(a.Name, name));
+                if(config != null) return config;
+            }
             return null;
         }
         /// <summary>
@@ -338,7 +341,7 @@ namespace MisakiEQ.Lib.Config
             /// <returns>対応するグループ</returns>
             public List<IndexData>? GetGroup(string name, bool Create = false)
             {
-                var instance = Data.Find(a => a.Name == name);
+                var instance = Data.Find(a => string.Equals(a.Name,name));
                 if (instance == null)
                 {
                     if (Create)
@@ -348,8 +351,7 @@ namespace MisakiEQ.Lib.Config
                     }
                     else return null;
                 }
-                else
-                    return instance.Setting;
+                else return instance.Setting;
             }
             public class ConfigGroup
             {
@@ -604,8 +606,8 @@ namespace MisakiEQ.Lib.Config
             }
             public override bool SetConfigString(string value)
             {
-                if (value.ToLower() == "true" || value == "0") Value = true;
-                else if (value.ToLower() == "false" || value == "1") Value = false;
+                if (string.Equals(value.ToLower(),"true") || string.Equals(value,"0")) Value = true;
+                else if (string.Equals(value.ToLower(),"false") || string.Equals(value,"1")) Value = false;
                 else throw new ArgumentException($"bool型ではない、もしくは正しく検出できませんでした。val=\"{value}\"", nameof(value));
                 return true;
             }
@@ -763,10 +765,7 @@ namespace MisakiEQ.Lib.Config
                 Default = def;
                 Value = def;
 
-                foreach (var item in list)
-                {
-                    ComboStrings.Add(item);
-                }
+                foreach (var item in list) ComboStrings.Add(item);
             }
 
             public override string GetConfigString()

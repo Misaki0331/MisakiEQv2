@@ -30,10 +30,7 @@ namespace MisakiEQ.Funcs
         /// </summary>
         public static SoundCollective GetInstance()
         {
-            if (singleton == null)
-            {
-                singleton = new();
-            }
+            singleton ??= new();
             return singleton;
         }
         public static async void Init()
@@ -66,22 +63,17 @@ namespace MisakiEQ.Funcs
                 try
                 {
                     int Index = -1;
-                    bool IsNew = true;
-                    Struct.Common.Intensity max = Struct.Common.Intensity.Unknown;
+                    Common.Intensity max = Common.Intensity.Unknown;
                     EEWSound tmp = new(eew.Serial.EventID, eew.EarthQuake.MaxIntensity);
-                    for (int i = 0; i < eewsound.Count; i++)
+                    var sound = eewsound.Find(a => string.Equals(a.EventID,eew.Serial.EventID));
+                    if (sound != null)
                     {
-                        if (eewsound[i].EventID == eew.Serial.EventID)
-                        {
-                            tmp = eewsound[i];
-                            max = eewsound[i].MaxIntensity;
-                            eewsound[i].LatestTime = DateTime.Now;
-                            Index = i;
-                            IsNew = false;
-                            break;
-                        }
+                        tmp = sound;
+                        max=sound.MaxIntensity;
+                        sound.LatestTime = DateTime.Now;
+                        Index = eewsound.FindIndex(a => sound == a);
                     }
-                    if (IsNew || tmp.MaxIntensity < eew.EarthQuake.MaxIntensity)
+                    if (sound!=null || tmp.MaxIntensity < eew.EarthQuake.MaxIntensity)
                     {
                         tmp.MaxIntensity = eew.EarthQuake.MaxIntensity;
                         SoundController? controll = null;
@@ -129,12 +121,9 @@ namespace MisakiEQ.Funcs
                             Init();
                         }
                     }
-                    if (IsNew) eewsound.Add(tmp);
-                    for (int i = eewsound.Count - 1; i >= 0; i--)
-                    {
-                        TimeSpan T = DateTime.Now - eewsound[i].LatestTime;
-                        if (T.Seconds > 180) eewsound.RemoveAt(i);
-                    }
+                    if (sound != null) eewsound.Add(tmp);
+                    var delete = eewsound.FindAll(a => (DateTime.Now - a.LatestTime).Seconds > 180);
+                    foreach (var item in delete)eewsound.Remove(item);
                     return true;
                 }
                 catch (Exception ex)

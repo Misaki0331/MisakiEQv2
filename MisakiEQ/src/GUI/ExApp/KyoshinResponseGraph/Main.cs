@@ -245,7 +245,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
             }
             sw.Stop();
         }

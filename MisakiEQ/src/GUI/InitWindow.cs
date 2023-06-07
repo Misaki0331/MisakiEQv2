@@ -29,10 +29,10 @@ namespace MisakiEQ
         private void InitialTask_ReportFunction(int percent,string report,Action action,Stopwatch stopwatch)
         {
             InitialTask.ReportProgress(percent, report+"中...");
-            Log.Instance.Debug($"{stopwatch.Elapsed.TotalSeconds} - {percent}% {report}中...");
+            Log.Debug($"{stopwatch.Elapsed.TotalSeconds} - {percent}% {report}中...");
             action();
             InitialTask.ReportProgress(percent, report+"完了");
-            Log.Instance.Debug($"{stopwatch.Elapsed.TotalSeconds} - {percent}% {report}完了");
+            Log.Debug($"{stopwatch.Elapsed.TotalSeconds} - {percent}% {report}完了");
         }
 
         private async void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
@@ -71,7 +71,7 @@ namespace MisakiEQ
                 {
                     if (!File.Exists("TwitterAuth.cfg"))
                     {
-                        Log.Instance.Warn("Twitter連携が未設定です。");
+                        Log.Warn("Twitter連携が未設定です。");
                         return;
                     }
                     using var reader = new StreamReader("TwitterAuth.cfg");
@@ -81,14 +81,14 @@ namespace MisakiEQ
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error(ex.Message);
+                    Log.Error(ex.Message);
                 }
             }), stw);
             InitialTask_ReportFunction(90, "Misskey API連携", new(() =>
             {
                 if (!File.Exists("MisskeyAccessToken.cfg"))
                 {
-                    Log.Instance.Warn("Misskeyのアクセストークンが設定されていません。\nアクセストークンを「MisskeyAccessToken.cfg」に設定してください。");
+                    Log.Warn("Misskeyのアクセストークンが設定されていません。\nアクセストークンを「MisskeyAccessToken.cfg」に設定してください。");
                     return;
                 }
                 using var reader = new StreamReader("MisskeyAccessToken.cfg");
@@ -101,14 +101,14 @@ namespace MisakiEQ
             {
                 if (!File.Exists("DiscordWebHookToken.cfg"))
                 {
-                    Log.Instance.Warn("Discord WebHookのアクセストークンが設定されていません。\nアクセストークンを「DiscordWebHookToken.cfg」に設定してください。");
+                    Log.Warn("Discord WebHookのアクセストークンが設定されていません。\nアクセストークンを「DiscordWebHookToken.cfg」に設定してください。");
                     return;
                 }
                 using var reader = new StreamReader("DiscordWebHookToken.cfg");
                 var text = reader.ReadToEnd();
                 if (!Lib.Discord.WebHooks.Main.SetToken(text))
                 {
-                    Log.Instance.Warn("Discord WebHookが連携できませんでした。");
+                    Log.Warn("Discord WebHookが連携できませんでした。");
                 }
 
             }), stw);
@@ -135,11 +135,11 @@ namespace MisakiEQ
                 }
                 catch (SecurityException)
                 {
-                    Log.Instance.Warn("イベントログ出力機能は利用できません。利用するには一度管理者権限で再起動してください。");
+                    Log.Warn("イベントログ出力機能は利用できません。利用するには一度管理者権限で再起動してください。");
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error($"Error: {ex.Message}");
+                    Log.Error($"Error: {ex.Message}");
 
                 }
             }), stw);
@@ -156,7 +156,7 @@ namespace MisakiEQ
 
         private async void InitialTask_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
-            Log.Instance.Info($"起動処理実行完了 {e.Result}");
+            Log.Info($"起動処理実行完了 {e.Result}");
             label1.Text = "起動処理実行完了";
             progressBar1.Value = 100;
             await Task.Delay(2000);

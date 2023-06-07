@@ -16,7 +16,7 @@ namespace MisakiEQ.Lib
             try
             {
                 if (string.IsNullOrWhiteSpace(URL)) throw new ArgumentException("ダウンロード先のURLが指定されていません。");
-                if (!Uri.CheckSchemeName(URL)) throw new ArgumentException("ダウンロード先のURLのリンクが不正です。");
+                if (!Uri.IsWellFormedUriString(URL, UriKind.Absolute)) throw new ArgumentException("ダウンロード先のURLのリンクが不正です。");
                 using HttpClient webClient = new();
                 var stream = await webClient.GetByteArrayAsync(new Uri(URL), (CancellationToken)(token != null ? token : CancellationToken.None));
                 return stream;
@@ -42,7 +42,7 @@ namespace MisakiEQ.Lib
             try
             {
                 if (string.IsNullOrWhiteSpace(URL)) throw new ArgumentException("ダウンロード先のURLが指定されていません。");
-                if (!Uri.CheckSchemeName(URL)) throw new ArgumentException("ダウンロード先のURLのリンクが不正です。");
+                if (!Uri.IsWellFormedUriString(URL, UriKind.Absolute)) throw new ArgumentException("ダウンロード先のURLのリンクが不正です。");
                 using HttpClient webClient = new();
                 var stream = await webClient.GetStringAsync(new Uri(URL), (CancellationToken)(token != null ? token : CancellationToken.None));
                 return stream;
@@ -69,14 +69,14 @@ namespace MisakiEQ.Lib
             try
             {
                 if (string.IsNullOrWhiteSpace(URL)) throw new ArgumentException("ダウンロード先のURLが指定されていません。");
-                if (!Uri.CheckSchemeName(URL)) throw new ArgumentException("ダウンロード先のURLのリンクが不正です。");
+                if (!Uri.IsWellFormedUriString(URL, UriKind.Absolute)) throw new ArgumentException("ダウンロード先のURLのリンクが不正です。");
                 if(string.IsNullOrWhiteSpace(json)) throw new ArgumentException("アップロードするjsonが指定されていません。");
                 using HttpClient webClient = new();
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var stream = await webClient.PostAsync(new Uri(URL), content, (CancellationToken)(token != null ? token : CancellationToken.None)); 
                 var text = await stream.Content.ReadAsStringAsync();
                 Log.Debug($"PostJson:{new Uri(URL).Host} - {(int)stream.StatusCode}({stream.StatusCode})");
-                if (text == null) return string.Empty;
+                if (string.IsNullOrEmpty(text)) return string.Empty;
                 return text;
             }
             catch (HttpRequestException ex)

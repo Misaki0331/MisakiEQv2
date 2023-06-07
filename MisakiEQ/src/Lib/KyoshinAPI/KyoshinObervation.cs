@@ -197,7 +197,7 @@ namespace MisakiEQ.Lib.KyoshinAPI
                     IsError = true,
                     ErrorMessage = ex.Message
                 };
-                Log.Instance.Warn($"{ex.GetType} - {ex.Message}");
+                Log.Warn($"{ex.GetType} - {ex.Message}");
                 return re;
             }
         }

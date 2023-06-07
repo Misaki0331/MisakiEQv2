@@ -104,7 +104,7 @@ namespace MisakiEQ.Funcs
                 {
                     int Index = -1;
                     long LatestID = 0;
-                    var latest = EEWReplyList.Find(a => a.EventID == eew.Serial.EventID);
+                    var latest = EEWReplyList.Find(a => string.Equals(a.EventID,eew.Serial.EventID));
                     if (latest != null)
                     {
                         LatestID = latest.LatestTweet;

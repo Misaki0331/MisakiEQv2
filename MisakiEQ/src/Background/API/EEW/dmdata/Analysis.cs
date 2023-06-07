@@ -248,7 +248,7 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                     }
                     //緊急地震速報のタイプ(キャンセル報か予報以上か)
                     tmp = root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("InfoType")}", nsManager)?.Value;
-                    if (tmp == "取消") eew.Serial.Infomation = Struct.EEW.InfomationLevel.Cancelled;
+                    if (string.Equals(tmp,"取消")) eew.Serial.Infomation = Struct.EEW.InfomationLevel.Cancelled;
                     //発表時刻チェック
                     Log.Debug(root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("ReportDateTime")}", nsManager)?.Value ?? "");
                     if (!DateTime.TryParse(root.XPathSelectElement($"/jmx:Report/{GetName("Head")}/{GetName("ReportDateTime")}", nsManager)?.Value,
@@ -287,26 +287,26 @@ namespace MisakiEQ.Background.API.EEW.dmdata
                         }
                     }
                     //海域かどうか
-                    if (root.XPathSelectElement($"/jmx:Report/{GetName("Body")}/{GetName("Earthquake")}/{GetName("Hypocenter")}/{GetName("Area")}/{GetName("LandOrSea")}", nsManager)?.Value == "海域")
+                    if (string.Equals(root.XPathSelectElement($"/jmx:Report/{GetName("Body")}/{GetName("Earthquake")}/{GetName("Hypocenter")}/{GetName("Area")}/{GetName("LandOrSea")}", nsManager)?.Value,"海域"))
                         eew.EarthQuake.IsSea = true;
                     //最大震度の取得
-                    var intensity = Struct.Common.StringToInt(root.XPathSelectElement($"/jmx:Report/{GetName("Body")}/{GetName("Intensity")}/{GetName("Forecast")}/{GetName("ForecastInt")}/*[2]", nsManager)?.Value);
+                    var intensity = Common.StringToInt(root.XPathSelectElement($"/jmx:Report/{GetName("Body")}/{GetName("Intensity")}/{GetName("Forecast")}/{GetName("ForecastInt")}/*[2]", nsManager)?.Value);
                     //Log.Instance.Debug($"/jmx:Report/{GetName("Body")}/{GetName("Intensity")}/{GetName("Forecast")}/{GetName("ForecastInt")}/*[1]");
-                    if (intensity == Struct.Common.Intensity.Unknown) intensity = Struct.Common.StringToInt(root.XPathSelectElement($"/jmx:Report/{GetName("Body")}/{GetName("Intensity")}/{GetName("Forecast")}/{GetName("ForecastInt")}/*[1]", nsManager)?.Value);
+                    if (intensity == Common.Intensity.Unknown) intensity = Common.StringToInt(root.XPathSelectElement($"/jmx:Report/{GetName("Body")}/{GetName("Intensity")}/{GetName("Forecast")}/{GetName("ForecastInt")}/*[1]", nsManager)?.Value);
                     eew.EarthQuake.MaxIntensity = intensity;
                     for (int i = 0; i < 1000; i++)
                     {
                         tmp = root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[\"Area\"]/*", nsManager)?.Value;
-                        if (tmp == null) break;
+                        if (string.IsNullOrEmpty(tmp)) break;
                         Struct.cEEW.AreaInfo areaInfo = new()
                         {
-                            Prefectures = Struct.Common.StringToPrefectures(root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Name\"]", nsManager)?.Value ?? ""),
+                            Prefectures = Common.StringToPrefectures(root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Name\"]", nsManager)?.Value ?? ""),
                             Name = tmp,
-                            Intensity = Struct.Common.StringToInt(root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Area\"]/*[local-name()=\"ForecastInt\"]/*[\"To\"]", nsManager)?.Value),
+                            Intensity = Common.StringToInt(root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Area\"]/*[local-name()=\"ForecastInt\"]/*[\"To\"]", nsManager)?.Value),
                         };
                         tmp = root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Name\"]", nsManager)?.Value;
-                        if (tmp != null && tmp.Contains("北海道")) tmp = "北海道";
-                        if (tmp != null) areaInfo.Prefectures = Struct.Common.StringToPrefectures(tmp);
+                        if (!string.IsNullOrEmpty(tmp) && tmp.Contains("北海道")) tmp = "北海道";
+                        if (!string.IsNullOrEmpty(tmp)) areaInfo.Prefectures = Common.StringToPrefectures(tmp);
                         //Log.Instance.Debug(root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Name\"]", nsManager)?.Value??"");
                         if (!DateTime.TryParse(root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Area\"]/*[local-name()=\"ArrivalTime\"]", nsManager)?.Value, out areaInfo.ExpectedArrival)) areaInfo.ExpectedArrival = DateTime.MinValue;
                         var text = root.XPathSelectElement($"/jmx:Report/*[\"Body\"]/*[\"Intensity\"]/*[\"Forecast\"]/*[local-name()=\"Pref\"][{i + 1}]/*[local-name()=\"Area\"]/*[\"Category\"]/*[\"Kind\"]/*[\"Name\"]", nsManager)?.Value;

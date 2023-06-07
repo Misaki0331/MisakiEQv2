@@ -219,7 +219,7 @@ namespace MisakiEQ
                 StackFrame? objStackFrame = new(nFrame);
                 if (objStackFrame == null) break;
                 if (objStackFrame.GetMethod() == null) break;
-                if (strMethodName == "") strMethodName = $"{objStackFrame.GetMethod().Name}";
+                if (string.IsNullOrWhiteSpace(strMethodName)) strMethodName = $"{objStackFrame.GetMethod().Name}";
                 if (objStackFrame.GetMethod().ReflectedType == null) break;
                 strMethodName = $"{objStackFrame.GetMethod().ReflectedType.FullName}.{strMethodName}";
                 if (objStackFrame.GetMethod().ReflectedType.FullName.Contains("MisakiEQ")) break;
@@ -228,7 +228,7 @@ namespace MisakiEQ
 
             }
             // 呼び出し元のメソッド名を取得する
-            if (strMethodName == "") strMethodName = "Undefined";
+            if (string.IsNullOrEmpty(strMethodName)) strMethodName = "Undefined";
             int tid = Environment.CurrentManagedThreadId;
             string para = strMethodName;
             if (para.Length > STACKLEN)
@@ -242,7 +242,8 @@ namespace MisakiEQ
             }
             string trace = msg.Replace("\n", "\n"+"".PadLeft(44+STACKLEN, ' '));
             string logs = $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [{para}]: {trace}";
-            Trace.WriteLine(logs);
+            if (level == LogLevel.DEBUG) System.Diagnostics.Debug.WriteLine(logs);
+            else Trace.WriteLine(logs);
             var strings = logs.Replace("\r", "");
             var splitstrings = strings.Split('\n');
             string col = "";
@@ -303,8 +304,8 @@ namespace MisakiEQ
                 lock (lockObj)
                 {
 
-                    if (stream != null) stream.WriteLine(fullMsg);
-                    if (logFilePath == null) return;
+                    stream?.WriteLine(fullMsg);
+                    if (string.IsNullOrEmpty(logFilePath)) return;
 
                     FileInfo logFile = new(logFilePath);
                     if (LOGFILE_MAXSIZE < logFile.Length)
@@ -320,9 +321,9 @@ namespace MisakiEQ
             try
             {
                 //イベントの発生
-                if (LogUpdateHandler != null)
-                    LogUpdateHandler(null, addtext);
-            }catch{}
+                LogUpdateHandler?.Invoke(null, addtext);
+            }
+            catch{}
         }
 
         /// <summary>

@@ -20,7 +20,7 @@ namespace MisakiEQ.GUI
         }
         public void SetInfomation(Struct.EEW eew)
         {
-            Log.Instance.Debug("データの更新中...");
+            Log.Debug("データの更新中...");
                 SignalCount.Text = $"第 {eew.Serial.Number} 報{(eew.Serial.IsFinal?" (最終報)":"")}";
             string temp = string.Empty;
             switch (eew.Serial.Infomation)
@@ -88,7 +88,7 @@ namespace MisakiEQ.GUI
             AreaIntensity.Text = Struct.Common.IntToStringShort(eew.UserInfo.LocalIntensity);
             */
 
-            Log.Instance.Debug("データの更新完了");
+            Log.Debug("データの更新完了");
         }
         void SetColor(bool IsArea, Struct.Common.Intensity value)
         {
