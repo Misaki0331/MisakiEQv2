@@ -54,7 +54,7 @@ namespace MisakiEQ
         public void SetLogLevel(LogLevel level)
         {
             LOG_LEVEL = level;
-            Info(NameSpace.Logger,$"ログの出力レベルを{LOG_LEVEL}に変更しました。");
+            Info("Logger",$"ログの出力レベルを{LOG_LEVEL}に変更しました。");
         }
 
         /// <summary>
@@ -113,7 +113,6 @@ namespace MisakiEQ
         /// ERRORレベルのスタックトレースログを出力する
         /// </summary>
         /// <param name="ex">例外オブジェクト</param>
-        [Obsolete("関数名は見れますが長くなるので独自名に")]
         public static void Error(Exception ex,
             [CallerFilePath] string callerFilePath = "",
             [CallerLineNumber] int callerLineNumber = -1)
@@ -132,7 +131,7 @@ namespace MisakiEQ
         /// </summary>
         /// <param name="ex">例外オブジェクト</param>
         /// <param name="funcName">関数名</param>
-        public static void Error(NameSpace funcName, Exception ex,
+        public static void Error(string funcName, Exception ex,
             [CallerFilePath] string callerFilePath = "",
             [CallerLineNumber] int callerLineNumber = -1)
         {
@@ -149,7 +148,6 @@ namespace MisakiEQ
         /// FATALレベルのスタックトレースログを出力する
         /// </summary>
         /// <param name="ex">例外オブジェクト</param>
-        [Obsolete("関数名は見れますが長くなるので独自名に")]
         public static void Fatal(Exception ex,
             [CallerFilePath] string callerFilePath = "",
             [CallerLineNumber] int callerLineNumber = -1)
@@ -169,7 +167,7 @@ namespace MisakiEQ
         /// </summary>
         /// <param name="ex">例外オブジェクト</param>
         /// <param name="funcName">関数名</param>
-        public static void Fatal(NameSpace funcName, Exception ex,
+        public static void Fatal(string funcName, Exception ex,
             [CallerFilePath] string callerFilePath = "",
             [CallerLineNumber] int callerLineNumber = -1)
         {
@@ -186,7 +184,6 @@ namespace MisakiEQ
         /// FATALレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        [Obsolete("関数名は見れますが長くなるので独自名に")]
 
         public static void Fatal(string msg)
         {
@@ -201,7 +198,7 @@ namespace MisakiEQ
         /// </summary>
         /// <param name="msg">メッセージ</param>
         /// <param name="funcName">関数名</param>
-        public static void Fatal(NameSpace funcName, string msg)
+        public static void Fatal(string funcName, string msg)
         {
             if (LogLevel.FATAL >= Instance.LOG_LEVEL)
             {
@@ -214,7 +211,6 @@ namespace MisakiEQ
         /// ERRORレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        [Obsolete("関数名は見れますが長くなるので独自名に")]
         public static void Error(string msg)
         {
 
@@ -228,7 +224,7 @@ namespace MisakiEQ
         /// ERRORレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        public static void Error(NameSpace funcName, string msg)
+        public static void Error(string funcName, string msg)
         {
             if (LogLevel.ERROR >= Instance.LOG_LEVEL)
             {
@@ -240,7 +236,6 @@ namespace MisakiEQ
         /// WARNレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        [Obsolete("関数名は見れますが長くなるので独自名に")]
         public static void Warn(string msg)
         {
             if (LogLevel.WARN >= Instance.LOG_LEVEL)
@@ -254,7 +249,7 @@ namespace MisakiEQ
         /// </summary>
         /// <param name="msg">メッセージ</param>
         /// <param name="funcName">関数名</param>
-        public static void Warn(NameSpace funcName, string msg)
+        public static void Warn(string funcName, string msg)
         {
             if (LogLevel.WARN >= Instance.LOG_LEVEL)
             {
@@ -266,7 +261,6 @@ namespace MisakiEQ
         /// INFOレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        [Obsolete("関数名は見れますが長くなるので独自名に")]
         public static void Info(string msg)
         {
             if (LogLevel.INFO >= Instance.LOG_LEVEL)
@@ -279,7 +273,7 @@ namespace MisakiEQ
         /// </summary>
         /// <param name="msg">メッセージ</param>
         /// <param name="funcName">関数名</param>
-        public static void Info(NameSpace funcName, string msg)
+        public static void Info(string funcName, string msg)
         {
             if (LogLevel.INFO >= Instance.LOG_LEVEL)
             {
@@ -291,7 +285,6 @@ namespace MisakiEQ
         /// DEBUGレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        [Obsolete("関数名は見れますが長くなるので独自名に")]
         public static void Debug(string msg)
         {
             if (LogLevel.DEBUG >= Instance.LOG_LEVEL)
@@ -304,7 +297,7 @@ namespace MisakiEQ
         /// </summary>
         /// <param name="msg">メッセージ</param>
         /// <param name="funcName">関数名</param>
-        public static void Debug(NameSpace funcName, string msg)
+        public static void Debug(string funcName, string msg)
         {
             if (LogLevel.DEBUG >= Instance.LOG_LEVEL)
             {

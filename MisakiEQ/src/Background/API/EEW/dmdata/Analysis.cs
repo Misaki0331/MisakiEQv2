@@ -60,10 +60,10 @@ namespace MisakiEQ.Background.API.EEW.dmdata
         }
         private LoadInfomation LoadToken()
         {
-            Log.Debug(Log.NameSpace.API_DMData, "トークンを読み込みます。");
+            Log.Debug("トークンを読み込みます。");
             if (!File.Exists("DMDataToken.cfg"))
             {
-                Log.Warn(Log.NameSpace.API_DMData, "トークンファイルが存在しません。");
+                Log.Warn("トークンファイルが存在しません。");
                 return LoadInfomation.NotFound;
             }
             try
@@ -74,7 +74,7 @@ namespace MisakiEQ.Background.API.EEW.dmdata
             }
             catch (Exception ex)
             {
-                Log.Error(Log.NameSpace.API_DMData,$"読込中にエラー : {ex.Message}");
+                Log.Error($"読込中にエラー : {ex.Message}");
                 return LoadInfomation.LoadFailed;
             }
         }
