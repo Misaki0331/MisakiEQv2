@@ -39,7 +39,7 @@ namespace MisakiEQ.Struct
                 return di / 1000.0;//km換算
             }catch(Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return double.NaN;
             }
         }

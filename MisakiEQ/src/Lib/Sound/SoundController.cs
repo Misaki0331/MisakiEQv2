@@ -67,12 +67,12 @@ namespace MisakiEQ.Lib.Sound
                 var reader = new AudioFileReader(FileName);
                 readers = new AudioReader(reader);
                 wav.Init(reader);
-                Log.Instance.Debug($"\"{FileName}\"のwaveファイルを読み込みました。");
+                Log.Debug($"\"{FileName}\"のwaveファイルを読み込みました。");
                 return true;
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return false;
             }
         }
@@ -85,12 +85,12 @@ namespace MisakiEQ.Lib.Sound
                 var reader = new WaveFileReader(streams);
                 readers = new WaveReader(reader);
                 wav.Init(reader);
-                Log.Instance.Debug($"waveストリームを読み込みました。");
+                Log.Debug($"waveストリームを読み込みました。");
                 return true;
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return false;
             }
         }
@@ -102,12 +102,12 @@ namespace MisakiEQ.Lib.Sound
                 var reader = new Mp3FileReader(streams);
                 readers = new Mp3Reader(reader);
                 wav.Init(reader);
-                Log.Instance.Debug($"mp3ストリームを読み込みました。");
+                Log.Debug($"mp3ストリームを読み込みました。");
                 return true;
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return false;
             }
         }
@@ -168,10 +168,7 @@ namespace MisakiEQ.Lib.Sound
         /// </summary>
         public static Sounds GetInstance()
         {
-            if (singleton == null)
-            {
-                singleton = new Sounds();
-            }
+            singleton ??= new Sounds();
             return singleton;
         }
         public Config Config = new();

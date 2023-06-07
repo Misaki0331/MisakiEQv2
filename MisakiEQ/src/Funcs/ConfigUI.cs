@@ -24,7 +24,7 @@ namespace MisakiEQ.Funcs
             public Point Point { get => button.Location; set => button.Location = value; }
             public bool Enabled {  get=> button.Enabled; set => button.Enabled = value; }
             Action act;
-            string url;
+            readonly string url;
             readonly TabPage Par;
             readonly Button button;
             public LinkButton(TabPage par,Point point, string name, Action act)
@@ -67,10 +67,7 @@ namespace MisakiEQ.Funcs
             void Click(object? e,EventArgs args)
             {
                 act();
-                if (!string.IsNullOrEmpty(this.url))
-                {
-                    OpenLink(url);
-                }
+                if (!string.IsNullOrEmpty(this.url)) OpenLink(url);
             }
 
         }

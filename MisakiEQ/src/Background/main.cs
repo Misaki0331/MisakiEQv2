@@ -7,10 +7,7 @@ namespace MisakiEQ.Background
         static APIs? singleton = null;
         public static APIs GetInstance()
         {
-            if (singleton == null)
-            {
-                singleton = new APIs();
-            }
+            singleton ??= new APIs();
             return singleton;
         }
         private APIs()

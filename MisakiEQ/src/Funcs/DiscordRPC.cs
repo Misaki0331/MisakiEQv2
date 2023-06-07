@@ -1,4 +1,5 @@
 ﻿using MisakiEQ.Struct;
+using System;
 
 namespace MisakiEQ.Funcs
 {
@@ -7,9 +8,7 @@ namespace MisakiEQ.Funcs
         public static void PostEEW(EEW eew)
         {
             var discord = Lib.Discord.RichPresence.GetInstance();
-            string detail = "", status = "";
-            string img = "", imgtxt = "";
-            string mimg = "", mimgtxt = "";
+            string detail = "", status = "",img = "", imgtxt = "", mimg = "", mimgtxt = "";
             switch (eew.Serial.Infomation)
             {
                 case EEW.InfomationLevel.Cancelled:
@@ -37,23 +36,15 @@ namespace MisakiEQ.Funcs
         public static void PostJAlert(Struct.cJAlert.J_Alert data)
         {
             var discord = Lib.Discord.RichPresence.GetInstance();
-            string detail = "", status = "";
-            detail = $"J-ALERT【{data.Title}】";
-            if (data.Detail.Length > 32)
-            {
-                status=data.Detail.Substring(0,32)+"...";
-            }
-            else
-            {
-                status=data.Detail;
-            }
+            string status, detail = $"J-ALERT【{data.Title}】";
+            if (data.Detail.Length > 32) status = string.Concat(data.Detail.AsSpan(0, 32), "...");
+            else status = data.Detail;
             discord.Update(detail: detail, status: status);
         }
         public static void PostEarthquake(EarthQuake eq)
         {
             var discord = Lib.Discord.RichPresence.GetInstance();
-            string detail = "", status = "";
-            string imgtxt = "";
+            string detail = "", status = "", imgtxt = "";
             switch (eq.Issue.Type)
             {
                 case EarthQuake.EarthQuakeType.ScalePrompt:
@@ -62,15 +53,9 @@ namespace MisakiEQ.Funcs
                     if (list.Count > 0)
                     {
                         status = $"震度{Common.IntToStringLong(list[0].Intensity)}:";
-                        for (int i = 0; i < list[0].Prefectures.Count; i++)
-                        {
-                            status += $"{list[0].Prefectures[i]} ";
-                        }
+                        foreach (var pref in list[0].Prefectures) status += $"{Common.PrefecturesToString(pref)} ";
                     }
-                    else
-                    {
-                        status = "震度情報がありません";
-                    }
+                    else status = "震度情報がありません";
                     break;
                 case EarthQuake.EarthQuakeType.Destination:
                     detail = $"【震源情報】{eq.Details.OriginTime:d日H:mm}頃";
@@ -87,15 +72,9 @@ namespace MisakiEQ.Funcs
                     if (list.Count > 0)
                     {
                         imgtxt = $"震度{Common.IntToStringLong(list[0].Intensity)}:";
-                        for (int i = 0; i < list[0].Prefectures.Count; i++)
-                        {
-                            imgtxt += $"{list[0].Prefectures[i]} ";
-                        }
+                        foreach (var pref in list[0].Prefectures) status += $"{Common.PrefecturesToString(pref)} ";
                     }
-                    else
-                    {
-                        imgtxt = "震度情報がありません";
-                    }
+                    else imgtxt = "震度情報がありません";
                     break;
             }
             discord.Update(detail: detail, status: status, LImgKey: "", LImgText: imgtxt, SImgKey: "", SImgText: "");

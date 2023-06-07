@@ -49,15 +49,10 @@ namespace MisakiEQ.Funcs
         {
             var attribution = $"津波情報";
 
-            string title;
-            var index = "";
-            if (data.Cancelled)
-            {
-                title = "津波予報は解除されました。";
-            }
+            string title = string.Empty, index = string.Empty;
+            if (data.Cancelled) title = "津波予報は解除されました。";
             else
             {
-                
                 int watch=0, warn=0, mwarn=0;
                 for(int i = 0; i < data.Areas.Count; i++)
                 {
@@ -89,19 +84,13 @@ namespace MisakiEQ.Funcs
                     title = "津波注意報が発表された地域があります。";
                     index = "海岸に近い方は速やかに海から離れてください。\n";
                 }
-                else
-                {
-                    title = "津波予報が発表されました。";
-                }
                 index += "詳細はテレビ放送もしくは気象庁HPをご覧ください。";
             }
             Lib.ToastNotification.PostNotification(title:title,index:index,attribution:attribution,customTime:data.CreatedAt);
         }
         public static void Post(Struct.cJAlert.J_Alert data)
         {
-            var attribution = "J-ALERT";
-            var title = data.Title;
-            var index = data.Detail;
+            string attribution = "J-ALERT", title = data.Title, index = data.Detail;
             Lib.ToastNotification.PostNotification(title: title, index: index, attribution: attribution, customTime: data.AnnounceTime);
         }
         private static void PostEEWForecast(EEW data)
@@ -124,14 +113,14 @@ namespace MisakiEQ.Funcs
                 + "次の地域は強い揺れに注意してください\n";
             if (data.EarthQuake.ForecastArea.Regions.Count < 6)
             {
-                for (int i = 0; i < data.EarthQuake.ForecastArea.Regions.Count; i++) index += MisakiEQ.Struct.EEWArea.RegionsToStr(data.EarthQuake.ForecastArea.Regions[i]) + " ";
+                for (int i = 0; i < data.EarthQuake.ForecastArea.Regions.Count; i++) index += EEWArea.RegionsToStr(data.EarthQuake.ForecastArea.Regions[i]) + " ";
             } else if (data.EarthQuake.ForecastArea.LocalAreas.Count < 10)
             {
-                for (int i = 0; i < data.EarthQuake.ForecastArea.LocalAreas.Count; i++) index += MisakiEQ.Struct.EEWArea.LocalAreasToStr(data.EarthQuake.ForecastArea.LocalAreas[i]) + " ";
+                for (int i = 0; i < data.EarthQuake.ForecastArea.LocalAreas.Count; i++) index += EEWArea.LocalAreasToStr(data.EarthQuake.ForecastArea.LocalAreas[i]) + " ";
             }
             else
             {
-                for (int i = 0; i < data.EarthQuake.ForecastArea.District.Count; i++) index += MisakiEQ.Struct.EEWArea.DistrictToStr(data.EarthQuake.ForecastArea.District[i]) + " ";
+                for (int i = 0; i < data.EarthQuake.ForecastArea.District.Count; i++) index += EEWArea.DistrictToStr(data.EarthQuake.ForecastArea.District[i]) + " ";
             }
             if (data.EarthQuake.IsSea && data.EarthQuake.Depth < 40 && data.EarthQuake.Depth >= 0 && data.EarthQuake.Magnitude >= 6.0)
             {
@@ -146,7 +135,7 @@ namespace MisakiEQ.Funcs
             var title = "この緊急地震速報はキャンセルされました。";
             Lib.ToastNotification.PostNotification(title, attribution: attribution, customTime: data.Serial.UpdateTime);
         }
-        
+
         private static void PostEarthquakeScalePrompt(EarthQuake data)
         {
             var attribution = $"震度速報 - {data.Details.OriginTime:M/dd H:mm}発生";
@@ -154,15 +143,12 @@ namespace MisakiEQ.Funcs
             var detail = "";
 
             var list = data.Details.PrefIntensity.GetIntensityPrefectures();
-            for (int i =0;i<list.Count;i++)
+            foreach (var l in list)
             {
-                if (list.Count == 0) continue;
-                if(i!=0)detail += "\n";
-                detail += $"震度{Common.IntToStringLong(list[i].Intensity)}:";
-                for (int j = 0; j < list[i].Prefectures.Count; j++)
-                {
-                    detail += Common.PrefecturesToString(list[i].Prefectures[j]) +" ";
-                }
+                if (list[0]!=l) detail += "\n";
+                detail += $"震度{Common.IntToStringLong(l.Intensity)}:";
+                for (int j = 0; j < l.Prefectures.Count; j++)
+                    detail += Common.PrefecturesToString(l.Prefectures[j]) + " ";
             }
             Lib.ToastNotification.PostNotification(title, attribution: attribution, index: detail, customTime: data.CreatedAt);
         }
@@ -179,17 +165,13 @@ namespace MisakiEQ.Funcs
             var attribution = $"震源と震度に関する情報 - {data.Details.OriginTime:M/dd H:mm}発生";
             var title = $"震源地 : {data.Details.Hypocenter}";
             var detail = $"震源の深さ : {Common.DepthToString(data.Details.Depth)} 地震の規模 : M {data.Details.Magnitude:0.0}\n";
-
             var list = data.Details.PrefIntensity.GetIntensityPrefectures();
-            for (int i = 0; i < list.Count; i++)
+            foreach (var l in list)
             {
-                if (list.Count == 0) continue;
                 detail += "\n";
-                detail += $"震度{Common.IntToStringLong(list[i].Intensity)}:";
-                for (int j = 0; j < list[i].Prefectures.Count; j++)
-                {
-                    detail += Common.PrefecturesToString(list[i].Prefectures[j]) + " ";
-                }
+                detail += $"震度{Common.IntToStringLong(l.Intensity)}:";
+                for (int j = 0; j < l.Prefectures.Count; j++)
+                    detail += Common.PrefecturesToString(l.Prefectures[j]) + " ";
             }
             Lib.ToastNotification.PostNotification(title, attribution: attribution, index: detail, customTime: data.CreatedAt);
         }
@@ -197,18 +179,15 @@ namespace MisakiEQ.Funcs
         {
             var attribution = $"各地の震度に関する情報 - {data.Details.OriginTime:M/dd H:mm}発生";
             var title = $"最大震度{Common.IntToStringLong(data.Details.MaxIntensity)} {data.Details.Hypocenter}";
-            var detail = $"震源の深さ : {Common.DepthToString(data.Details.Depth)} 地震の規模 : M {data.Details.Magnitude:0.0}\n";
-            detail += $"この地震による{EarthQuake.DomesticToString(data.Details.DomesticTsunami)}\n";
+            var detail = $"震源の深さ : {Common.DepthToString(data.Details.Depth)} 地震の規模 : M {data.Details.Magnitude:0.0}\n"+
+                $"この地震による{EarthQuake.DomesticToString(data.Details.DomesticTsunami)}\n";
             var list = data.Details.PrefIntensity.GetIntensityPrefectures();
-            for (int i = 0; i < list.Count; i++)
+            foreach (var l in list)
             {
-                if (list.Count == 0) continue;
                 detail += "\n";
-                detail += $"震度{Common.IntToStringLong(list[i].Intensity)}:";
-                for (int j = 0; j < list[i].Prefectures.Count; j++)
-                {
-                    detail += Common.PrefecturesToString(list[i].Prefectures[j]) + " ";
-                }
+                detail += $"震度{Common.IntToStringLong(l.Intensity)}:";
+                for (int j = 0; j < l.Prefectures.Count; j++)
+                    detail += Common.PrefecturesToString(l.Prefectures[j]) + " ";
             }
             Lib.ToastNotification.PostNotification(title, attribution: attribution, index: detail, customTime: data.CreatedAt);
         }

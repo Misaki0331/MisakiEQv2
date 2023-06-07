@@ -21,10 +21,7 @@ namespace MisakiEQ.Lib.Discord
         /// </summary>
         public static RichPresence GetInstance()
         {
-            if (singleton == null)
-            {
-                singleton = new RichPresence();
-            }
+            singleton ??= new RichPresence();
             return singleton;
         }
 
@@ -43,8 +40,8 @@ namespace MisakiEQ.Lib.Discord
                 client = new DiscordRpcClient(Resources.API.API.DiscordRPC);
                 client.OnReady += (sender, e) =>
                 {
-                    Log.Instance.Info($"ユーザー名 : {e.User.Username}");
-                    Log.Instance.Info($"会員資格 : {e.User.Premium}");
+                    Log.Info($"ユーザー名 : {e.User.Username}");
+                    Log.Info($"会員資格 : {e.User.Premium}");
                 };
 
 
@@ -55,7 +52,7 @@ namespace MisakiEQ.Lib.Discord
 
                 //Connect to the RPC
                 client.Initialize();
-                if (DiscordLImagePath == "") DiscordLImagePath = "default_main";
+                if (string.IsNullOrEmpty(DiscordLImagePath)) DiscordLImagePath = "default_main";
                 client.SetPresence(new DiscordRPC.RichPresence()
                 {
                     Details = DiscordDetail,

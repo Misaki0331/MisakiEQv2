@@ -53,12 +53,12 @@ namespace MisakiEQ.Lib
                         }
                         catch (TaskCanceledException)
                         {
-                            Log.Instance.Info("遅延処理はキャンセルされました。");
+                            Log.Info("遅延処理はキャンセルされました。");
                             return; 
                         }
-                        Log.Instance.Info("遅延処理は実行しています。");
+                        Log.Info("遅延処理は実行しています。");
                     }
-                    Log.Instance.Info("遅延処理実行完了");
+                    Log.Info("遅延処理実行完了");
                     IsRunning = false;
                     return;
                 });

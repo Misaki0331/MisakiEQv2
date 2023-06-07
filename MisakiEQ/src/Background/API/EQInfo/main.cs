@@ -39,25 +39,25 @@ namespace MisakiEQ.Background.API
 
             if (Threads == null || Threads.Status != TaskStatus.Running)
             {
-                Log.Instance.Debug("スレッド開始の準備を開始します。");
+                Log.Debug("スレッド開始の準備を開始します。");
                 TSW.Restart();
                 Threads = Task.Run(() => ThreadFunction(CancelToken));
             }
             else
             {
-                Log.Instance.Error("該当スレッドは動作中の為、起動ができませんでした。");
+                Log.Error("該当スレッドは動作中の為、起動ができませんでした。");
             }
 
         }
         public void AbortThread()
         {
-            Log.Instance.Debug("スレッド破棄の準備を開始します。");
+            Log.Debug("スレッド破棄の準備を開始します。");
             TSW.Stop();
             CancelTokenSource.Cancel();
         }
         public async Task AbortAndWait()
         {
-            Log.Instance.Debug("スレッドを終了しています...");
+            Log.Debug("スレッドを終了しています...");
             CancelTokenSource.Cancel();
             if (Threads != null && !Threads.IsCompleted) await Threads;
         }
@@ -72,7 +72,7 @@ namespace MisakiEQ.Background.API
         }
         private async void ThreadFunction(CancellationToken token)
         {
-            Log.Instance.Info("スレッド開始");
+            Log.Info("スレッド開始");
             long TempDelay = 0;
             while (true)
             {
@@ -90,7 +90,7 @@ namespace MisakiEQ.Background.API
                         }
                         catch (Exception ex)
                         {
-                            Log.Instance.Warn($"取得時にエラーが発生しました。{ex.Message}");
+                            Log.Warn($"取得時にエラーが発生しました。{ex.Message}");
                         }
                         if (task.IsCompletedSuccessfully && !string.IsNullOrEmpty(task.Result))
                         { 
@@ -140,13 +140,13 @@ namespace MisakiEQ.Background.API
                 }
                 catch (TaskCanceledException ex)
                 {
-                    Log.Instance.Info($"スレッドの処理を終了します。{ex.Message}");
+                    Log.Info($"スレッドの処理を終了します。{ex.Message}");
                     return;
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error($"文字列データ : \"{json}\"");
-                    Log.Instance.Error(ex);
+                    Log.Error($"文字列データ : \"{json}\"");
+                    Log.Error(ex);
                 }
             }
 

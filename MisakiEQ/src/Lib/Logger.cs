@@ -90,10 +90,7 @@ namespace MisakiEQ
         /// </summary>
         private static Log GetInstance()
         {
-            if (singleton == null)
-            {
-                singleton = new Log();
-            }
+            singleton ??= new Log();
             return singleton;
         }
         public static Log Instance { get { return GetInstance(); } }
@@ -111,32 +108,16 @@ namespace MisakiEQ
 #endif
         }
 
-        /*static void FirstChanceException(object? sender, FirstChanceExceptionEventArgs e)
-        {
-            string str = $"FirstChanceException\n" +
-                $"例外エラー名 : {e.Exception.GetType()}\n" +
-                $"{e.Exception.Message}\n" +
-                $"{e.Exception.StackTrace}";
-            if (e.Exception.InnerException != null)
-            {
-                str += "\n--- 内部エラーの詳細 ---\n" +
-                    $"例外エラー名 : {e.Exception.InnerException.GetType()}\n" +
-                    $"{e.Exception.InnerException.Message}\n" +
-                    $"{e.Exception.InnerException.StackTrace}";
-            }
-            Instance.Error(str);
-        }*/
-
         /// <summary>
         /// ERRORレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        public void Error(string msg, [CallerMemberName] string callerMethodName = "")
+        public static void Error(string msg)
         {
             
-            if (LogLevel.ERROR >= LOG_LEVEL)
+            if (LogLevel.ERROR >= Instance.LOG_LEVEL)
             {
-                Out(LogLevel.ERROR, msg, callerMethodName);
+                Instance.Out(LogLevel.ERROR, msg);
             }
         }
 
@@ -144,16 +125,16 @@ namespace MisakiEQ
         /// ERRORレベルのスタックトレースログを出力する
         /// </summary>
         /// <param name="ex">例外オブジェクト</param>
-        public void Error(Exception ex, [CallerMemberName] string callerMethodName = "",
+        public static void Error(Exception ex,
             [CallerFilePath] string callerFilePath = "",
             [CallerLineNumber] int callerLineNumber = -1)
         {
-            if (LogLevel.ERROR >= LOG_LEVEL)
+            if (LogLevel.ERROR >= Instance.LOG_LEVEL)
             {
-                Out(LogLevel.ERROR, ex.Message + Environment.NewLine
+                Instance.Out(LogLevel.ERROR, ex.Message + Environment.NewLine
                     + $"{callerFilePath} - {callerLineNumber}行目" + Environment.NewLine
                     + $"[{ex.Source}] {ex.GetType()} : {ex.Message}" + Environment.NewLine
-                    + ex.StackTrace, callerMethodName);
+                    + ex.StackTrace);
             }
         }
 
@@ -161,16 +142,16 @@ namespace MisakiEQ
         /// FATALレベルのスタックトレースログを出力する
         /// </summary>
         /// <param name="ex">例外オブジェクト</param>
-        public void Fatal(Exception ex, [CallerMemberName] string callerMethodName = "",
+        public static void Fatal(Exception ex,
             [CallerFilePath] string callerFilePath = "",
             [CallerLineNumber] int callerLineNumber = -1)
         {
-            if (LogLevel.FATAL >= LOG_LEVEL)
+            if (LogLevel.FATAL >= Instance.LOG_LEVEL)
             {
-                Out(LogLevel.FATAL, ex.Message + Environment.NewLine
+                Instance.Out(LogLevel.FATAL, ex.Message + Environment.NewLine
                     + $"{callerFilePath} - {callerLineNumber}行目" + Environment.NewLine
                     + $"[{ex.Source}] {ex.GetType()} : {ex.Message}" + Environment.NewLine
-                    + ex.StackTrace, callerMethodName);
+                    + ex.StackTrace);
             }
         }
 
@@ -178,11 +159,12 @@ namespace MisakiEQ
         /// FATALレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        public void Fatal(string msg, [CallerMemberName] string callerMethodName = "")
+        
+        public static void Fatal(string msg)
         {
-            if (LogLevel.FATAL >= LOG_LEVEL)
+            if (LogLevel.FATAL >= Instance.LOG_LEVEL)
             {
-                Out(LogLevel.FATAL, msg, callerMethodName);
+                Instance.Out(LogLevel.FATAL, msg);
             }
         }
 
@@ -190,11 +172,11 @@ namespace MisakiEQ
         /// WARNレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        public void Warn(string msg, [CallerMemberName] string callerMethodName = "")
+        public static void Warn(string msg)
         {
-            if (LogLevel.WARN >= LOG_LEVEL)
+            if (LogLevel.WARN >= Instance.LOG_LEVEL)
             {
-                Out(LogLevel.WARN, msg, callerMethodName);
+                Instance.Out(LogLevel.WARN, msg);
             }
         }
 
@@ -202,11 +184,11 @@ namespace MisakiEQ
         /// INFOレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        public void Info(string msg, [CallerMemberName] string callerMethodName = "")
+        public static void Info(string msg)
         {
-            if (LogLevel.INFO >= LOG_LEVEL)
+            if (LogLevel.INFO >= Instance.LOG_LEVEL)
             {
-                Out(LogLevel.INFO, msg, callerMethodName);
+                Instance.Out(LogLevel.INFO, msg);
             }
         }
 
@@ -214,11 +196,11 @@ namespace MisakiEQ
         /// DEBUGレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        public void Debug(string msg, [CallerMemberName] string callerMethodName = "")
+        public static void Debug(string msg)
         {
-            if (LogLevel.DEBUG >= LOG_LEVEL)
+            if (LogLevel.DEBUG >= Instance.LOG_LEVEL)
             {
-                Out(LogLevel.DEBUG, msg, callerMethodName);
+                Instance.Out(LogLevel.DEBUG, msg);
             }
         }
 
@@ -228,7 +210,7 @@ namespace MisakiEQ
         /// </summary>
         /// <param name="level">ログレベル</param>
         /// <param name="msg">メッセージ</param>
-        private void Out(LogLevel level, string msg, string calledMethodName)
+        private void Out(LogLevel level, string msg)
         {
             string strMethodName="";
             for(int nFrame = 2; ; nFrame++)

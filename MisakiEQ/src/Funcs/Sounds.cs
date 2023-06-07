@@ -125,7 +125,7 @@ namespace MisakiEQ.Funcs
                             }
                         }catch(Exception ex)
                         {
-                            Log.Instance.Error(ex);
+                            Log.Error(ex);
                             Init();
                         }
                     }
@@ -139,14 +139,14 @@ namespace MisakiEQ.Funcs
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error(ex);
+                    Log.Error(ex);
                     return false;
                 }
             }
 
         }
 
-        public static async void SoundEarthquake(Struct.EarthQuake eq)
+        public static async void SoundEarthquake(EarthQuake eq)
         {
             try
             {
@@ -154,49 +154,46 @@ namespace MisakiEQ.Funcs
                 var ins = Sounds.GetInstance();
                 switch (eq.Issue.Type)
                 {
-                    case Struct.EarthQuake.EarthQuakeType.ScalePrompt:
-                        if (eq.Details.MaxIntensity >= Struct.Common.Intensity.Int5Down)
+                    case EarthQuake.EarthQuakeType.ScalePrompt:
+                        if (eq.Details.MaxIntensity >= Common.Intensity.Int5Down)
                             controll = await ins.GetSound("Earthquake_High");
                         else
                             controll = await ins.GetSound("Earthquake_Mid");
                         break;
-                    case Struct.EarthQuake.EarthQuakeType.Destination:
-                    case Struct.EarthQuake.EarthQuakeType.ScaleAndDestination:
+                    case EarthQuake.EarthQuakeType.Destination:
+                    case EarthQuake.EarthQuakeType.ScaleAndDestination:
                         controll = await ins.GetSound("Earthquake_Prompt");
                         break;
-                    case Struct.EarthQuake.EarthQuakeType.DetailScale:
+                    case EarthQuake.EarthQuakeType.DetailScale:
                         controll = await ins.GetSound("Earthquake_Low");
                         break;
                 }
                 if (controll != null&&!ins.Config.IsMute)
                 {
-                    controll.Volume = ins.Config.EarthquakeVolume / 100f; ;
+                    controll.Volume = ins.Config.EarthquakeVolume / 100f;
                     controll.Replay();
 
                 }
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 Init();
             }
         }
-        public static async void SoundTsunami(Struct.Tsunami data)
+        public static async void SoundTsunami(Tsunami data)
         {
             try
             {
                 SoundController? controll = null;
                 var ins = Sounds.GetInstance();
-                if (data.Cancelled)
-                {
-                    controll = await ins.GetSound("Tsunami_Cancel");
-                }
+                if (data.Cancelled) controll = await ins.GetSound("Tsunami_Cancel");
                 else
                 {
                     int watch = 0, warn = 0, mwarn = 0;
-                    for (int i = 0; i < data.Areas.Count; i++)
+                    foreach (var area in data.Areas)
                     {
-                        switch (data.Areas[i].Grade)
+                        switch (area.Grade)
                         {
                             case Tsunami.TsunamiGrade.Watch:
                                 watch++;
@@ -208,6 +205,7 @@ namespace MisakiEQ.Funcs
                                 mwarn++;
                                 break;
                         }
+                        if (mwarn > 0) break;
                     }
                     if (mwarn > 0)
                         controll = await ins.GetSound("Tsunami_MajorWarn");
@@ -224,7 +222,7 @@ namespace MisakiEQ.Funcs
             }
             catch(Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 Init();
             }
         }

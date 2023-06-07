@@ -43,13 +43,13 @@ namespace MisakiEQ.Struct
                     }
                     else
                     {
-                        Log.Instance.Warn($"areas[{i}].gradeを変換した後nullが返されました。 値 = {data.areas[i].grade}");
+                        Log.Warn($"areas[{i}].gradeを変換した後nullが返されました。 値 = {data.areas[i].grade}");
                         arg.Grade = TsunamiGrade.Unknown;
                     }
                 }
                 else
                 {
-                    Log.Instance.Warn($"areas[{i}].gradeの変換に失敗しました。 値 = {data.areas[i].grade}");
+                    Log.Warn($"areas[{i}].gradeの変換に失敗しました。 値 = {data.areas[i].grade}");
                     arg.Grade = TsunamiGrade.Unknown;
                 }
                 from.Areas.Add(arg);

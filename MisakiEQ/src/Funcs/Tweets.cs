@@ -104,23 +104,21 @@ namespace MisakiEQ.Funcs
                 {
                     int Index = -1;
                     long LatestID = 0;
-                    for (int i = 0; i < EEWReplyList.Count; i++)
+                    var latest = EEWReplyList.Find(a => a.EventID == eew.Serial.EventID);
+                    if (latest != null)
                     {
-                        if (EEWReplyList[i].EventID == eew.Serial.EventID)
+                        LatestID = latest.LatestTweet;
+                        if (latest.LatestSerial >= eew.Serial.Number)
                         {
-                            LatestID = EEWReplyList[i].LatestTweet;
-                            if (EEWReplyList[i].LatestSerial >= eew.Serial.Number)
-                            {
-                                EEWReplyList[i].DuplicateCount++;
-                                Log.Instance.Warn($"この緊急地震速報は{EEWReplyList[i].DuplicateCount}回発信されています。\nEventID:{EEWReplyList[i].EventID} 情報番号:{EEWReplyList[i].LatestSerial}");
-                                //return;
-                            }
-                            Index = i;
+                            latest.DuplicateCount++;
+                            Log.Warn($"この緊急地震速報は{latest.DuplicateCount}回発信されています。\nEventID:{latest.EventID} 情報番号:{latest.LatestSerial}");
+                            //return;
                         }
+                        Index = EEWReplyList.IndexOf(latest);
                     }
                     var twitter = APIs.GetInstance();
                     LatestID = await twitter.Tweet(reply: LatestID, tweet: TweetIndex);
-                    Log.Instance.Debug($"ツイートしました。 ID:{LatestID}\n" + TweetIndex);
+                    Log.Debug($"ツイートしました。 ID:{LatestID}\n" + TweetIndex);
                     if (Index != -1)
                     {
                         if (LatestID != 1)
@@ -142,7 +140,7 @@ namespace MisakiEQ.Funcs
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Warn($"ツイート中にエラー : {ex.Message}");
+                    Log.Warn($"ツイート中にエラー : {ex.Message}");
                 }
             }
         }
@@ -267,7 +265,7 @@ namespace MisakiEQ.Funcs
                         }
                         else
                         {
-                            Log.Instance.Warn($"ツイートできませんでした。\n{TweetIndexs[i]}");
+                            Log.Warn($"ツイートできませんでした。\n{TweetIndexs[i]}");
                         }
                     }
                     if (!IsExist)
@@ -280,7 +278,7 @@ namespace MisakiEQ.Funcs
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error(ex);
+                    Log.Error(ex);
                 }
             }
         }
@@ -425,12 +423,12 @@ namespace MisakiEQ.Funcs
                         TweetList[i] += "#MisakiEQ #津波";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
                         Latest = await APIs.GetInstance().Tweet(TweetList[i], Latest);
-                        Log.Instance.Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
+                        Log.Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error(ex);
+                    Log.Error(ex);
                 }
             }
         }
@@ -497,12 +495,12 @@ namespace MisakiEQ.Funcs
                         TweetList[i] += "#MisakiEQ #Jアラート";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
                         Latest = await APIs.GetInstance().Tweet(TweetList[i], Latest);
-                        Log.Instance.Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
+                        Log.Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
                     }
                 }
                 catch(Exception ex)
                 {
-                    Log.Instance.Error(ex);
+                    Log.Error(ex);
                 }
             }
         }
