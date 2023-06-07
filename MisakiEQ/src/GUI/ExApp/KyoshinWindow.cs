@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using KyoshinMonitorLib;
 using KyoshinMonitorLib.Images;
+using MisakiEQ;
 
 namespace MisakiEQ.GUI.ExApp
 {

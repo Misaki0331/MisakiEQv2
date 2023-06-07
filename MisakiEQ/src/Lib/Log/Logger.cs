@@ -12,7 +12,7 @@ using System.Runtime.ExceptionServices;
 
 namespace MisakiEQ
 {
-    class Log
+    partial class Log
     {
         LogLevel LOG_LEVEL = 0;
 
@@ -23,7 +23,7 @@ namespace MisakiEQ
         /// <summary>書き込むログファイル</summary>
         const string LOGFILE_NAME = "console";
         /// <summary>ログファイルの最大容量</summary>
-        const long LOGFILE_MAXSIZE = 1024*1024*1;
+        const long LOGFILE_MAXSIZE = 1024 * 1024 * 1;
         /// <summary>ログ保存期間</summary>
         const int LOGFILE_PERIOD = 90;
         /// <summary>関数名の長さ</summary>
@@ -54,7 +54,7 @@ namespace MisakiEQ
         public void SetLogLevel(LogLevel level)
         {
             LOG_LEVEL = level;
-            Info($"ログの出力レベルを{LOG_LEVEL}に変更しました。");
+            Info(NameSpace.Logger,$"ログの出力レベルを{LOG_LEVEL}に変更しました。");
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace MisakiEQ
         /// </summary>
         private Log()
         {
-            this.logFilePath = LOGDIR_PATH + LOGFILE_NAME + ".log";
+            logFilePath = LOGDIR_PATH + LOGFILE_NAME + ".log";
             //AppDomain.CurrentDomain.
             // ログファイルを生成する
             CreateLogfile(new FileInfo(logFilePath));
@@ -108,23 +108,12 @@ namespace MisakiEQ
 #endif
         }
 
-        /// <summary>
-        /// ERRORレベルのログを出力する
-        /// </summary>
-        /// <param name="msg">メッセージ</param>
-        public static void Error(string msg)
-        {
-            
-            if (LogLevel.ERROR >= Instance.LOG_LEVEL)
-            {
-                Instance.Out(LogLevel.ERROR, msg);
-            }
-        }
 
         /// <summary>
         /// ERRORレベルのスタックトレースログを出力する
         /// </summary>
         /// <param name="ex">例外オブジェクト</param>
+        [Obsolete("関数名は見れますが長くなるので独自名に")]
         public static void Error(Exception ex,
             [CallerFilePath] string callerFilePath = "",
             [CallerLineNumber] int callerLineNumber = -1)
@@ -139,9 +128,28 @@ namespace MisakiEQ
         }
 
         /// <summary>
+        /// ERRORレベルのスタックトレースログを出力する
+        /// </summary>
+        /// <param name="ex">例外オブジェクト</param>
+        /// <param name="funcName">関数名</param>
+        public static void Error(NameSpace funcName, Exception ex,
+            [CallerFilePath] string callerFilePath = "",
+            [CallerLineNumber] int callerLineNumber = -1)
+        {
+            if (LogLevel.ERROR >= Instance.LOG_LEVEL)
+            {
+                Instance.Out(LogLevel.ERROR, ex.Message + Environment.NewLine
+                    + $"{callerFilePath} - {callerLineNumber}行目" + Environment.NewLine
+                    + $"[{ex.Source}] {ex.GetType()} : {ex.Message}" + Environment.NewLine
+                    + ex.StackTrace, $"{funcName}");
+            }
+        }
+
+        /// <summary>
         /// FATALレベルのスタックトレースログを出力する
         /// </summary>
         /// <param name="ex">例外オブジェクト</param>
+        [Obsolete("関数名は見れますが長くなるので独自名に")]
         public static void Fatal(Exception ex,
             [CallerFilePath] string callerFilePath = "",
             [CallerLineNumber] int callerLineNumber = -1)
@@ -155,11 +163,31 @@ namespace MisakiEQ
             }
         }
 
+
+        /// <summary>
+        /// FATALレベルのスタックトレースログを出力する
+        /// </summary>
+        /// <param name="ex">例外オブジェクト</param>
+        /// <param name="funcName">関数名</param>
+        public static void Fatal(NameSpace funcName, Exception ex,
+            [CallerFilePath] string callerFilePath = "",
+            [CallerLineNumber] int callerLineNumber = -1)
+        {
+            if (LogLevel.FATAL >= Instance.LOG_LEVEL)
+            {
+                Instance.Out(LogLevel.FATAL, ex.Message + Environment.NewLine
+                    + $"{callerFilePath} - {callerLineNumber}行目" + Environment.NewLine
+                    + $"[{ex.Source}] {ex.GetType()} : {ex.Message}" + Environment.NewLine
+                    + ex.StackTrace, $"{funcName}");
+            }
+        }
+
         /// <summary>
         /// FATALレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
-        
+        [Obsolete("関数名は見れますが長くなるので独自名に")]
+
         public static void Fatal(string msg)
         {
             if (LogLevel.FATAL >= Instance.LOG_LEVEL)
@@ -169,9 +197,50 @@ namespace MisakiEQ
         }
 
         /// <summary>
+        /// FATALレベルのログを出力する
+        /// </summary>
+        /// <param name="msg">メッセージ</param>
+        /// <param name="funcName">関数名</param>
+        public static void Fatal(NameSpace funcName, string msg)
+        {
+            if (LogLevel.FATAL >= Instance.LOG_LEVEL)
+            {
+                Instance.Out(LogLevel.FATAL, msg, $"{funcName}");
+            }
+        }
+
+
+        /// <summary>
+        /// ERRORレベルのログを出力する
+        /// </summary>
+        /// <param name="msg">メッセージ</param>
+        [Obsolete("関数名は見れますが長くなるので独自名に")]
+        public static void Error(string msg)
+        {
+
+            if (LogLevel.ERROR >= Instance.LOG_LEVEL)
+            {
+                Instance.Out(LogLevel.ERROR, msg);
+            }
+        }
+
+        /// <summary>
+        /// ERRORレベルのログを出力する
+        /// </summary>
+        /// <param name="msg">メッセージ</param>
+        public static void Error(NameSpace funcName, string msg)
+        {
+            if (LogLevel.ERROR >= Instance.LOG_LEVEL)
+            {
+                Instance.Out(LogLevel.ERROR, msg, $"{funcName}");
+            }
+        }
+
+        /// <summary>
         /// WARNレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
+        [Obsolete("関数名は見れますが長くなるので独自名に")]
         public static void Warn(string msg)
         {
             if (LogLevel.WARN >= Instance.LOG_LEVEL)
@@ -181,9 +250,23 @@ namespace MisakiEQ
         }
 
         /// <summary>
+        /// WARNレベルのログを出力する
+        /// </summary>
+        /// <param name="msg">メッセージ</param>
+        /// <param name="funcName">関数名</param>
+        public static void Warn(NameSpace funcName, string msg)
+        {
+            if (LogLevel.WARN >= Instance.LOG_LEVEL)
+            {
+                Instance.Out(LogLevel.WARN, msg, $"{funcName}");
+            }
+        }
+
+        /// <summary>
         /// INFOレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
+        [Obsolete("関数名は見れますが長くなるので独自名に")]
         public static void Info(string msg)
         {
             if (LogLevel.INFO >= Instance.LOG_LEVEL)
@@ -191,16 +274,41 @@ namespace MisakiEQ
                 Instance.Out(LogLevel.INFO, msg);
             }
         }
+        /// <summary>
+        /// INFOレベルのログを出力する
+        /// </summary>
+        /// <param name="msg">メッセージ</param>
+        /// <param name="funcName">関数名</param>
+        public static void Info(NameSpace funcName, string msg)
+        {
+            if (LogLevel.INFO >= Instance.LOG_LEVEL)
+            {
+                Instance.Out(LogLevel.INFO, msg, $"{funcName}");
+            }
+        }
 
         /// <summary>
         /// DEBUGレベルのログを出力する
         /// </summary>
         /// <param name="msg">メッセージ</param>
+        [Obsolete("関数名は見れますが長くなるので独自名に")]
         public static void Debug(string msg)
         {
             if (LogLevel.DEBUG >= Instance.LOG_LEVEL)
             {
                 Instance.Out(LogLevel.DEBUG, msg);
+            }
+        }
+        /// <summary>
+        /// DEBUGレベルのログを出力する
+        /// </summary>
+        /// <param name="msg">メッセージ</param>
+        /// <param name="funcName">関数名</param>
+        public static void Debug(NameSpace funcName, string msg)
+        {
+            if (LogLevel.DEBUG >= Instance.LOG_LEVEL)
+            {
+                Instance.Out(LogLevel.DEBUG, msg, $"{funcName}");
             }
         }
 
@@ -210,37 +318,41 @@ namespace MisakiEQ
         /// </summary>
         /// <param name="level">ログレベル</param>
         /// <param name="msg">メッセージ</param>
-        private void Out(LogLevel level, string msg)
+        private void Out(LogLevel level, string msg, string? from = null)
         {
-            string strMethodName="";
-            for(int nFrame = 2; ; nFrame++)
+            string strMethodName = "";
+            if (!string.IsNullOrEmpty(from)) strMethodName = from;
+            else
             {
+                for (int nFrame = 2; ; nFrame++)
+                {
 #pragma warning disable CS8602 // null 参照の可能性があるものの逆参照です。
-                StackFrame? objStackFrame = new(nFrame);
-                if (objStackFrame == null) break;
-                if (objStackFrame.GetMethod() == null) break;
-                if (string.IsNullOrWhiteSpace(strMethodName)) strMethodName = $"{objStackFrame.GetMethod().Name}";
-                if (objStackFrame.GetMethod().ReflectedType == null) break;
-                strMethodName = $"{objStackFrame.GetMethod().ReflectedType.FullName}.{strMethodName}";
-                if (objStackFrame.GetMethod().ReflectedType.FullName.Contains("MisakiEQ")) break;
-                if (objStackFrame.GetMethod().ReflectedType.FullName.Contains("System")) break;
+                    StackFrame? objStackFrame = new(nFrame);
+                    if (objStackFrame == null) break;
+                    if (objStackFrame.GetMethod() == null) break;
+                    if (string.IsNullOrWhiteSpace(strMethodName)) strMethodName = $"{objStackFrame.GetMethod().Name}";
+                    if (objStackFrame.GetMethod().ReflectedType == null) break;
+                    strMethodName = $"{objStackFrame.GetMethod().ReflectedType.FullName}.{strMethodName}";
+                    if (objStackFrame.GetMethod().ReflectedType.FullName.Contains("MisakiEQ")) break;
+                    if (objStackFrame.GetMethod().ReflectedType.FullName.Contains("System")) break;
 #pragma warning restore CS8602 // null 参照の可能性があるものの逆参照です。
 
+                }
+                // 呼び出し元のメソッド名を取得する
+                if (string.IsNullOrEmpty(strMethodName)) strMethodName = "Undefined";
             }
-            // 呼び出し元のメソッド名を取得する
-            if (string.IsNullOrEmpty(strMethodName)) strMethodName = "Undefined";
             int tid = Environment.CurrentManagedThreadId;
             string para = strMethodName;
             if (para.Length > STACKLEN)
             {
-                para= para.Substring(para.Length-(STACKLEN - 2), STACKLEN-2);
+                para = para.Substring(para.Length - (STACKLEN - 2), STACKLEN - 2);
                 para = ".." + para;
             }
             else
             {
-                para=para.PadLeft(STACKLEN);
+                para = para.PadLeft(STACKLEN);
             }
-            string trace = msg.Replace("\n", "\n"+"".PadLeft(44+STACKLEN, ' '));
+            string trace = msg.Replace("\n", "\n" + "".PadLeft(44 + STACKLEN, ' '));
             string logs = $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [{para}]: {trace}";
             if (level == LogLevel.DEBUG) System.Diagnostics.Debug.WriteLine(logs);
             else Trace.WriteLine(logs);
@@ -282,7 +394,7 @@ namespace MisakiEQ
                 for (int i = 0; i < splitstrings.Length; i++)
                 {
                     if (i != 0) addtext += "\n";
-                    addtext+=col+splitstrings[i];
+                    addtext += col + splitstrings[i];
                     Logdata.Add(col + splitstrings[i]);
                 }
                 while (Logdata.Count > 100)
@@ -299,7 +411,7 @@ namespace MisakiEQ
                 {
                     fullMsg = $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}][{tid,5}][{level,-5}] [..{strMethodName.Substring(strMethodName.Length-1-METHODNAMELEN)}]: {msg}";
                 }*/
-                
+
 
                 lock (lockObj)
                 {
@@ -323,7 +435,7 @@ namespace MisakiEQ
                 //イベントの発生
                 LogUpdateHandler?.Invoke(null, addtext);
             }
-            catch{}
+            catch { }
         }
 
         /// <summary>
@@ -342,12 +454,12 @@ namespace MisakiEQ
         /// <param name="logFile">ファイル情報</param>
         private void CreateLogfile(FileInfo logFile)
         {
-            if (!Directory.Exists(logFile.DirectoryName)&&logFile.DirectoryName!=null)
+            if (!Directory.Exists(logFile.DirectoryName) && logFile.DirectoryName != null)
             {
                 Directory.CreateDirectory(logFile.DirectoryName);
             }
 
-            this.stream = new StreamWriter(logFile.FullName, true, Encoding.UTF8)
+            stream = new StreamWriter(logFile.FullName, true, Encoding.UTF8)
             {
                 AutoFlush = true
             };
@@ -358,9 +470,9 @@ namespace MisakiEQ
         /// </summary>
         private void CompressLogFile()
         {
-            if(stream!=null)stream.Close();
+            if (stream != null) stream.Close();
             string oldFilePath = LOGDIR_PATH + LOGFILE_NAME + "_" + DateTime.Now.ToString("yyyyMMddHHmmss");
-            if(logFilePath!=null)File.Move(this.logFilePath, oldFilePath + ".log");
+            if (logFilePath != null) File.Move(logFilePath, oldFilePath + ".log");
 
             FileStream inStream = new(oldFilePath + ".log", FileMode.Open, FileAccess.Read);
             FileStream outStream = new(oldFilePath + ".gz", FileMode.Create, FileAccess.Write);
@@ -378,7 +490,7 @@ namespace MisakiEQ
             outStream.Close();
 
             File.Delete(oldFilePath + ".log");
-            if(logFilePath!=null)CreateLogfile(new FileInfo(logFilePath));
+            if (logFilePath != null) CreateLogfile(new FileInfo(logFilePath));
         }
 
         /// <summary>

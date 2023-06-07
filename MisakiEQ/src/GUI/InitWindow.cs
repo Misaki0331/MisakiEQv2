@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Security;
 using System.Windows.Markup;
+using MisakiEQ;
 
 namespace MisakiEQ
 {

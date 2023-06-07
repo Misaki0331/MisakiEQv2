@@ -1,4 +1,5 @@
 ﻿using MisakiEQ.Background;
+using MisakiEQ;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -12,6 +12,8 @@ using System.Windows.Forms;
 using System.Web;
 using System.Management;
 using System.IO;
+using MisakiEQ;
+
 namespace MisakiEQ.GUI.ErrorInfo
 {
     public partial class UnhandledException : Form

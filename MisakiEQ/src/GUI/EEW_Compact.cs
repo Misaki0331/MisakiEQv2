@@ -1,4 +1,5 @@
 ﻿using MisakiEQ.Background.API.EQInfo.JSON;
+using MisakiEQ;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -1,4 +1,5 @@
 ﻿using KyoshinMonitorLib.ApiResult.WebApi;
+using MisakiEQ;
 using MisakiEQ.Struct;
 using System;
 using System.Collections.Generic;

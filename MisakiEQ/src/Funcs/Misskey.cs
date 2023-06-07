@@ -1,4 +1,5 @@
 ﻿using MisakiEQ.Lib;
+using MisakiEQ;
 
 namespace MisakiEQ.Funcs
 {

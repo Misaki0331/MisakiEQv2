@@ -1,5 +1,6 @@
 ﻿using MisakiEQ.Lib.Config;
 using MisakiEQ.Lib.Misskey;
+using MisakiEQ;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
