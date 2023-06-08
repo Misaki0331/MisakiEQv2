@@ -37,6 +37,9 @@
     <Compile Update="src\GUI\LogViewerWindow.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="src\GUI\Map.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="src\GUI\Overlay\FullScreenWarning.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Security;
 using System.Windows.Markup;
 using MisakiEQ;
+using MisakiEQ.src.GUI;
 
 namespace MisakiEQ
 {
@@ -38,6 +39,17 @@ namespace MisakiEQ
 
         private async void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
+#if DEBUG
+            this.Invoke(()=> {
+                Hide();
+
+                var Map = new Map();
+                Map.Show();
+            });
+
+            await Task.Delay(2147483647);
+            return;
+#endif
             var stw = new Stopwatch();
             stw.Start();
             

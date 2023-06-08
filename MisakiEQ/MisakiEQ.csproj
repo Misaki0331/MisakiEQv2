@@ -42,6 +42,7 @@
     <PackageReference Include="KyoshinMonitorLib" Version="0.4.5" />
     <PackageReference Include="KyoshinMonitorLib.Images" Version="0.4.3" />
     <PackageReference Include="KyoshinMonitorLib.SkiaImages" Version="0.4.3" />
+    <PackageReference Include="LiveCharts.WinForms.NetCore3" Version="0.9.7" />
     <PackageReference Include="LiveChartsCore" Version="2.0.0-beta.710" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     <PackageReference Include="NAudio" Version="2.1.0" />
@@ -80,6 +81,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>API.resx</DependentUpon>
     </Compile>
+    <Compile Update="Resources\Map\MapResource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MapResource.resx</DependentUpon>
+    </Compile>
     <Compile Update="src\Struct\jma\Area\AreaName\Resource.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -108,6 +114,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>API.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Map\MapResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MapResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="src\Struct\jma\Area\AreaName\Resource.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
@@ -123,6 +133,10 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="src\Lib\Map\" />
   </ItemGroup>
 
 </Project>
