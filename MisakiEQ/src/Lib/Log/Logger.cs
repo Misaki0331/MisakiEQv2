@@ -104,7 +104,7 @@ namespace MisakiEQ
             // ログファイルを生成する
             CreateLogfile(new FileInfo(logFilePath));
 #if DEBUG
-            AllocConsole();
+            // AllocConsole();
 #endif
         }
 
