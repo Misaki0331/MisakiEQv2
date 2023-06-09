@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows.Markup;
 using MisakiEQ;
 using MisakiEQ.src.GUI;
@@ -8,6 +9,16 @@ namespace MisakiEQ
 {
     public partial class InitWindow : Form
     {
+        class Tasks
+        {
+            public Tasks(string function,Action act)
+            {
+                name = function;
+                action = act;
+            }
+            public string name;
+            public Action action;
+        }
         public InitWindow()
         {
             InitializeComponent();
@@ -50,36 +61,42 @@ namespace MisakiEQ
             await Task.Delay(2147483647);
             return;
 #endif
-            var stw = new Stopwatch();
-            stw.Start();
-            
-            InitialTask_ReportFunction(11, "APIの起動処理", new(() => { _=Background.APIs.Instance; }), stw);
-            InitialTask_ReportFunction(22, "設定データ読込", new(() => {
+            List<Tasks> tasks = new();
+            tasks.Add(new("APIの起動処理", new(() => { _ = Background.APIs.Instance; })));
+            tasks.Add(new("設定データ読込", new(() => {
                 var config = Lib.Config.Funcs.GetInstance();
                 config.ReadConfig();
-            }), stw);
-            InitialTask_ReportFunction(33, "設定データ適用", new(() => {
+            })));
+            var stw = new Stopwatch();
+            stw.Start();
+
+            tasks.Add(new("APIの起動処理", new(() => { _ = Background.APIs.Instance; })));
+            tasks.Add(new("設定データ読込", new(() => {
+                var config = Lib.Config.Funcs.GetInstance();
+                config.ReadConfig();
+            })));
+            tasks.Add(new("設定データ適用", new(() => {
                 var config = Lib.Config.Funcs.GetInstance();
                 config.ApplyConfig();
-            }), stw);
-            InitialTask_ReportFunction(44, "APIスレッド起動", new(() => {
+            })));
+            tasks.Add(new("APIスレッド起動", new(() => {
                 Background.APIs.Instance.Run();
-            }), stw);
-            InitialTask_ReportFunction(56, "Discord RPC接続", new(() => {
+            })));
+            tasks.Add(new("Discord RPC接続", new(() => {
                 var discord = Lib.Discord.RichPresence.GetInstance();
                 discord.Init();
                 discord.Update(detail: "MisakiEQは地震監視中です。");
-            }), stw);
-            InitialTask_ReportFunction(67, "強震モニタのポイントを取得", new(() => {
+            })));
+            tasks.Add(new("強震モニタのポイントを取得", new(() => {
                 Lib.KyoshinAPI.KyoshinObervation.Init();
-            }), stw);
-            InitialTask_ReportFunction(70, "地震情報データ取得", new(() => { _ = Struct.jma.Area.Static.EarthquakePos.Instance; }), stw);
+            })));
+            tasks.Add(new("地震情報データ取得", new(() => { _ = Struct.jma.Area.Static.EarthquakePos.Instance; })));
 
-            InitialTask_ReportFunction(78, "サウンドの読込", new(() => {
+            tasks.Add(new("サウンドの読込", new(() => {
                 Funcs.SoundCollective.Init();
-            }), stw);
+            })));
 #if ADMIN || DEBUG
-            InitialTask_ReportFunction(89, "Twitter API連携", new(async () => {
+            tasks.Add(new("Twitter API連携", new(async () => {
                 try
                 {
                     if (!File.Exists("TwitterAuth.cfg"))
@@ -96,8 +113,8 @@ namespace MisakiEQ
                 {
                     Log.Error(ex.Message);
                 }
-            }), stw);
-            InitialTask_ReportFunction(90, "Misskey API連携", new(() =>
+            })));
+            tasks.Add(new("Misskey API連携", new(() =>
             {
                 if (!File.Exists("MisskeyAccessToken.cfg"))
                 {
@@ -108,9 +125,9 @@ namespace MisakiEQ
                 var text = reader.ReadToEnd();
                 Lib.Misskey.APIData.accessToken = text;
 
-            }), stw);
+            })));
 
-            InitialTask_ReportFunction(91, "Discord WebHook連携", new(() =>
+            tasks.Add(new("Discord WebHook連携", new(() =>
             {
                 if (!File.Exists("DiscordWebHookToken.cfg"))
                 {
@@ -124,13 +141,13 @@ namespace MisakiEQ
                     Log.Warn("Discord WebHookが連携できませんでした。");
                 }
 
-            }), stw);
+            })));
 #endif
-            InitialTask_ReportFunction(95, "イベントを設定", new(() =>
+            tasks.Add(new("イベントを設定", new(() =>
             {
                 GUI.TrayHub.GetInstance(false)?.SetEvent();
-            }),stw);
-            InitialTask_ReportFunction(99, "イベントログ関連確認", new(() =>
+            })));
+            tasks.Add(new("イベントログ関連確認", new(() =>
             {
                 string sourceName = "MisakiEQ";
                 if (Lib.WinAPI.IsAdministrator())
@@ -155,7 +172,12 @@ namespace MisakiEQ
                     Log.Error($"Error: {ex.Message}");
 
                 }
-            }), stw);
+            })));
+            for(int i=0; i < tasks.Count; i++)
+            {
+                var task = tasks[i];
+                InitialTask_ReportFunction((int)((double)i / tasks.Count * 100.0), task.name, task.action, stw);
+            }
             e.Result = "OK";
             await Task.Delay(2000);
         }
