@@ -268,7 +268,7 @@ namespace MisakiEQ.Funcs
                             if (string.IsNullOrWhiteSpace(areastr))continue;
                             content.embeds[0].fields.Add(new()
                             {
-                                name = $"震度{Struct.Common.IntToStringLong(eq.Details.MaxIntensity)}",
+                                name = $"震度{Struct.Common.IntToStringLong(intensity)}",
                                 value = areastr
                             });
                         }
