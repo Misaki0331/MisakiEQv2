@@ -62,11 +62,6 @@ namespace MisakiEQ
             return;
 #endif
             List<Tasks> tasks = new();
-            tasks.Add(new("APIの起動処理", new(() => { _ = Background.APIs.Instance; })));
-            tasks.Add(new("設定データ読込", new(() => {
-                var config = Lib.Config.Funcs.GetInstance();
-                config.ReadConfig();
-            })));
             var stw = new Stopwatch();
             stw.Start();
 
