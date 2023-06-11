@@ -1,6 +1,6 @@
 using MisakiEQ.GUI;
 
-namespace MisakiEQ.src
+namespace MisakiEQ
 {
     internal static class Program
     {

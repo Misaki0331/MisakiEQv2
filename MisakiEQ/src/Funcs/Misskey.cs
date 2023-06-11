@@ -1,5 +1,7 @@
 ﻿using MisakiEQ.Lib;
 using MisakiEQ;
+using MisakiEQ.Struct;
+using static MisakiEQ.Lib.Discord.WebHooks.Main;
 
 namespace MisakiEQ.Funcs
 {
@@ -56,8 +58,8 @@ namespace MisakiEQ.Funcs
         }
         public int EEWDelayTime
         {
-           get { return EEWDelay.DelayTime; }
-           set { EEWDelay.DelayTime = value; }
+            get { return EEWDelay.DelayTime; }
+            set { EEWDelay.DelayTime = value; }
         }
         public bool IsInterSend { get; set; } = true;
         //Todo : 重大インシデント
@@ -79,13 +81,13 @@ namespace MisakiEQ.Funcs
         private readonly AsyncLock Tsunami_Lock = new();
         private readonly AsyncLock JALERT_Lock = new();
 
-        private string SetMisskeyColor(string BG,string FG, string str)
+        private string SetMisskeyColor(string BG, string FG, string str)
         {
             return $"$[bg.color={BG} $[fg.color={FG} {str}]]";
         }
-        private string IntensityColor(Struct.Common.Intensity Intensity, string str) 
+        private string IntensityColor(Struct.Common.Intensity Intensity, string str)
         {
-            switch(Intensity)
+            switch (Intensity)
             {
                 case Struct.Common.Intensity.Int7:
                     return SetMisskeyColor("808", "FF0", str);
@@ -108,7 +110,7 @@ namespace MisakiEQ.Funcs
                 case Struct.Common.Intensity.Int0:
                 case Struct.Common.Intensity.Unknown:
                 default:
-                    return SetMisskeyColor("FFF","000",str);
+                    return SetMisskeyColor("FFF", "000", str);
             }
         }
 
@@ -136,7 +138,7 @@ namespace MisakiEQ.Funcs
                 TweetIndex += $"{eew.EarthQuake.Hypocenter} " +
                     $"深さ:{Struct.Common.DepthToString(eew.EarthQuake.Depth)} " +
                     $"M{eew.EarthQuake.Magnitude:0.0}\n" +
-                    $"{IntensityColor(eew.EarthQuake.MaxIntensity,$"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}")}\n";
+                    $"{IntensityColor(eew.EarthQuake.MaxIntensity, $"最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}")}\n";
                 if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
                 {
                     TweetIndex += "$[bg.color=FF0 $[fg.color=F00 ⚠️以下の地域は強い揺れに注意⚠️]]\n";
@@ -144,7 +146,7 @@ namespace MisakiEQ.Funcs
                     foreach (var area in eew.EarthQuake.ForecastArea.LocalAreas)
                     {
                         line += $"{Struct.EEWArea.LocalAreasToStr(area)}";
-                        if (eew.EarthQuake.ForecastArea.LocalAreas[^1]!=area)
+                        if (eew.EarthQuake.ForecastArea.LocalAreas[^1] != area)
                         {
                             if (line.Length > 16)
                             {
@@ -156,11 +158,11 @@ namespace MisakiEQ.Funcs
                     }
                     TweetIndex += $"{line}**\n\n";
                 }
-                TweetIndex += $"発生時刻 : <plain>{(eew.EarthQuake.OriginTime==DateTime.MinValue?"不明":$"{eew.EarthQuake.OriginTime:M/dd HH:mm:ss}")}</plain>\n";
+                TweetIndex += $"発生時刻 : <plain>{(eew.EarthQuake.OriginTime == DateTime.MinValue ? "不明" : $"{eew.EarthQuake.OriginTime:M/dd HH:mm:ss}")}</plain>\n";
             }
             else TweetIndex += $"この緊急地震速報は取り消されました。\n";
             var time = "";
-            if(eew.EarthQuake.OriginTime != DateTime.MinValue)
+            if (eew.EarthQuake.OriginTime != DateTime.MinValue)
                 time = $" ({(eew.Serial.UpdateTime - eew.EarthQuake.OriginTime).TotalSeconds} 秒前)";
             TweetIndex += $"発表時刻 : <plain>{eew.Serial.UpdateTime:M/dd HH:mm:ss}</plain>{time}\n";
             if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
@@ -185,25 +187,25 @@ namespace MisakiEQ.Funcs
                     string LatestID = string.Empty;
                     foreach (var list in EEWReplyList)
                     {
-                        if (string.Equals(list.EventID,eew.Serial.EventID))
+                        if (string.Equals(list.EventID, eew.Serial.EventID))
                         {
                             LatestID = list.LatestNote;
                             if (list.LatestSerial >= eew.Serial.Number)
                                 list.DuplicateCount++;
-                            Current= list;
+                            Current = list;
                             Index = EEWReplyList.FindIndex(a => a == list);
                         }
                     }
                     var visibility = Lib.Misskey.Setting.Visibility.Home;
-                    if (eew.Serial.Number == 1|| //第1報
-                        eew.Serial.IsFinal|| // 最終報
+                    if (eew.Serial.Number == 1 || //第1報
+                        eew.Serial.IsFinal || // 最終報
                         (!Current.IsWarnFirstNoted &&//まだ規模が大きく変化した際の未発表の場合
-                        (eew.EarthQuake.MaxIntensity>=Struct.Common.Intensity.Int5Down || // 震度5弱以上
+                        (eew.EarthQuake.MaxIntensity >= Struct.Common.Intensity.Int5Down || // 震度5弱以上
                         eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)) || // 警報
                         eew.Serial.Infomation == Struct.EEW.InfomationLevel.Cancelled ||//キャンセル
-                        eew.EarthQuake.ForecastArea.LocalAreas.Count>Current.WarnAreaCount) //地名の数が更新されたとき
+                        eew.EarthQuake.ForecastArea.LocalAreas.Count > Current.WarnAreaCount) //地名の数が更新されたとき
                     {
-                        if(eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
+                        if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
                             Current.IsWarnFirstNoted = true;
                         visibility = Lib.Misskey.Setting.Visibility.Public;
                     }
@@ -213,10 +215,10 @@ namespace MisakiEQ.Funcs
                     n.Visibility = visibility;
                     if (visibility == Lib.Misskey.Setting.Visibility.Public)
                     {
-                        if(IsInterSend) EEWDelay.InterTask(n);
+                        if (IsInterSend) EEWDelay.InterTask(n);
                         else
                         {
-                            IsNextPublic= true;
+                            IsNextPublic = true;
                             EEWDelay.SendTask(n);
                         }
                     }
@@ -292,7 +294,41 @@ namespace MisakiEQ.Funcs
                             index.Add(string.Empty);
                             index.Add("各地の震度は以下の通りです。");
                             index.Add(string.Empty);
-                            var list = eq.Details.PrefIntensity.GetIntensityPrefectures();
+                            if (eq.Details.localAreaPoints.Count > 0)
+                            {
+                                var loop = new List<Common.Intensity>()
+                                {
+                            Common.Intensity.Int7,
+                            Common.Intensity.Int6Up, Common.Intensity.Int6Down ,
+                            Common.Intensity.Int5Up, Common.Intensity.Int5Down , Common.Intensity.Int5Over,
+                            Common.Intensity.Int4,  Common.Intensity.Int3,
+                            Common.Intensity.Int2, Common.Intensity.Int1,
+                                };
+                                foreach (var intensity in loop)
+                                {
+                                    var a = Struct.Common.IntToStringLong(intensity);
+                                    string space = "";
+                                    for (int i = 0; i < 8 - a.Length; i++) space += "  ";
+
+                                    if (eq.Details.MaxIntensity < intensity) continue;
+                                    string txt = $"{IntensityColor(intensity, $"**震度{Struct.Common.IntToStringLong(intensity)}**{space}")}\n";
+                                    var area = eq.Details.localAreaPoints.FindAll(eq => eq.Intensity == intensity);
+                                    if (area == null) continue;
+                                    if(area.Count==0) continue;
+                                    string areastr = "";
+                                    foreach (var areaPoint in area)
+                                    {
+                                        areastr += $"{areaPoint.Area.Name} ";
+                                    }
+                                    areastr = areastr.Trim();
+                                    txt += areastr;
+                                    index.Add(txt+"\n");
+                                }
+
+                            }
+                            //都道府県で解決する時代は終わった。
+
+                            /*var list = eq.Details.PrefIntensity.GetIntensityPrefectures();
                             for (int i = 0; i < list.Count; i++)
                             {
                                 string txt = $"{IntensityColor(list[i].Intensity, $"震度{Struct.Common.IntToStringLong(list[i].Intensity)}")}：";
@@ -312,7 +348,7 @@ namespace MisakiEQ.Funcs
                                 }
                                 index.Add(txt);
 
-                            }
+                            }*/
                         }
                     }
                     bool IsExist = false;
@@ -328,9 +364,9 @@ namespace MisakiEQ.Funcs
 
                     List<string> TweetIndexs = new();
                     string Text = "";
-                    foreach (var line in index)Text += $"{line}\n";
+                    foreach (var line in index) if(Text.Length+line.Length+20<3000)Text += $"{line}\n";
                     Text += "\n#MisakiEQ #地震";
-                    string id = await Lib.Misskey.APIData.CreateNote(Text, Lib.Misskey.Setting.Visibility.Public , eqdata.LatestNote/*LatestID*/);
+                    string id = await Lib.Misskey.APIData.CreateNote(Text, Lib.Misskey.Setting.Visibility.Public, eqdata.LatestNote/*LatestID*/);
                     if (!string.IsNullOrEmpty(id)) eqdata.LatestNote = id;
                     else Log.Warn($"Note投稿できませんでした。\n{Text}");
                     if (!IsExist) EQReplyList.Add(new(eq.Details.OriginTime, eqdata.LatestNote));
@@ -374,7 +410,7 @@ namespace MisakiEQ.Funcs
                         index.Add("");
                         List<string>[] grades = new List<string>[6];
                         for (int i = 0; i < 6; i++) grades[i] = new();
-                        foreach(var area in tsunami.Areas)
+                        foreach (var area in tsunami.Areas)
                         {
                             switch (area.Grade)
                             {
@@ -466,7 +502,7 @@ namespace MisakiEQ.Funcs
                     {
                         TweetList[i] += "#MisakiEQ #津波";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
-                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i], Lib.Misskey.Setting.Visibility.Public,""/*Latest*/);
+                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i], Lib.Misskey.Setting.Visibility.Public, ""/*Latest*/);
                         Log.Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
                     }
                 }
@@ -512,7 +548,7 @@ namespace MisakiEQ.Funcs
                     {
                         TweetList[i] += "#MisakiEQ #Jアラート";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
-                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i],Lib.Misskey.Setting.Visibility.Public, ""/*Latest*/);
+                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i], Lib.Misskey.Setting.Visibility.Public, ""/*Latest*/);
                         Log.Debug($"Misskeyにノートを投稿しました。 ID:{Latest}");
                     }
                 }

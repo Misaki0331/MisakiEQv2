@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             geoMap1 = new LiveCharts.WinForms.GeoMap();
+            timer1 = new System.Windows.Forms.Timer();
             SuspendLayout();
             // 
             // geoMap1
@@ -53,11 +54,17 @@
             Name = "Map";
             Text = "Map";
             FormClosed += Map_FormClosed;
+            //
+            // timer1
+            //
+            timer1.Interval = 500;
+            timer1.Tick += Map_Timer;
             ResumeLayout(false);
         }
 
         #endregion
 
         private LiveCharts.WinForms.GeoMap geoMap1;
+        private System.Windows.Forms.Timer timer1;
     }
 }
