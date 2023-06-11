@@ -1,5 +1,6 @@
 ﻿using KyoshinMonitorLib.ApiResult.WebApi;
 using MisakiEQ;
+using MisakiEQ.Background.API;
 using MisakiEQ.Struct;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,8 @@ namespace MisakiEQ.Funcs
                     case Struct.EEW.InfomationLevel.Forecast:
                         content.embeds[0].color = 0x0000ff;
                         content.embeds[0].title = $"🔵緊急地震速報(予報) {(eew.Serial.IsFinal ? "最終報" : $"第 {eew.Serial.Number} 報")}";
-                        content.embeds[0].description = $"震源地 : {eew.EarthQuake.Hypocenter} 深さ : {Struct.Common.DepthToString(eew.EarthQuake.Depth)}\n" +
+                        content.embeds[0].description = $"{eew.EarthQuake.Hypocenter}\n" +
+                            $"深さ : {Struct.Common.DepthToString(eew.EarthQuake.Depth)} " +
                             $"地震の規模 : Ｍ{eew.EarthQuake.Magnitude:0.0}  最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}";
 
                         content.embeds[0].fields.Add(new()
@@ -48,7 +50,7 @@ namespace MisakiEQ.Funcs
                         content.embeds[0].fields.Add(new()
                         {
                             name = "発生時刻",
-                            value = $"{(eew.EarthQuake.OriginTime != DateTime.MinValue ? "不明" : $"{eew.EarthQuake.OriginTime:MM/dd HH:mm:ss}")}",
+                            value = $"{(eew.EarthQuake.OriginTime == DateTime.MinValue ? "不明" : $"{eew.EarthQuake.OriginTime:MM/dd HH:mm:ss}")}",
                             inline = true
                         });
 
@@ -149,7 +151,7 @@ namespace MisakiEQ.Funcs
                         content.embeds[0].fields.Add(new()
                         {
                             name = "震源の深さ",
-                            value = $"{eq.Details.Hypocenter}",
+                            value = $"{Struct.Common.DepthToString(eq.Details.Depth)}",
                             inline = true
                         });
                         content.embeds[0].fields.Add(new()
@@ -177,7 +179,7 @@ namespace MisakiEQ.Funcs
                         content.embeds[0].fields.Add(new()
                         {
                             name = "震源の深さ",
-                            value = $"{eq.Details.Hypocenter}",
+                            value = $"{Struct.Common.DepthToString(eq.Details.Depth)}",
                             inline = true
                         });
                         content.embeds[0].fields.Add(new()
@@ -212,7 +214,7 @@ namespace MisakiEQ.Funcs
                         content.embeds[0].fields.Add(new()
                         {
                             name = "震源の深さ",
-                            value = $"{eq.Details.Hypocenter}",
+                            value = $"{Struct.Common.DepthToString(eq.Details.Depth)}",
                             inline = true
                         });
                         content.embeds[0].fields.Add(new()
@@ -259,11 +261,12 @@ namespace MisakiEQ.Funcs
                             string areastr = "";
                             foreach (var areaPoint in area) {
                                 areastr += $"{areaPoint.Area.Name} ";
-                            }
+                            }                  
                             areastr = areastr.Trim();
+                            if (string.IsNullOrWhiteSpace(areastr))continue;
                             content.embeds[0].fields.Add(new()
                             {
-                                name = $"震度{Common.IntToStringLong(eq.Details.MaxIntensity)} の地域",
+                                name = $"震度{Struct.Common.IntToStringLong(intensity)}",
                                 value = areastr
                             });
                         }
