@@ -258,12 +258,12 @@ namespace MisakiEQ.Funcs
                         {
                             var area = eq.Details.localAreaPoints.FindAll(eq => eq.Intensity == intensity);
                             if (area == null) continue;
+                            if (area.Count == 0) continue;
                             string areastr = "";
                             foreach (var areaPoint in area) {
                                 areastr += $"{areaPoint.Area.Name} ";
                             }                  
                             areastr = areastr.Trim();
-                            if (string.IsNullOrWhiteSpace(areastr))continue;
                             content.embeds[0].fields.Add(new()
                             {
                                 name = $"震度{Struct.Common.IntToStringLong(intensity)}",
