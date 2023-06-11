@@ -12,6 +12,8 @@ using System.Windows.Forms;
 using System.Web;
 using System.Management;
 using System.IO;
+using MisakiEQ;
+
 namespace MisakiEQ.GUI.ErrorInfo
 {
     public partial class UnhandledException : Form
@@ -106,13 +108,13 @@ namespace MisakiEQ.GUI.ErrorInfo
                 writer.WriteLine($"OS : {(Environment.Is64BitOperatingSystem ? "64ビット" : "32ビット")} プロセッサ : {(Environment.Is64BitProcess ? "64ビット" : "32ビット")}");
                 writer.WriteLine($"システム起動時間 : {TimeSpan.FromMilliseconds(Environment.TickCount64)}");
                 writer.Close();
-                Log.Instance.Info($"「{save}」にクラッシュレポートを保存しました。");
+                Log.Info($"「{save}」にクラッシュレポートを保存しました。");
                 return save;
             }
             catch(Exception ex)
             {
-                Log.Instance.Error("クラッシュレポートの保存に失敗しました。");
-                Log.Instance.Error(ex);
+                Log.Error("クラッシュレポートの保存に失敗しました。");
+                Log.Error(ex);
                 return String.Empty;
             }
 
@@ -131,7 +133,7 @@ namespace MisakiEQ.GUI.ErrorInfo
                 if (ErrCnt > 4) ErrorInfomation.ForeColor = System.Drawing.Color.Red;
                 label2.Text = "特定の手順で発生する場合は開発者にご報告ください。";
             }
-            if (CrashMethod == "Void CauseException()")
+            if (string.Equals(CrashMethod,"Void CauseException()"))
             {
                 ErrorInfomation.Text = "MisakiEQを意図的にクラッシュさせました。";
                 ErrorInfomation.ForeColor = System.Drawing.Color.Black;
@@ -146,14 +148,14 @@ namespace MisakiEQ.GUI.ErrorInfo
             {
                 RestartTimer.Stop();
                 RestartMassage.Text = "繰り返し動作が停止しましたので自動再起動は無効になりました。";
-                Log.Instance.Error("強制終了が複数回検出された為自動再起動は無効になりました。");
+                Log.Error("強制終了が複数回検出された為自動再起動は無効になりました。");
             }
             GetString();
         }
         private void button1_Click(object sender, EventArgs e)
         {
             string UserReportStr = string.Join("\n", UserReport.Text);
-            if (UserReport.Text == "") UserReportStr = "[未入力]\n";
+            if (string.IsNullOrEmpty(UserReport.Text)) UserReportStr = "[未入力]\n";
             string link = HttpUtility.UrlEncode($"----------ユーザー報告----------\n"
                     + $"{UserReportStr}\n"
                     + $"----------エラーの内容----------\n"
@@ -168,20 +170,20 @@ namespace MisakiEQ.GUI.ErrorInfo
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Log.Instance.Info("STOP!");
+            Log.Info("STOP!");
             Environment.Exit(-1);
         }
 
         private void ExceptionMassage_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Log.Instance.Info("STOP!");
+            Log.Info("STOP!");
             Environment.Exit(-1);
         }
 
         private void RestartButton_Click(object sender, EventArgs e)
         {
             ErrCnt++;
-            Log.Instance.Info("RESTART!");
+            Log.Info("RESTART!");
             System.Diagnostics.Process.Start(Application.ExecutablePath, "ErrorFlg=" + ErrCnt.ToString());
             Environment.Exit(-1);
         }
@@ -200,7 +202,7 @@ namespace MisakiEQ.GUI.ErrorInfo
             {
                 ErrCnt++;
                 System.Diagnostics.Process.Start(Application.ExecutablePath, "ErrorFlg=" + ErrCnt.ToString());
-                Log.Instance.Info("TRIGGER RESTART!");
+                Log.Info("TRIGGER RESTART!");
                 Environment.Exit(-1);
             }
             RestartMassage.Text = "MisakiEQは " + RestartTimerCount.ToString() + " 秒後、自動的に再起動します。";

@@ -5,13 +5,13 @@ namespace MisakiEQ.Background
     internal class APIs
     {
         static APIs? singleton = null;
-        public static APIs GetInstance()
+        public static APIs Instance
         {
-            if (singleton == null)
+            get
             {
-                singleton = new APIs();
+                singleton ??= new APIs();
+                return singleton;
             }
-            return singleton;
         }
         private APIs()
         {

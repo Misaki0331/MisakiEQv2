@@ -90,7 +90,7 @@ namespace MisakiEQ.GUI.ExApp
         {
             if (Visible)
             {
-                Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin += KyoshinEvent;
+                Background.APIs.Instance.KyoshinAPI.UpdatedKyoshin += KyoshinEvent;
                 UpdateTimer.Start();
 
                 double shindo = await Background.API.KyoshinAPI.KyoshinAPI.GetUserRawIntensity();
@@ -98,7 +98,7 @@ namespace MisakiEQ.GUI.ExApp
             }
             else
             {
-                Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin -= KyoshinEvent;
+                Background.APIs.Instance.KyoshinAPI.UpdatedKyoshin -= KyoshinEvent;
                 UpdateTimer.Stop();
             }
         }

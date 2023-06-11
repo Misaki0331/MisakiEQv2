@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MisakiEQ;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -40,13 +41,13 @@ namespace MisakiEQ.Background.API
         {
             if (Threads == null || Threads.Status != TaskStatus.Running)
             {
-                Log.Instance.Debug("スレッド開始の準備を開始します。");
+                Log.Debug("スレッド開始の準備を開始します。");
                 TSW.Restart();
                 Threads = Task.Run(() => ThreadFunction(CancelToken));
             }
             else
             {
-                Log.Instance.Error("該当スレッドは動作中の為、起動ができませんでした。");
+                Log.Error("該当スレッドは動作中の為、起動ができませんでした。");
             }
 
         }
@@ -57,7 +58,7 @@ namespace MisakiEQ.Background.API
         }*/
         public async Task AbortAndWait()
         {
-            Log.Instance.Debug("スレッドを終了しています...");
+            Log.Debug("スレッドを終了しています...");
             CancelTokenSource.Cancel();
             if (Threads != null && !Threads.IsCompleted) await Threads;
         }
@@ -75,7 +76,7 @@ namespace MisakiEQ.Background.API
 
         private async Task ThreadFunction(CancellationToken token)
         {
-            Log.Instance.Info("スレッド開始");
+            Log.Info("スレッド開始");
             var looping = true;
             while (looping) 
             {
@@ -88,7 +89,7 @@ namespace MisakiEQ.Background.API
                     case APIServer.Dmdata:
                         if (!DMData.Init())
                         {
-                            Log.Instance.Warn("トークンがセットできない為他のAPIを使用します。");
+                            Log.Warn("トークンがセットできない為他のAPIを使用します。");
                             CurrentAPI=APIServer.OldAPI;
                             looping = true;
                             continue;
@@ -99,11 +100,11 @@ namespace MisakiEQ.Background.API
                         DMData.APIClose();
                         break;
                     default:
-                        Log.Instance.Error("目的のAPIが存在しません");
+                        Log.Error("目的のAPIが存在しません");
                         break;
                 }
             }
-            Log.Instance.Info("スレッド終了");
+            Log.Info("スレッド終了");
         }
         public void GetEvent(object? sender, EEWEventArgs e)
         {
@@ -118,13 +119,13 @@ namespace MisakiEQ.Background.API
                 }
                 else
                 {
-                    Log.Instance.Info("地震イベントを再連携します。");
+                    Log.Info("地震イベントを再連携します。");
                     try
                     {
                         GUI.TrayHub.GetInstance()?.ResetEventEEW();
                     }catch(Exception ex)
                     {
-                        Log.Instance.Error(ex);
+                        Log.Error(ex);
                     }
                 }
             }
@@ -134,13 +135,13 @@ namespace MisakiEQ.Background.API
             switch (CurrentAPI)
             {
                 case APIServer.OldAPI:
-                    Log.Instance.Debug("OldAPI");
+                    Log.Debug("OldAPI");
                     return OldAPI.GetData(from);
                 case APIServer.Dmdata:
-                    Log.Instance.Debug("DMDATA");
+                    Log.Debug("DMDATA");
                     return DMData.GetEEW();
                 default:
-                    Log.Instance.Error("目的のAPIが存在しません");
+                    Log.Error("目的のAPIが存在しません");
                     from = new();
                     return from;
             }

@@ -1,4 +1,5 @@
 ﻿using KyoshinMonitorLib.ApiResult.WebApi;
+using MisakiEQ;
 using MisakiEQ.Background.API;
 using MisakiEQ.Struct;
 using System;
@@ -20,7 +21,7 @@ namespace MisakiEQ.Funcs
                 var token = Lib.Discord.WebHooks.Main.TokenData;
                 if (token == null)
                 {
-                    Log.Instance.Warn("トークンが設定されていない為送信できませんでした。");
+                    Log.Warn("トークンが設定されていない為送信できませんでした。");
                     return false;
                 }
                 var content = new Lib.Discord.WebHooks.Main.Content();
@@ -40,7 +41,6 @@ namespace MisakiEQ.Funcs
                             name = "震源の場所",
                             value = $"{eew.EarthQuake.Hypocenter} ({eew.EarthQuake.Location.Long:0.0}E {eew.EarthQuake.Location.Lat:0.0}N) 深さ:{Struct.Common.DepthToString(eew.EarthQuake.Depth)}"
                         });
-
                         content.embeds[0].fields.Add(new()
                         {
                             name = "発表時刻",
@@ -59,20 +59,19 @@ namespace MisakiEQ.Funcs
 
                         content.embeds[0].color = 0xff0000;
                         content.embeds[0].title = $"\u26A0\uFE0F緊急地震速報(警報) {(eew.Serial.IsFinal ? "最終報" : $"第 {eew.Serial.Number} 報")}";
-                        content.embeds[0].description = $"{eew.EarthQuake.Hypocenter}\n" +
-                            $"深さ : {Struct.Common.DepthToString(eew.EarthQuake.Depth)} " +
-                            $"地震の規模 : Ｍ{eew.EarthQuake.Magnitude:0.0}  最大震度 : {Struct.Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n" +
+                        content.embeds[0].description = $"震源地 : {eew.EarthQuake.Hypocenter}\n" +
+                            $"地震の規模 : Ｍ{eew.EarthQuake.Magnitude:0.0}  最大震度 : {Common.IntToStringLong(eew.EarthQuake.MaxIntensity)}\n" +
                             $"\u26A0\uFE0F対象地域：";
                         foreach (var area in eew.EarthQuake.ForecastArea.LocalAreas) content.embeds[0].description += $"{LocalAreasToStr(area)} ";
                         content.embeds[0].fields.Add(new()
                         {
                             name = "震源の場所",
-                            value = $"**{eew.EarthQuake.Hypocenter}** ({eew.EarthQuake.Location.Long:0.0}E {eew.EarthQuake.Location.Lat:0.0}N) 深さ:{Struct.Common.DepthToString(eew.EarthQuake.Depth)}"
+                            value = $"**{eew.EarthQuake.Hypocenter}** ({eew.EarthQuake.Location.Long:0.0}E {eew.EarthQuake.Location.Lat:0.0}N) 深さ:{Common.DepthToString(eew.EarthQuake.Depth)}"
                         });
                         var TweetIndex = "";
                         for (int i = 0; i < eew.AreasInfo.Count; i++)
                         {
-                            string intensity = $"**震度{Struct.Common.IntToStringLong(eew.AreasInfo[i].Intensity).PadRight(2, 't').Replace("t", "  ")} ";
+                            string intensity = $"**震度{Common.IntToStringLong(eew.AreasInfo[i].Intensity).PadRight(2, 't').Replace("t", "  ")} ";
                             TweetIndex += $"{intensity}{(eew.AreasInfo[i].ExpectedArrival == DateTime.MinValue ? "到達済み" : $"{eew.AreasInfo[i].ExpectedArrival:HH:mm:ss}")}** {eew.AreasInfo[i].Name}";
                             if (TweetIndex.Length > 2000 || eew.AreasInfo.Count - 1 == i) break;
                             TweetIndex += "\n";
@@ -100,7 +99,6 @@ namespace MisakiEQ.Funcs
                         content.embeds[0].color = 0x00ff00;
                         content.embeds[0].title = $"🟢緊急地震速報(取消)";
                         content.embeds[0].description = $"この緊急地震速報はキャンセルされました。";
-
                         content.embeds[0].fields.Add(new()
                         {
                             name = "発表時刻",
@@ -113,23 +111,23 @@ namespace MisakiEQ.Funcs
                 }
                 content.embeds[0].timestamp = eew.Serial.UpdateTime.AddHours(-9);
                 Lib.Discord.WebHooks.Main.Sent(token, content);
-                Log.Instance.Debug("送信完了");
+                Log.Debug("送信完了");
 
             } catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return false;
             }
             return true;
         }
-        public static bool Earthquake(Struct.EarthQuake eq)
+        public static bool Earthquake(EarthQuake eq)
         {
             try
             {
                 var token = Lib.Discord.WebHooks.Main.TokenData;
                 if (token == null)
                 {
-                    Log.Instance.Warn("トークンが設定されていない為送信できませんでした。");
+                    Log.Warn("トークンが設定されていない為送信できませんでした。");
                     return false;
                 }
                 var content = new Lib.Discord.WebHooks.Main.Content();
@@ -137,12 +135,12 @@ namespace MisakiEQ.Funcs
                 content.embeds.Add(new());
                 switch (eq.Issue.Type)
                 {
-                    case Struct.EarthQuake.EarthQuakeType.ScalePrompt:
+                    case EarthQuake.EarthQuakeType.ScalePrompt:
                         content.embeds[0].title = $"震度速報 - {eq.Details.OriginTime:M/dd H:mm}頃";
-                        content.embeds[0].description = $"最大震度{Struct.Common.IntToStringLong(eq.Details.MaxIntensity)}を観測する地震が発生しました。";
+                        content.embeds[0].description = $"最大震度{Common.IntToStringLong(eq.Details.MaxIntensity)}を観測する地震が発生しました。";
                         content.embeds[0].color = 0xFFFF00;
                         break;
-                    case Struct.EarthQuake.EarthQuakeType.Destination:
+                    case EarthQuake.EarthQuakeType.Destination:
                         content.embeds[0].title = $"震源情報 - {eq.Details.OriginTime:M/dd H:mm}頃";
                         content.embeds[0].fields.Add(new()
                         {
@@ -165,12 +163,12 @@ namespace MisakiEQ.Funcs
                         content.embeds[0].fields.Add(new()
                         {
                             name = "情報",
-                            value = $"この地震による{Struct.EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}",
+                            value = $"この地震による{EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}",
                             inline = false
                         });
                         content.embeds[0].color = 0xFFFF00;
                         break;
-                    case Struct.EarthQuake.EarthQuakeType.ScaleAndDestination:
+                    case EarthQuake.EarthQuakeType.ScaleAndDestination:
                         content.embeds[0].title = $"震度&震源情報 - {eq.Details.OriginTime:M/dd H:mm}頃";
                         content.embeds[0].fields.Add(new()
                         {
@@ -200,12 +198,12 @@ namespace MisakiEQ.Funcs
                         content.embeds[0].fields.Add(new()
                         {
                             name = "情報",
-                            value = $"この地震による{Struct.EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}",
+                            value = $"この地震による{EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}",
                             inline = false
                         });
                         content.embeds[0].color = 0xFFFF00;
                         break;
-                    case Struct.EarthQuake.EarthQuakeType.DetailScale:
+                    case EarthQuake.EarthQuakeType.DetailScale:
                         content.embeds[0].title = $"詳細情報 - {eq.Details.OriginTime:M/dd H:mm}頃";
                         content.embeds[0].fields.Add(new()
                         {
@@ -234,7 +232,7 @@ namespace MisakiEQ.Funcs
                         content.embeds[0].fields.Add(new()
                         {
                             name = "情報",
-                            value = $"この地震による{Struct.EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}",
+                            value = $"この地震による{EarthQuake.DomesticToString(eq.Details.DomesticTsunami)}",
                             inline = false
                         });
                         content.embeds[0].color = 0x0000FF;
@@ -242,19 +240,19 @@ namespace MisakiEQ.Funcs
                     default:
                         return false;
                 }
-                if (eq.Issue.Type == Struct.EarthQuake.EarthQuakeType.ScalePrompt ||
-                       eq.Issue.Type == Struct.EarthQuake.EarthQuakeType.ScaleAndDestination ||
-                       eq.Issue.Type == Struct.EarthQuake.EarthQuakeType.DetailScale)
+                if (eq.Issue.Type == EarthQuake.EarthQuakeType.ScalePrompt ||
+                       eq.Issue.Type == EarthQuake.EarthQuakeType.ScaleAndDestination ||
+                       eq.Issue.Type == EarthQuake.EarthQuakeType.DetailScale)
                 {
                     if (eq.Details.localAreaPoints.Count > 0)
                     {
-                        var loop = new List<Struct.Common.Intensity>()
+                        var loop = new List<Common.Intensity>()
                         {
-                            Struct.Common.Intensity.Int7,
-                            Struct.Common.Intensity.Int6Up, Struct.Common.Intensity.Int6Down ,
-                            Struct.Common.Intensity.Int5Up, Struct.Common.Intensity.Int5Down , Struct.Common.Intensity.Int5Over,
-                            Struct.Common.Intensity.Int4, Struct.Common.Intensity.Int3,
-                            Struct.Common.Intensity.Int2, Struct.Common.Intensity.Int1,
+                            Common.Intensity.Int7,
+                            Common.Intensity.Int6Up, Common.Intensity.Int6Down ,
+                            Common.Intensity.Int5Up, Common.Intensity.Int5Down , Common.Intensity.Int5Over,
+                            Common.Intensity.Int4,  Common.Intensity.Int3,
+                            Common.Intensity.Int2, Common.Intensity.Int1,
                         };
                         foreach (var intensity in loop)
                         {
@@ -278,24 +276,24 @@ namespace MisakiEQ.Funcs
 
                 content.embeds[0].timestamp = eq.CreatedAt.AddHours(-9);
                 Lib.Discord.WebHooks.Main.Sent(token, content);
-                Log.Instance.Debug("送信完了");
+                Log.Debug("送信完了");
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return false;
             }
             return true;
         }
 
-        public static bool Tsunami(Struct.Tsunami tsunami)
+        public static bool Tsunami(Tsunami tsunami)
         {
             try
             {
                 var token = Lib.Discord.WebHooks.Main.TokenData;
                 if (token == null)
                 {
-                    Log.Instance.Warn("トークンが設定されていない為送信できませんでした。");
+                    Log.Warn("トークンが設定されていない為送信できませんでした。");
                     return false;
                 }
                 var content = new Lib.Discord.WebHooks.Main.Content();
@@ -370,11 +368,11 @@ namespace MisakiEQ.Funcs
 
                 content.embeds[0].timestamp = tsunami.CreatedAt.AddHours(-9);
                 Lib.Discord.WebHooks.Main.Sent(token, content);
-                Log.Instance.Debug("送信完了");
+                Log.Debug("送信完了");
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return false;
             }
             return true;
@@ -386,7 +384,7 @@ namespace MisakiEQ.Funcs
                 var token = Lib.Discord.WebHooks.Main.TokenData;
                 if (token == null)
                 {
-                    Log.Instance.Warn("トークンが設定されていない為送信できませんでした。");
+                    Log.Warn("トークンが設定されていない為送信できませんでした。");
                     return false;
                 }
                 var content = new Lib.Discord.WebHooks.Main.Content();
@@ -418,11 +416,11 @@ namespace MisakiEQ.Funcs
                 content.embeds[0].color = 0xFF0000;
 
                 Lib.Discord.WebHooks.Main.Sent(token, content);
-                Log.Instance.Debug("送信完了");
+                Log.Debug("送信完了");
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return false;
             }
             return true;

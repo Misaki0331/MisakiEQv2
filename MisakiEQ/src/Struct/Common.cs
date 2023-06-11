@@ -118,7 +118,7 @@ namespace MisakiEQ.Struct
             }
             else
             {
-                Log.Instance.Warn($"DateTime型への変換に失敗しました。 値 = \"{str}\"");
+                Log.Warn($"DateTime型への変換に失敗しました。 値 = \"{str}\"");
                 return DateTime.MinValue;
             }
         }

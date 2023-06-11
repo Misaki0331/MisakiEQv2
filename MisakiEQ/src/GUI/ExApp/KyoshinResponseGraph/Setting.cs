@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MisakiEQ;
 
 namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
 {
@@ -58,11 +59,11 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                 writer.WriteLine($"WindowH={WindowH}");
                 writer.Close();
                 CurrentNum = (int)numericUpDown1.Value;
-                Log.Instance.Debug($"No.{(int)numericUpDown1.Value}のメモリを書き込みました。");
+                Log.Debug($"No.{(int)numericUpDown1.Value}のメモリを書き込みました。");
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
             }
         }
         private void CheckBoxTextChanging(object sender, EventArgs e)
@@ -187,22 +188,22 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                                     comboBox1.SelectedIndex = c;
                                 break;
                             case "Check1":
-                                if (cmd[1] == "1") checkBox1.Checked = true;
+                                if (string.Equals(cmd[1],"1")) checkBox1.Checked = true;
                                 break;
                             case "Check2":
-                                if (cmd[1] == "1") checkBox2.Checked = true;
+                                if (string.Equals(cmd[1],"1")) checkBox2.Checked = true;
                                 break;
                             case "Check3":
-                                if (cmd[1] == "1") checkBox3.Checked = true;
+                                if (string.Equals(cmd[1], "1")) checkBox3.Checked = true;
                                 break;
                             case "Check4":
-                                if (cmd[1] == "1") checkBox4.Checked = true;
+                                if (string.Equals(cmd[1], "1")) checkBox4.Checked = true;
                                 break;
                             case "MaxValue":
-                                if (cmd[1] == "1") checkBox5.Checked = true;
+                                if (string.Equals(cmd[1], "1")) checkBox5.Checked = true;
                                 break;
                             case "Linear":
-                                if (cmd[1] == "1") checkBox6.Checked = true;
+                                if (string.Equals(cmd[1], "1")) checkBox6.Checked = true;
                                 break;
                             case "WindowX":
                                 if(int.TryParse(cmd[1], out int data))WindowX=data;
@@ -225,7 +226,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
                     }
                     CurrentNum = ConfigNum;
                     reader.Close();
-                    Log.Instance.Debug($"No.{ConfigNum}のメモリを読み込みました。");
+                    Log.Debug($"No.{ConfigNum}のメモリを読み込みました。");
                 }
                 else
                 {
@@ -245,7 +246,7 @@ namespace MisakiEQ.GUI.ExApp.KyoshinGraphWindow
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
             }
         }
         bool IsWillClose = false;

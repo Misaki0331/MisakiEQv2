@@ -39,7 +39,7 @@ namespace MisakiEQ.Struct
                 return di / 1000.0;//km換算
             }catch(Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return double.NaN;
             }
         }
@@ -55,7 +55,7 @@ namespace MisakiEQ.Struct
         public static EEW GetData(Background.API.EEW.OLD.JSON.Root Data, EEW? from = null)
         {
             if (Data == null) throw new ArgumentNullException(nameof(Data), "Jsonデータがnullです。");
-            if (from == null) from = new EEW();
+            from ??= new EEW();
             if (Data.Hypocenter != null)
             {
                 from.EarthQuake.Depth = Data.Hypocenter.Location.Depth.Int;
@@ -79,23 +79,23 @@ namespace MisakiEQ.Struct
                 case "00":
                     if (Data.Warn)
                     {
-                        from.Serial.Infomation = Struct.EEW.InfomationLevel.Warning;
+                        from.Serial.Infomation = InfomationLevel.Warning;
                     }
                     else
                     {
-                        from.Serial.Infomation = Struct.EEW.InfomationLevel.Forecast;
+                        from.Serial.Infomation = InfomationLevel.Forecast;
                     }
                     break;
                 case "01":
                 case "20":
                 case "30":
-                    from.Serial.Infomation = Struct.EEW.InfomationLevel.Test;
+                    from.Serial.Infomation = InfomationLevel.Test;
                     break;
                 case "10":
-                    from.Serial.Infomation = Struct.EEW.InfomationLevel.Cancelled;
+                    from.Serial.Infomation = InfomationLevel.Cancelled;
                     break;
                 case "11":
-                    from.Serial.Infomation = Struct.EEW.InfomationLevel.CancelledTest;
+                    from.Serial.Infomation = InfomationLevel.CancelledTest;
                     break;
             }
             from.Serial.EventID = Data.EventID;
@@ -116,7 +116,7 @@ namespace MisakiEQ.Struct
         public static EEW GetData(Background.API.KyoshinAPI.EEW.JSON.Root Data, EEW? from = null)
         {
             if (Data == null) throw new ArgumentNullException(nameof(Data), "Jsonデータがnullです。");
-            if (from == null) from = new EEW();
+            from ??= new EEW();
             switch (Data.Alertflg)
             {
                 case null:

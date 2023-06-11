@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MisakiEQ;
 
 namespace MisakiEQ.GUI.Sub
 {
@@ -24,10 +25,10 @@ namespace MisakiEQ.GUI.Sub
 
         private async void AuthDmdata_Load(object sender, EventArgs e)
         {
-            string? token = await Background.APIs.GetInstance().EEW.DMData.Authentication(cancel.Token);
+            string? token = await Background.APIs.Instance.EEW.DMData.Authentication(cancel.Token);
             if(token == null)
             {
-                Log.Instance.Warn("トークンの取得に失敗しました。");
+                Log.Warn("トークンの取得に失敗しました。");
                 Text = "認証失敗";
                 label1.ForeColor = Color.Red;
                 label1.Text = "トークンの取得に失敗しました。";
@@ -46,7 +47,7 @@ namespace MisakiEQ.GUI.Sub
                 }
                 catch(Exception ex)
                 {
-                    Log.Instance.Error(ex);
+                    Log.Error(ex);
                     Text = "認証データ保存失敗";
                     label1.ForeColor = Color.Red;
                     label1.Text = $"リフレッシュトークンの保存に失敗しました。\n{ex.Message}";

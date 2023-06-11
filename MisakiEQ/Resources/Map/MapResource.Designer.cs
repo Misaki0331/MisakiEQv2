@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MisakiEQ.Properties {
+namespace MisakiEQ.Resources.Map {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace MisakiEQ.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Version {
+    internal class MapResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Version() {
+        internal MapResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace MisakiEQ.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MisakiEQ.Properties.Version", typeof(Version).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MisakiEQ.Resources.Map.MapResource", typeof(MapResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,20 +61,26 @@ namespace MisakiEQ.Properties {
         }
         
         /// <summary>
-        ///    に類似しているローカライズされた文字列を検索します。
+        ///   &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;!--
+        ///	(c) lvcharts.net
+        ///	Map Version 1.0
+        ///
+        ///	This work is licensed under a Creative Commons
+        ///	Attribution-NonCommercial-ShareAlike 4.0 International License
+        ///	https://creativecommons.org/licenses/by-nc-sa/4.0/
+        ///--&gt;
+        ///&lt;LiveChartsMap xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;Height&gt;2946&lt;/Height&gt;
+        ///  &lt;Width&gt;3456&lt;/Width&gt;
+        ///  &lt;Shapes&gt;
+        ///    &lt;MapShape&gt;
+        ///      &lt;Id&gt;3687&lt;/Id&gt;
+        ///      &lt;Path&gt;M603,1941L603,1942L602,1942L60 [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string Help {
+        internal static string Japan {
             get {
-                return ResourceManager.GetString("Help", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   MisakiEQ a2.6.1 に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string Name {
-            get {
-                return ResourceManager.GetString("Name", resourceCulture);
+                return ResourceManager.GetString("Japan", resourceCulture);
             }
         }
     }

@@ -11,37 +11,15 @@ namespace MisakiEQ.Lib
 {
     internal static class WebAPI
     {
-
-
         public static async Task<byte[]> GetBytes(string URL,CancellationToken? token = null)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(URL))
-                    throw new ArgumentException("ダウンロード先のURLが指定されていません。");
+                if (string.IsNullOrWhiteSpace(URL)) throw new ArgumentException("ダウンロード先のURLが指定されていません。");
+                if (!Uri.IsWellFormedUriString(URL, UriKind.Absolute)) throw new ArgumentException("ダウンロード先のURLのリンクが不正です。");
                 using HttpClient webClient = new();
-                Task<byte[]> stream;
-                if (token != null)
-                {
-                    stream = webClient.GetByteArrayAsync(new Uri(URL), (CancellationToken)token);
-                }
-                else
-                {
-                    stream = webClient.GetByteArrayAsync(new Uri(URL));
-                }
-                await stream;
-                if (stream.IsFaulted)
-                {
-                    if (stream.Exception != null)
-                    {
-                        throw stream.Exception;
-                    }
-                    else
-                    {
-                        throw new ArgumentException("例外エラーが発生しましたが、例外は返されませんでした。");
-                    }
-                }
-                return stream.Result;
+                var stream = await webClient.GetByteArrayAsync(new Uri(URL), (CancellationToken)(token != null ? token : CancellationToken.None));
+                return stream;
             }
             catch (HttpRequestException ex)
             {
@@ -49,12 +27,12 @@ namespace MisakiEQ.Lib
             }
             catch (TaskCanceledException ex)
             {
-                Log.Instance.Info("タスクが取り消されました。");
+                Log.Warn("タスクが取り消されました。");
                 throw ex;
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 await Task.FromException<string>(ex);
                 return Array.Empty<byte>();
             }
@@ -63,31 +41,11 @@ namespace MisakiEQ.Lib
         {
             try
             {
-                if (URL == "")
-                    throw new ArgumentException("ダウンロード先のURLが指定されていません。");
+                if (string.IsNullOrWhiteSpace(URL)) throw new ArgumentException("ダウンロード先のURLが指定されていません。");
+                if (!Uri.IsWellFormedUriString(URL, UriKind.Absolute)) throw new ArgumentException("ダウンロード先のURLのリンクが不正です。");
                 using HttpClient webClient = new();
-                Task<string> stream;
-                if (token != null)
-                {
-                    stream = webClient.GetStringAsync(new Uri(URL), (CancellationToken)token);
-                }
-                else
-                {
-                    stream = webClient.GetStringAsync(new Uri(URL));
-                }
-                await stream;
-                if (stream.IsFaulted)
-                {
-                    if (stream.Exception != null)
-                    {
-                        throw stream.Exception;
-                    }
-                    else
-                    {
-                        throw new ArgumentException("例外エラーが発生しましたが、例外は返されませんでした。");
-                    }
-                }
-                return stream.Result;
+                var stream = await webClient.GetStringAsync(new Uri(URL), (CancellationToken)(token != null ? token : CancellationToken.None));
+                return stream;
             }
             catch (HttpRequestException ex)
             {
@@ -95,12 +53,12 @@ namespace MisakiEQ.Lib
             }
             catch (TaskCanceledException ex)
             {
-                Log.Instance.Info("タスクが取り消されました。");
+                Log.Warn("タスクが取り消されました。");
                 throw ex;
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 await Task.FromException<string>(ex);
                 return string.Empty;
             }
@@ -108,29 +66,17 @@ namespace MisakiEQ.Lib
 
         public static async Task<string> PostJson(string URL, string json, CancellationToken? token = null)
         {
-            Log.Instance.Debug(URL);
-            Log.Instance.Debug(json);
             try
             {
-                if (URL == "")
-                    throw new ArgumentException("アップロード先のURLが指定されていません。");
-                if (json == "")
-                    throw new ArgumentException("アップロードするjsonが指定されていません。");
+                if (string.IsNullOrWhiteSpace(URL)) throw new ArgumentException("ダウンロード先のURLが指定されていません。");
+                if (!Uri.IsWellFormedUriString(URL, UriKind.Absolute)) throw new ArgumentException("ダウンロード先のURLのリンクが不正です。");
+                if(string.IsNullOrWhiteSpace(json)) throw new ArgumentException("アップロードするjsonが指定されていません。");
                 using HttpClient webClient = new();
-                HttpResponseMessage stream;
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-                if (token != null)
-                {
-                    stream = await webClient.PostAsync(new Uri(URL), content, (CancellationToken)token);
-                }
-                else
-                {
-                    stream = await webClient.PostAsync(new Uri(URL), content);
-
-                }
+                var stream = await webClient.PostAsync(new Uri(URL), content, (CancellationToken)(token != null ? token : CancellationToken.None)); 
                 var text = await stream.Content.ReadAsStringAsync();
-                Log.Instance.Debug(text);
-                if (text == null) return "";
+                Log.Debug($"PostJson:{new Uri(URL).Host} - {(int)stream.StatusCode}({stream.StatusCode})");
+                if (string.IsNullOrEmpty(text)) return string.Empty;
                 return text;
             }
             catch (HttpRequestException ex)
@@ -139,12 +85,12 @@ namespace MisakiEQ.Lib
             }
             catch (TaskCanceledException ex)
             {
-                Log.Instance.Info("タスクが取り消されました。");
+                Log.Warn("タスクが取り消されました。");
                 throw ex;
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 await Task.FromException<string>(ex);
                 return string.Empty;
             }

@@ -21,7 +21,7 @@ namespace MisakiEQ.Lib.Discord.WebHooks
                 token = new(url);
             }catch(Exception e)
             {
-                Log.Instance.Error(e);
+                Log.Error(e);
                 return false;
             }
             return true;

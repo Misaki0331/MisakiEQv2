@@ -1,5 +1,6 @@
 ﻿using MisakiEQ.Lib.Config;
 using MisakiEQ.Lib.Misskey;
+using MisakiEQ;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -67,7 +68,7 @@ namespace MisakiEQ.GUI
                     }
                     catch (Exception ex)
                     {
-                        Log.Instance.Error(ex);
+                        Log.Error(ex);
                     }
                     ((FunctionIndexData)fc).ButtonEnable = true;
                 });
@@ -129,7 +130,7 @@ namespace MisakiEQ.GUI
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
             }
         }
 
@@ -159,8 +160,8 @@ namespace MisakiEQ.GUI
             var uptime = Lib.Config.Funcs.GetInstance().GetConfigClass("AppInfo_Uptime");
             if (uptime != null) uptime.SetValue($"{TrayHub.GetInstance()?.AppTimer.ToString(@"dd\.hh\:mm\:ss")}");
             var usingapi = Lib.Config.Funcs.GetInstance().GetConfigClass("AppInfo_UsingAPI");
-            if (usingapi != null) usingapi.SetValue($"{Background.APIs.GetInstance().EEW.CurrentAPI}");
-            var kyoshin = Background.APIs.GetInstance().KyoshinAPI;
+            if (usingapi != null) usingapi.SetValue($"{Background.APIs.Instance.EEW.CurrentAPI}");
+            var kyoshin = Background.APIs.Instance.KyoshinAPI;
             uptime = Lib.Config.Funcs.GetInstance().GetConfigClass("Kyoshin_Time");
             if (kyoshin.KyoshinLatest.Year > 2000)
             {
@@ -204,14 +205,14 @@ namespace MisakiEQ.GUI
             Stopwatch st = new();
             st.Start();
             SettingTabs.Visible = false;
-            Log.Instance.Debug($"リサイズ開始");
+            Log.Debug($"リサイズ開始");
             tabPage1.AutoScroll = false;
             tabPage1.AutoScrollOffset = new Point(0, 0);
-            Log.Instance.Debug($"再リサイズ中 : {st.Elapsed}");
+            Log.Debug($"再リサイズ中 : {st.Elapsed}");
             SettingTabs.Size = new Size(Width - 7, Height - 121);
             tabPage1.AutoScroll = true;
             st.Stop();
-            Log.Instance.Debug($"リサイズ完了 : {st.Elapsed}");
+            Log.Debug($"リサイズ完了 : {st.Elapsed}");
             SettingTabs.Visible = true;
             SizeChange.Stop();
         }

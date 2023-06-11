@@ -32,7 +32,7 @@ namespace MisakiEQ.GUI.Overlay
             //TopMost = true;
             //LabelIndexText.Location= new(0, 120);
             LabelIndexText.Size = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 290);
-            var data = Background.APIs.GetInstance().Jalert.LatestJAlert;
+            var data = Background.APIs.Instance.Jalert.LatestJAlert;
             LabelTitle.Text=data.Title;
             string str = $"{data.Detail}\n\n対象地域:\n";
             for (int i = 0; i < data.Areas.Count; i++) str += $"{data.Areas[i]} ";

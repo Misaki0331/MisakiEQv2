@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MisakiEQ;
 
 namespace MisakiEQ.GUI.Twitter
 {
@@ -46,7 +47,7 @@ namespace MisakiEQ.GUI.Twitter
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error(ex.Message);
+                    Log.Error(ex.Message);
                 }
             }
             else

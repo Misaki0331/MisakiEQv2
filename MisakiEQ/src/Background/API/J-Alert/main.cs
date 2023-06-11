@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using MisakiEQ;
 
 namespace MisakiEQ.Background.API
 {
@@ -37,25 +38,25 @@ namespace MisakiEQ.Background.API
 
             if (Threads == null || Threads.Status != TaskStatus.Running)
             {
-                Log.Instance.Debug("スレッド開始の準備を開始します。");
+                Log.Debug("スレッド開始の準備を開始します。");
                 TSW.Restart();
                 Threads = Task.Run(() => ThreadFunction(CancelToken));
             }
             else
             {
-                Log.Instance.Error("該当スレッドは動作中の為、起動ができませんでした。");
+                Log.Error("該当スレッドは動作中の為、起動ができませんでした。");
             }
 
         }
         public void AbortThread()
         {
-            Log.Instance.Debug("スレッド破棄の準備を開始します。");
+            Log.Debug("スレッド破棄の準備を開始します。");
             TSW.Stop();
             CancelTokenSource.Cancel();
         }
         public async Task AbortAndWait()
         {
-            Log.Instance.Debug("スレッドを終了しています...");
+            Log.Debug("スレッドを終了しています...");
             CancelTokenSource.Cancel();
             if (Threads != null && !Threads.IsCompleted) await Threads;
         }
@@ -70,7 +71,7 @@ namespace MisakiEQ.Background.API
         }
         private async void ThreadFunction(CancellationToken token)
         {
-            Log.Instance.Info("スレッド開始");
+            Log.Info("スレッド開始");
             long TempDelay = 0;
             while (true)
             {
@@ -88,13 +89,13 @@ namespace MisakiEQ.Background.API
                         }
                         catch (Exception ex)
                         {
-                            Log.Instance.Warn($"取得時にエラーが発生しました。{ex.Message}");
+                            Log.Warn($"取得時にエラーが発生しました。{ex.Message}");
                         }
                         if (task.IsCompletedSuccessfully && !string.IsNullOrEmpty(task.Result))
                         {
                             string a = "<p class=\\\"jalertInfo-item\\\">(.*)</p>";
                             MatchCollection results  = Regex.Matches(task.Result, a);
-                            foreach (Match m in results) // Matchと型を明示（varは不可）
+                            foreach (Match m in results.Cast<Match>()) // Matchと型を明示（varは不可）
                             {
                                 int index = m.Index; // 発見した文字列の開始位置
                                 string value = m.Value; // 発見した文字列
@@ -103,7 +104,7 @@ namespace MisakiEQ.Background.API
                             if(results.Count>0)str=results[0].Value;
                             a = "<div class=\\\"header large title\\\">[\\s]*<h1>(.*)?</h1>";
                             results = Regex.Matches(task.Result, a);
-                            foreach (Match m in results) // Matchと型を明示（varは不可）
+                            foreach (Match m in results.Cast<Match>()) // Matchと型を明示（varは不可）
                             {
                                 int index = m.Index; // 発見した文字列の開始位置
                                 string value = m.Value; // 発見した文字列
@@ -119,7 +120,7 @@ namespace MisakiEQ.Background.API
                             {
                                 if (!string.IsNullOrWhiteSpace(t))
                                 {
-                                    if(IsFirst)Log.Instance.Info($"J-ALERTの取得に成功しました。72時間以内の発表はありません。値={t}");
+                                    if(IsFirst)Log.Info($"J-ALERTの取得に成功しました。72時間以内の発表はありません。値={t}");
                                     IsFirst = false;
                                 }
                                 continue;
@@ -141,7 +142,7 @@ namespace MisakiEQ.Background.API
                                     }
                                     else
                                     {
-                                        if (IsFirst) Log.Instance.Info($"J-ALERTの取得に成功しました。最終更新:{data.AnnounceTime}");
+                                        if (IsFirst) Log.Info($"J-ALERTの取得に成功しました。最終更新:{data.AnnounceTime}");
                                         IsFirst = false;
                                     }
                                     LatestData = data;
@@ -153,13 +154,13 @@ namespace MisakiEQ.Background.API
                 }
                 catch (TaskCanceledException ex)
                 {
-                    Log.Instance.Info($"スレッドの処理を終了します。{ex.Message}");
+                    Log.Info($"スレッドの処理を終了します。{ex.Message}");
                     return;
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error($"文字列データ : \"{json}\"");
-                    Log.Instance.Error(ex);
+                    Log.Error($"文字列データ : \"{json}\"");
+                    Log.Error(ex);
                 }
             }
 

@@ -1,4 +1,5 @@
 ﻿using MisakiEQ.Background;
+using MisakiEQ;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -103,7 +104,7 @@ namespace MisakiEQ.GUI
             var commands = Command.Text.Split(' ');
             if (commands.Length < 1)
             {
-                Log.Instance.Error("コマンドの内容がありません。");
+                Log.Error("コマンドの内容がありません。");
             }
             try
             {
@@ -114,22 +115,22 @@ namespace MisakiEQ.GUI
                         try
                         {
                             var task = new Task(() => {
-                                Log.Instance.Debug($"{commands[1]}のデータ読込中...");
+                                Log.Debug($"{commands[1]}のデータ読込中...");
                                 var reader = new StreamReader(commands[1]);
                                 var str = reader.ReadToEnd();
-                                APIs.GetInstance().EEW.DMData.Test(str);
+                                APIs.Instance.EEW.DMData.Test(str);
                                 reader.Close();
-                                Log.Instance.Debug($"Done");
+                                Log.Debug($"Done");
                             });
                             task.Start();
                         }
                         catch (Exception ex)
                         {
-                            Log.Instance.Error(ex.ToString());
+                            Log.Error(ex.ToString());
                         }
                         break;
                     case "/misskey-token":
-                        Log.Instance.Info(Lib.Misskey.APIData.accessToken);
+                        Log.Info(Lib.Misskey.APIData.accessToken);
                         break;
                     case "/config_view":
                         Lib.Config.Funcs.GetInstance().Configs.OutputLog();
@@ -137,7 +138,7 @@ namespace MisakiEQ.GUI
                     case "/crash":
                         throw new NullReferenceException(); 
                     default:
-                        Log.Instance.Warn("不明なコマンドです。" + commands[0]);
+                        Log.Warn("不明なコマンドです。" + commands[0]);
                         break;
                 }
             }
@@ -147,7 +148,7 @@ namespace MisakiEQ.GUI
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex.Message);
+                Log.Error(ex.Message);
             }
             SendCommands.Add(Command.Text);
             Command.Text = "";

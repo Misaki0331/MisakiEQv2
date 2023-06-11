@@ -21,10 +21,7 @@ namespace MisakiEQ.Lib.Config
         /// <returns>Configのインスタンス</returns>
         public static Funcs GetInstance()
         {
-            if (singleton == null)
-            {
-                singleton = new Funcs();
-            }
+            singleton ??= new Funcs();
             return singleton;
         }
         private Funcs()
@@ -42,24 +39,21 @@ namespace MisakiEQ.Lib.Config
             {
                 var sr = new Stopwatch();
                 sr.Start();
-                Log.Instance.Info("Config書込開始");
+                Log.Info("Config書込開始");
                 System.Reflection.FieldInfo[] fields = Configs.GetType().GetFields();
                 using var sw = new StreamWriter(CfgFile, false, Encoding.UTF8);
-                for (int i = 0; i < Configs.Data.Count; i++)
-                {
-                    var config = Configs.Data[i].Setting;
-                    for (int j = 0; j < config.Count; j++) sw.Write($"{config[j].GetConfigString()}");
-                }
+                foreach (var data in Configs.Data)
+                    foreach (var cfg in data.Setting) sw.Write($"{cfg.GetConfigString()}");
                 sw.Close();
                 OverrideTemplates();
                 sr.Stop();
-                Log.Instance.Debug($"Config書込完了 計測時間:{(sr.ElapsedTicks / 10000.0):#,##0.0000}ms");
+                Log.Debug($"Config書込完了 計測時間:{(sr.ElapsedTicks / 10000.0):#,##0.0000}ms");
                 return true;
             }
             catch (Exception ex)
             {
-                Log.Instance.Error("ファイルの書込中にエラーが発生しました。");
-                Log.Instance.Error(ex);
+                Log.Error("ファイルの書込中にエラーが発生しました。");
+                Log.Error(ex);
                 return false;
             }
         }
@@ -74,25 +68,23 @@ namespace MisakiEQ.Lib.Config
             int PASS = 0, TOTAL = 0;
             try
             {
-                Log.Instance.Debug("Config読込開始");
+                Log.Debug("Config読込開始");
                 using var sr = new StreamReader(CfgFile, Encoding.UTF8);
                 while (true)
                 {
                     var line = sr.ReadLine();
-                    if (line == null) break;
+                    if (string.IsNullOrEmpty(line)) break;
                     var lines = line.Split('=');
                     if (lines.Length == 2)
                     {
                         try
                         {
                             SetConfigValue(lines[0], lines[1]);
-
-                            Log.Instance.Debug($"{line}");
                             PASS++;
                         }
                         catch (Exception ex)
                         {
-                            Log.Instance.Error(ex);
+                            Log.Error(ex);
                         }
                         TOTAL++;
                     }
@@ -100,18 +92,18 @@ namespace MisakiEQ.Lib.Config
                 sr.Close();
                 OverrideTemplates();
                 sw.Stop();
-                Log.Instance.Debug($"コンフィグの読込に成功 計測時間:{(sw.ElapsedTicks / 10000.0):#,##0.0000}ms 読込数:{PASS}/{TOTAL}");
+                Log.Debug($"コンフィグの読込に成功 計測時間:{sw.ElapsedTicks / 10000.0:#,##0.0000}ms 読込数:{PASS}/{TOTAL}");
                 return true;
             }
             catch (FileNotFoundException)
             {
-                Log.Instance.Warn("ファイルが見つかりませんでした。");
+                Log.Warn("ファイルが見つかりませんでした。");
                 return false;
             }
             catch (Exception ex)
             {
-                Log.Instance.Error($"コンフィグの読込に失敗 計測時間:{(sw.ElapsedTicks / 10000.0):#,##0.0000}ms");
-                Log.Instance.Error(ex);
+                Log.Error($"コンフィグの読込に失敗 計測時間:{(sw.ElapsedTicks / 10000.0):#,##0.0000}ms");
+                Log.Error(ex);
                 return false;
             }
         }
@@ -120,7 +112,7 @@ namespace MisakiEQ.Lib.Config
         /// </summary>
         public void ApplyConfig()
         {
-            var api = APIs.GetInstance();
+            var api = APIs.Instance;
             SetValue("API_EEW_Delay", (e) => { api.EEW.Config.Delay = (int)(long)e;});
             SetValue("API_EEW_DelayDetectMode", (e) => { api.EEW.Config.DelayDetectMode = (int)(long)e;});
             SetValue("API_EEW_DelayDetectCoolDown", (e) => { api.EEW.Config.DelayDetectCoolDown = (int)(long)e;});
@@ -132,7 +124,7 @@ namespace MisakiEQ.Lib.Config
             SetValue("API_K-moni_Adjust", (e) => { api.KyoshinAPI.Config.AutoAdjustKyoshinTime = (int)(long)e*60; });
             SetValue("API_J-ALERT_Delay", (e) => { api.Jalert.Config.Delay = (uint)(long)e; });
             SetValue("GUI_Popup_J-ALERT", (e) => { api.Jalert.Config.IsDisplay = (bool)e; });
-            var gui = APIs.GetInstance().KyoshinAPI.Config;
+            var gui = APIs.Instance.KyoshinAPI.Config;
             SetValue("USER_Pos_Long", (e) => { gui.UserLong = (double)(long)e / 10000.0; });
             SetValue("USER_Pos_Lat", (e) => { gui.UserLat = (double)(long)e / 10000.0; });
             SetValue("USER_Pos_Display", (e) => { gui.UserDisplay = (bool)e; });
@@ -170,7 +162,7 @@ namespace MisakiEQ.Lib.Config
                 var c = GetConfigClass(id);
                 if (c == null)
                 {
-                    Log.Instance.Error($"「{id}」は存在しません。");
+                    Log.Error($"「{id}」は存在しません。");
                     return false;
                 }
                 if (c.GetType() == typeof(LongIndexData)) act(((LongIndexData)c).Value);
@@ -181,7 +173,7 @@ namespace MisakiEQ.Lib.Config
                 return true;
             }catch(Exception ex)
             {
-                Log.Instance.Error($"「{id}」は読み込めませんでした。理由:{ex.Message}");
+                Log.Error($"「{id}」は読み込めませんでした。理由:{ex.Message}");
                 return false;
             }
         }
@@ -191,20 +183,10 @@ namespace MisakiEQ.Lib.Config
         private void OverrideTemplates()
         {
             ConfigTemplates.Clear();
-            for (int i = 0; i < Configs.Data.Count; i++)
-            {
-                var config = Configs.Data[i].Setting;
-                for (int j = 0; j < config.Count; j++)
-                {
-                    if (config[j] is ComboIndexData)
-                    {
-                        ConfigTemplates.Add(new(config[j].Name, $"={((ComboIndexData)config[j]).Value}"));
-                    }
-                    else
-                    if (config[j].ValueDefaultable()) ConfigTemplates.Add(new(config[j].Name, $"{config[j].GetValue()}"));
-                }
-            }
-            for (int i = 0; i < ConfigTemplates.Count; i++) SetConfigValue(ConfigTemplates[i].Key, ConfigTemplates[i].Value, false);
+            foreach (var data in Configs.Data) foreach (var config in data.Setting)
+                if (config is ComboIndexData combo) ConfigTemplates.Add(new(config.Name, $"={combo.Value}"));
+                else if (config.ValueDefaultable()) ConfigTemplates.Add(new(config.Name, $"{config.GetValue()}"));
+            foreach (var template in  ConfigTemplates) SetConfigValue(template.Key, template.Value, false);
         }
         /// <summary>
         /// 名前からコンフィグのクラスを取得します。<br/>
@@ -215,17 +197,12 @@ namespace MisakiEQ.Lib.Config
         /// 存在しない場合はnullが返ります</returns>
         public IndexData? GetConfigClass(string name)
         {
-            for (int i = 0; i < Configs.Data.Count; i++)
+            foreach (var data in Configs.Data)
             {
-                var config = Configs.Data[i].Setting;
-                for (int j = 0; j < config.Count; j++)
-                {
-                    if (config[j].Name == name) return config[j];
-                }
+                var config=data.Setting.Find(a => string.Equals(a.Name, name));
+                if(config != null) return config;
             }
             return null;
-
-
         }
         /// <summary>
         /// nameからコンフィグの値を取得します。
@@ -269,12 +246,12 @@ namespace MisakiEQ.Lib.Config
         readonly List<ConfigTemplate> ConfigTemplates = new();
         public void DiscardConfig()
         {
-            Log.Instance.Debug($"現在の設定が保存せずに破棄された為、コンフィグを前の状態に戻します。");
+            Log.Debug($"現在の設定が保存せずに破棄された為、コンフィグを前の状態に戻します。");
             var sw = new Stopwatch();
             sw.Start();
-            for (int i = 0; i < ConfigTemplates.Count; i++) SetConfigValue(ConfigTemplates[i].Key, ConfigTemplates[i].Value, false);
+            foreach (var template in ConfigTemplates) SetConfigValue(template.Key, template.Value, false);
             sw.Stop();
-            Log.Instance.Debug($"コンフィグを前の状態に戻しました。処理時間 : {sw.Elapsed}");
+            Log.Debug($"コンフィグを前の状態に戻しました。処理時間 : {sw.Elapsed}");
         }
         public Cfg Configs = new();
         public class Cfg
@@ -283,18 +260,16 @@ namespace MisakiEQ.Lib.Config
             public void OutputLog()
             {
                 int i = 0;
-                foreach(var d in Data)
-                {
-                    foreach(var e in d.Setting)
+                foreach (var d in Data)
+                    foreach (var e in d.Setting)
                     {
                         i++;
                         try
                         {
-                            Log.Instance.Debug($"No.{i,4}: \"{d.Name}\".\"{e.Name}\" Value=\"{e.GetValue()}\"");
+                            Log.Debug($"No.{i,4}: \"{d.Name}\".\"{e.Name}\" Value=\"{e.GetValue()}\"");
                         }
-                        catch  { }
+                        catch { }
                     }
-                }
             }
             public Cfg()
             {
@@ -312,7 +287,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("ユーザー設定", true)?.Add(new LongIndexData("USER_Pos_Long", "所在地(経度)", description: "ユーザーの経度です。予測震度を表示させたい場合にお使いください。", min: 1225000, max: 1460000, def: 1396983, displayMag: 10000));   //取得時の配列の数
                 GetGroup("ユーザー設定", true)?.Add(new ReadonlyIndexData("USER_Pos_Result", "該当地域名", "緯度・経度に対応されるであろう該当地域名です。"));
                 GetGroup("ユーザー設定", true)?.Add(new BoolIndexData("USER_Pos_Display", "強震モニタに座標表示", description: "ユーザーの経度経度情報を強震モニタに紫色で表示します。", def: false, "強震モニタに表示", "強震モニタに非表示"));   //取得時の配列の数
-                GetGroup("通信設定", true)?.Add(new FunctionIndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", workingTitle: "時刻調整中...", action: new Action(async () => { await APIs.GetInstance().KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
+                GetGroup("通信設定", true)?.Add(new FunctionIndexData("Kyoshin_Time_Adjust", "強震モニタ時刻調整", description: "強震モニタの時刻調整を実行します。", "時刻調整実行", workingTitle: "時刻調整中...", action: new Action(async () => { await APIs.Instance.KyoshinAPI.FixKyoshinTime(); })));//取得時の配列の数
                 GetGroup("通信設定", true)?.Add(new ReadonlyIndexData("Kyoshin_Time", "強震モニタ時刻", "強震モニタ上の最終更新時刻です。"));
                 GetGroup("Project DM-Data Service", true)?.Add(new FunctionIndexData("DMDATA_AuthFunction", "アプリ連携", "MisakiEQでDMDATAの緊急地震速報データを取得できるようにします。", "認証", workingTitle: "ブラウザで認証中..."));
 #if ADMIN||DEBUG
@@ -366,7 +341,7 @@ namespace MisakiEQ.Lib.Config
             /// <returns>対応するグループ</returns>
             public List<IndexData>? GetGroup(string name, bool Create = false)
             {
-                var instance = Data.Find(a => a.Name == name);
+                var instance = Data.Find(a => string.Equals(a.Name,name));
                 if (instance == null)
                 {
                     if (Create)
@@ -376,8 +351,7 @@ namespace MisakiEQ.Lib.Config
                     }
                     else return null;
                 }
-                else
-                    return instance.Setting;
+                else return instance.Setting;
             }
             public class ConfigGroup
             {
@@ -473,7 +447,6 @@ namespace MisakiEQ.Lib.Config
                         ValueChanged?.Invoke(this, EventArgs.Empty);
                     }
                 }
-
             }
             public string UnitName { get; set; }
             public double DisplayMag { get; set; }
@@ -488,12 +461,10 @@ namespace MisakiEQ.Lib.Config
                 UnitName = unitName;
                 DisplayMag = displayMag;
             }
-
             public override string GetConfigString()
             {
                 return Name + "=" + Value.ToString() + Environment.NewLine;
             }
-
             public override bool SetConfigString(string value)
             {
                 long val = long.Parse(value);
@@ -528,7 +499,7 @@ namespace MisakiEQ.Lib.Config
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error($"{ex.Message}");
+                    Log.Error($"{ex.Message}");
                 }
                 return false;
             }
@@ -580,10 +551,7 @@ namespace MisakiEQ.Lib.Config
             }
             public override void SetValue(object value)
             {
-                if (value is string)
-                {
-                    Value = (string)value;
-                }
+                if (value is string val) Value = val;
                 else throw new InvalidCastException($"{value}はstring型ではありません。Type:{value.GetType()}");
             }
             public override bool Apply()
@@ -596,7 +564,7 @@ namespace MisakiEQ.Lib.Config
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error($"{ex.Message}");
+                    Log.Error($"{ex.Message}");
                 }
                 return false;
             }
@@ -638,18 +606,9 @@ namespace MisakiEQ.Lib.Config
             }
             public override bool SetConfigString(string value)
             {
-                if (value.ToLower() == "true" || value == "0")
-                {
-                    Value = true;
-                }
-                else if (value.ToLower() == "false" || value == "1")
-                {
-                    Value = false;
-                }
-                else
-                {
-                    throw new ArgumentException($"bool型ではない、もしくは正しく検出できませんでした。val=\"{value}\"", nameof(value));
-                }
+                if (string.Equals(value.ToLower(),"true") || string.Equals(value,"0")) Value = true;
+                else if (string.Equals(value.ToLower(),"false") || string.Equals(value,"1")) Value = false;
+                else throw new ArgumentException($"bool型ではない、もしくは正しく検出できませんでした。val=\"{value}\"", nameof(value));
                 return true;
             }
             public override bool ValueDefaultable()
@@ -663,10 +622,7 @@ namespace MisakiEQ.Lib.Config
 
             public override void SetValue(object value)
             {
-                if (value is bool)
-                {
-                    Value = (bool)value;
-                }
+                if (value is bool val) Value = val;
                 else throw new InvalidCastException($"{value}はboolean型ではありません。Type:{value.GetType()}");
             }
             public override bool Apply()
@@ -679,7 +635,7 @@ namespace MisakiEQ.Lib.Config
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error($"{ex.Message}");
+                    Log.Error($"{ex.Message}");
                 }
                 return false;
             }
@@ -744,7 +700,7 @@ namespace MisakiEQ.Lib.Config
                         }
                         catch (Exception ex)
                         {
-                            Log.Instance.Warn(ex.Message);
+                            Log.Warn(ex.Message);
                         }
                     }
                 }
@@ -791,10 +747,7 @@ namespace MisakiEQ.Lib.Config
             }
             public override void SetValue(object value)
             {
-                if (value is string)
-                {
-                    Value = (string)value;
-                }
+                if (value is string val)  Value = val;
                 else throw new InvalidCastException($"{value}はstring型ではありません。Type:{value.GetType()}");
             }
 
@@ -812,10 +765,7 @@ namespace MisakiEQ.Lib.Config
                 Default = def;
                 Value = def;
 
-                foreach (var item in list)
-                {
-                    ComboStrings.Add(item);
-                }
+                foreach (var item in list) ComboStrings.Add(item);
             }
 
             public override string GetConfigString()
@@ -825,34 +775,18 @@ namespace MisakiEQ.Lib.Config
             public override bool SetConfigString(string value)
             {
                 if (value.StartsWith("="))
-                {
                     if (int.TryParse(value.Replace("=", ""), out int num))
-                    {
                         if (ComboStrings.Count > num && 0 <= num)
                         {
                             Value = num;
                             return true;
                         }
                         else throw new ArgumentOutOfRangeException(nameof(value), $"\"{num}\" は \"{ComboStrings.Count}\" の範囲外です。");
-                    }
-                    else
-                    {
-                        throw new InvalidDataException($"\"{value}\"は数値に変換できませんでした。");
-                    }
-                }
-                for (int i = 0; i < ComboStrings.Count; i++)
-                {
-                    string vals = value.Replace("%0D", "\n").Replace("%3D", "=").Replace("%%", "%");
-                    if (ComboStrings[i] == vals)
-                    {
-                        Value = i;
-                        return true;
-                    }
-
-                    if (i == ComboStrings.Count - 1)
-                        throw new ArgumentException($"\"{vals}\"は[{Name}]のコレクションの中には存在しませんでした。", nameof(value));
-                }
-                return false;
+                    else throw new InvalidDataException($"\"{value}\"は数値に変換できませんでした。");
+                string vals = value.Replace("%0D", "\n").Replace("%3D", "=").Replace("%%", "%");
+                var find = ComboStrings.Find(a => string.Equals(a, vals));
+                if (find == null) throw new ArgumentException($"\"{vals}\"は[{Name}]のコレクションの中には存在しませんでした。", nameof(value));
+                else return true;
             }
 
             public override bool ValueDefaultable()

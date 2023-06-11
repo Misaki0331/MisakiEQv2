@@ -18,22 +18,18 @@ namespace MisakiEQ.Lib.Twitter
         /// </summary>
         public static APIs GetInstance()
         {
-            if (singleton == null)
-            {
-                singleton = new APIs();
-            }
+            singleton ??= new APIs();
             return singleton;
         }
-        public static int 
-            GetLen(string str)
+        public static int GetLen(string str)
         {
             var replace = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&'()=~|-^\\@[`{;:]+*},./<>?\n";
-            for(int i = 0; i < replace.Length; i++)
+            for (int i = 0; i < replace.Length; i++)
             {
                 str = str.Replace(replace[i], ' ');
             }
             int len = 0;
-            for(int i = 0; i < str.Length; i++)
+            for (int i = 0; i < str.Length; i++)
             {
                 if (str[i] == ' ') len++;
                 else len += 2;
@@ -58,7 +54,7 @@ namespace MisakiEQ.Lib.Twitter
                 return AuthReq.AuthorizationURL;
             }catch(Exception ex)
             {
-                Log.Instance.Error($"Twitterの認証中にエラーが発生しました。\n{ex.Message}");
+                Log.Error($"Twitterの認証中にエラーが発生しました。\n{ex.Message}");
                 throw;
             }
         }
@@ -72,19 +68,19 @@ namespace MisakiEQ.Lib.Twitter
                 UserInfo = await client.Users.GetAuthenticatedUserAsync();
                 AccessToken = userCredentials.AccessToken;
                 AccessTokenSecret = userCredentials.AccessTokenSecret;
-                Log.Instance.Info("次のユーザーとしてログインしました: " + UserInfo);
+                Log.Info("次のユーザーとしてログインしました: " + UserInfo);
                 return true;
 
             }
             catch (Tweetinvi.Exceptions.TwitterException ex)
             {
-                Log.Instance.Error($"Twitterの認証に失敗しました。\n{ex.Message}");
+                Log.Error($"Twitterの認証に失敗しました。\n{ex.Message}");
                 return false;
 
             }
             catch (Exception ex)
             {
-                Log.Instance.Error($"Twitterの認証ができませんでした。\n{ex.Message}");
+                Log.Error($"Twitterの認証ができませんでした。\n{ex.Message}");
                 return false;
             }
         }
@@ -97,17 +93,17 @@ namespace MisakiEQ.Lib.Twitter
                 keys[0] = keys[0].Replace("\r", "");
                 client = new TwitterClient(keys[0], keys[1], token, secret);
                 UserInfo = await client.Users.GetAuthenticatedUserAsync();
-                Log.Instance.Info("次のユーザーとしてログインしました: " + UserInfo);
+                Log.Info("次のユーザーとしてログインしました: " + UserInfo);
                 return true;
             }
             catch (Tweetinvi.Exceptions.TwitterException ex)
             {
-                Log.Instance.Error($"Twitterの認証に失敗しました。\n{ex.Message}");
+                Log.Error($"Twitterの認証に失敗しました。\n{ex.Message}");
                 return false;
             }
             catch (Exception ex)
             {
-                Log.Instance.Error($"Twitterの認証ができませんでした。\n{ex.Message}");
+                Log.Error($"Twitterの認証ができませんでした。\n{ex.Message}");
                 return false;
             }
         }
@@ -123,7 +119,7 @@ namespace MisakiEQ.Lib.Twitter
                 return task.Result;
             }catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return false;
             }
         }
@@ -157,7 +153,7 @@ namespace MisakiEQ.Lib.Twitter
             }
             catch(Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return -1;
             }
         }

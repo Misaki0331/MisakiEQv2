@@ -21,60 +21,50 @@ namespace MisakiEQ.Lib.ConfigController
         {
             Tab = tab;
             NowSize = tab.Size;
-            var list = Config.Funcs.GetInstance().Configs.Data;
+            var list = GetInstance().Configs.Data;
             tab.SizeChanged += SizeChanged;
             int cnt = 1;
             List<int> sizelist = new();
             while (tab.Width / cnt > 450) cnt++;
             if (cnt > 1) while (tab.Width / cnt < 300) cnt--;
             for (int i = 0; i < cnt; i++) sizelist.Add(0);
-            for(int i = 0; i < list.Count; i++)
+            foreach (var l in list)
             {
                 Groups.Add(new GroupBox());
                 tab.Controls.Add(Groups[^1]);
-                Groups[^1].Size = new Size((tab.Width-15) / cnt-10, 32);
-                controllGroups.Add(new(Groups[^1], list[i].Setting, list[i].Name)) ;
-                int pos = 0;
-                int min = int.MaxValue;
-                for(int j=0;j<sizelist.Count; j++)
+                Groups[^1].Size = new Size((tab.Width - 15) / cnt - 10, 32);
+                controllGroups.Add(new(Groups[^1], l.Setting, l.Name));
+                int pos = 0, min = int.MaxValue;
+                foreach (var sz in sizelist)
                 {
-                    if (min > sizelist[j])
+                    if (min > sz)
                     {
-                        min = sizelist[j];
-                        pos = j;
+                        min = sz;
+                        pos = sizelist.FindIndex(a => a == sz);
                     }
                 }
-                controllGroups[^1].Location = new Point((tab.Width - 15) / cnt * pos+5, sizelist[pos]);
-                sizelist[pos] += controllGroups[^1].Height+5;
+                controllGroups[^1].Location = new Point((tab.Width - 15) / cnt * pos + 5, sizelist[pos]);
+                sizelist[pos] += controllGroups[^1].Height + 5;
             }
         }
         public void FormEventDispose()
         {
             Stopwatch sw = new();
             sw.Start();
-            var list = Config.Funcs.GetInstance().Configs.Data;
-            
-            for (int i = 0; i < list.Count; i++)
-            {
-                var list2 = list[i].Setting;
-                for(int j = 0; j < list2.Count; j++)
-                {
-                    if (list2[j] is ReadonlyIndexData read) read.Value = string.Empty;
-                }
-            }
-            for (int i = 0; i < controllGroups.Count; i++)
-            {
-                controllGroups[i].Dispose();
-            }
+            var list = GetInstance().Configs.Data;
+            foreach (var data in list)
+                foreach(var config in data.Setting)
+                    if (config is ReadonlyIndexData read) read.Value = string.Empty;
+            foreach (var control in controllGroups) control.Dispose();
             sw.Stop();
-            Log.Instance.Info($"フォームイベントを破棄しました。計測:{sw.Elapsed}");
+            Log.Info("ConfigWindow",$"フォームイベントを破棄しました。計測:{sw.Elapsed}");
         }
         void SizeChanged(object? sender, EventArgs e)
         {
             if (NowSize.Width != Tab.Size.Width)
             {
                 NowSize = Tab.Size;
-                var list = Config.Funcs.GetInstance().Configs.Data;
+                var list = GetInstance().Configs.Data;
                 int cnt = 1;
                 List<int> sizelist = new();
                 while (Tab.Width / cnt > 450) cnt++;
@@ -99,23 +89,20 @@ namespace MisakiEQ.Lib.ConfigController
             }
             Tab.Update();
         }
-        
     }
 
     class ControllGroup
     {
         public readonly GroupBox Box;
         readonly List<ToolBox> tools = new(); 
-        public ControllGroup(GroupBox gb, List<Config.Funcs.IndexData> list,string name)
+        public ControllGroup(GroupBox gb, List<IndexData> list,string name)
         {
             Box = gb;
             Box.Text = name;
             gb.Size = new Size(gb.Width, 22 + 23 * list.Count + 12);
             gb.SizeChanged += SizeChanged;
             for (int i = 0; i < list.Count; i++)
-            {
                 tools.Add(new ToolBox(gb, list[i], i));
-            }
         }
         public int Width { get => Box.Width; set => Box.Width = value; }
         public int Height { get => Box.Height; }
@@ -127,46 +114,30 @@ namespace MisakiEQ.Lib.ConfigController
             var config = Config.Funcs.GetInstance().Configs.GetGroup(listName);
             if (config == null) return;
             for (int i = 0; i < config.Count; i++)
-            {
                 tools.Add(new ToolBox(gb, config[i], i));
-            }
         }
         public void Dispose()
         {
-            for (int i = 0; i < tools.Count; i++)
-            {
-                tools[i].Dispose();
-            }
+            foreach (var tool in tools) tool.Dispose();
         }
         public void SizeChanged(object? sender, EventArgs e)
         {
-            for (int i = 0; i < tools.Count; i++)
+            int i = 0;
+            foreach (var tool in tools)
             {
                 int w = Box.Width;
-                if (tools[i].Type == typeof(LongIndexData))
+                if (tool.Type == typeof(LongIndexData))
                 {
-                    tools[i].ToolUnitLabel.Location = new Point(w - 28, 22 + i * 23);
-                    tools[i].ToolNumUD.Location = new Point(w - 108, 22 + i * 23);
-                    tools[i].ToolTrack.Size = new Size(w - 234, 23);
-                }else if (tools[i].Type == typeof(StringIndexData))
-                {
-                    tools[i].ToolTextBox.Size = new Size(w - 151, 23);
-                }else if (tools[i].Type == typeof(BoolIndexData))
-                {
-                    tools[i].ToolCheckBox.Size = new Size(w - 149, 23);
+                    tool.ToolUnitLabel.Location = new Point(w - 28, 22 + i * 23);
+                    tool.ToolNumUD.Location = new Point(w - 108, 22 + i * 23);
+                    tool.ToolTrack.Size = new Size(w - 234, 23);
                 }
-                else if (tools[i].Type == typeof(FunctionIndexData))
-                {
-                    tools[i].ToolButton.Size = new Size(w - 149, 23);
-                }
-                else if (tools[i].Type == typeof(ReadonlyIndexData))
-                {
-                    tools[i].ToolTextBox.Size = new Size(w - 151, 23);
-                }
-                else if (tools[i].Type == typeof(ComboIndexData))
-                {
-                    tools[i].ToolComboBox.Size = new Size(w - 149, 23);
-                }
+                else if (tool.Type == typeof(StringIndexData)) tool.ToolTextBox.Size = new Size(w - 151, 23);
+                else if (tool.Type == typeof(BoolIndexData)) tool.ToolCheckBox.Size = new Size(w - 149, 23);
+                else if (tool.Type == typeof(FunctionIndexData)) tool.ToolButton.Size = new Size(w - 149, 23);
+                else if (tool.Type == typeof(ReadonlyIndexData)) tool.ToolTextBox.Size = new Size(w - 151, 23);
+                else if (tool.Type == typeof(ComboIndexData)) tool.ToolComboBox.Size = new Size(w - 149, 23);
+                i++;
             }
         }
     }
@@ -181,9 +152,9 @@ namespace MisakiEQ.Lib.ConfigController
         public Button ToolButton = new();
         public ComboBox ToolComboBox = new();
         readonly GroupBox gp;
-        readonly Config.Funcs.IndexData cl;
+        readonly IndexData cl;
         public Type Type { get => cl.GetType();}
-        void LongInit(GroupBox gb, Config.Funcs.LongIndexData data, int pos)
+        void LongInit(GroupBox gb, LongIndexData data, int pos)
         {
             //338
             var w = gb.Width;
@@ -211,20 +182,20 @@ namespace MisakiEQ.Lib.ConfigController
             ToolNumUD.AccessibleDescription = data.Description;
             ToolNumUD.Minimum = long.MinValue;
             ToolNumUD.Maximum = long.MaxValue;
-            ToolNumUD.Value = (decimal)((long)data.Value / data.DisplayMag);
+            ToolNumUD.Value = (decimal)(data.Value / data.DisplayMag);
             ToolNumUD.DecimalPlaces = (int)Math.Log10(data.DisplayMag);
-            ToolNumUD.Minimum = (decimal)((long)data.Min / data.DisplayMag);
-            ToolNumUD.Maximum = (decimal)((long)data.Max / data.DisplayMag);
+            ToolNumUD.Minimum = (decimal)(data.Min / data.DisplayMag);
+            ToolNumUD.Maximum = (decimal)(data.Max / data.DisplayMag);
             ToolNumUD.TextAlign = HorizontalAlignment.Right;
             ToolTrack.Minimum = int.MinValue;
             ToolTrack.Maximum = int.MaxValue;
-            ToolTrack.Value = (int)(long)data.Value;
-            ToolTrack.Minimum = (int)(long)data.Min;
-            ToolTrack.Maximum = (int)(long)data.Max;
+            ToolTrack.Value = (int)data.Value;
+            ToolTrack.Minimum = (int)data.Min;
+            ToolTrack.Maximum = (int)data.Max;
             ((ISupportInitialize)(ToolNumUD)).EndInit();
             ((ISupportInitialize)(ToolTrack)).EndInit();
         }
-        void StringInit(GroupBox gb, Config.Funcs.StringIndexData data, int pos)
+        void StringInit(GroupBox gb, StringIndexData data, int pos)
         {
             //338
             var w = gb.Width;
@@ -232,23 +203,23 @@ namespace MisakiEQ.Lib.ConfigController
             ToolTextBox.Location = new Point(127, 22 + pos * 23);
             ToolTextBox.Size = new Size(w-151, 23);
             ToolTextBox.MaxLength = 255;
-            ToolTextBox.Text = (string)data.Value;
+            ToolTextBox.Text = data.Value;
             ToolTextBox.TextChanged += new EventHandler(TextBoxChanged);
         }
-        void BoolInit(GroupBox gb, Config.Funcs.BoolIndexData data, int pos)
+        void BoolInit(GroupBox gb, BoolIndexData data, int pos)
         {
             //338
             var w = gb.Width;
             gb.Controls.Add(ToolCheckBox);
             ToolCheckBox.Location = new Point(122, 22 + pos * 23);
             ToolCheckBox.Size = new Size(w-149, 23);
-            ToolCheckBox.Checked = (bool)data.Value;
+            ToolCheckBox.Checked = data.Value;
             ToolCheckBox.Text = ((BoolIndexData)cl).GetToggleText(ToolCheckBox.Checked);
             ToolCheckBox.Appearance = Appearance.Button;
             ToolCheckBox.CheckedChanged += new EventHandler(CheckBoxChanged);
             ToolCheckBox.TextAlign = ContentAlignment.MiddleCenter;
         }
-        void FunctionInit(GroupBox gb, Config.Funcs.FunctionIndexData data, int pos)
+        void FunctionInit(GroupBox gb, FunctionIndexData data, int pos)
         {
             //338
             var w = gb.Width;
@@ -260,7 +231,7 @@ namespace MisakiEQ.Lib.ConfigController
             ToolButton.Enabled = data.ButtonEnable;
             data.ButtonChanged += ButtonChanged;
         }
-        void ReadOnlyInit(GroupBox gb, Config.Funcs.ReadonlyIndexData data, int pos)
+        void ReadOnlyInit(GroupBox gb, ReadonlyIndexData data, int pos)
         {
             var w = gb.Width;
             gb.Controls.Add(ToolTextBox);
@@ -268,11 +239,11 @@ namespace MisakiEQ.Lib.ConfigController
             ToolTextBox.Size = new Size(w - 151, 23);
             ToolTextBox.MaxLength = 300;
             ToolTextBox.TextAlign = HorizontalAlignment.Center;
-            ToolTextBox.Text = (string)data.Value;
+            ToolTextBox.Text = data.Value;
             ToolTextBox.ReadOnly = true;
             data.ValueChanged += new EventHandler(UpdateText);
         }
-        void ComboInit(GroupBox gb, Config.Funcs.ComboIndexData data, int pos)
+        void ComboInit(GroupBox gb, ComboIndexData data, int pos)
         {
             var w = gb.Width;
             gb.Controls.Add(ToolComboBox);
@@ -281,7 +252,7 @@ namespace MisakiEQ.Lib.ConfigController
             ToolComboBox.Items.AddRange(data.Items);
             ToolComboBox.Location = new Point(123, 22 + pos * 23);
             ToolComboBox.Size = new Size(w - 151, 23);
-            ToolComboBox.SelectedIndex = (int)(long)data.Value;
+            ToolComboBox.SelectedIndex = data.Value;
             ToolComboBox.SelectedIndexChanged += ComboBoxChanged;
         }
         public void Dispose()
@@ -293,14 +264,13 @@ namespace MisakiEQ.Lib.ConfigController
             }
             catch(Exception ex)
             {
-                Log.Instance.Warn(ex.Message);
+                Log.Warn(ex.Message);
             }
         }
-        public ToolBox(GroupBox gb, Config.Funcs.IndexData data, int pos)//,)
+        public ToolBox(GroupBox gb, IndexData data, int pos)
         {
             gp = gb;
             cl = data;
-
             gb.Controls.Add(ToolLabel);
             ToolLabel.Location = new Point(6, 22 + pos * 23);
             ToolLabel.Size = new Size(116, 23);
@@ -312,25 +282,14 @@ namespace MisakiEQ.Lib.ConfigController
             else if (data is FunctionIndexData F) FunctionInit(gb, F, pos);
             else if (data is ReadonlyIndexData R) ReadOnlyInit(gb, R, pos);
             else if (data is ComboIndexData C) ComboInit(gb, C, pos);
-
-
         }
         void UpdateText(object? sender, EventArgs e)
         {
             string text = string.Empty;
             if (cl is StringIndexData str) text = str.GetValue();
             else if (cl is ReadonlyIndexData read) text = read.GetValue();
-            if (gp.InvokeRequired)
-            {
-                gp.Invoke(() =>
-                {
-                    ToolTextBox.Text = text;
-                });
-            }
-            else
-            {
-                ToolTextBox.Text = text;
-            }
+            if (gp.InvokeRequired) gp.Invoke(() => ToolTextBox.Text = text);
+            else ToolTextBox.Text = text;
         }
         void ButtonClick(object? sender, EventArgs e)
         {
@@ -346,17 +305,17 @@ namespace MisakiEQ.Lib.ConfigController
         }
         void TrackChanged(object? sender, EventArgs e)
         {
-            if (cl is LongIndexData)
+            if (cl is LongIndexData control)
             {
-                ToolNumUD.Value = (decimal)((double)ToolTrack.Value / ((LongIndexData)cl).DisplayMag);
-                ((LongIndexData)cl).Value = (long)ToolTrack.Value;
+                ToolNumUD.Value = (decimal)(ToolTrack.Value / control.DisplayMag);
+                control.Value = ToolTrack.Value;
             }
 
         }
         void NumUDChanged(object? sender, EventArgs e)
         {
-                ToolTrack.Value = (int)((double)ToolNumUD.Value * ((LongIndexData)cl).DisplayMag);
-                ((LongIndexData)cl).Value =(long)ToolTrack.Value;
+            ToolTrack.Value = (int)((double)ToolNumUD.Value * ((LongIndexData)cl).DisplayMag);
+            ((LongIndexData)cl).Value =ToolTrack.Value;
         }
         void TextBoxChanged(object? sender, EventArgs e)
         {

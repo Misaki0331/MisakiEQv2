@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MisakiEQ.Lib.Sound;
 using MisakiEQ.Properties;
+using MisakiEQ;
 using MisakiEQ.Struct;
 namespace MisakiEQ.Funcs
 {
@@ -30,10 +31,7 @@ namespace MisakiEQ.Funcs
         /// </summary>
         public static SoundCollective GetInstance()
         {
-            if (singleton == null)
-            {
-                singleton = new();
-            }
+            singleton ??= new();
             return singleton;
         }
         public static async void Init()
@@ -66,22 +64,17 @@ namespace MisakiEQ.Funcs
                 try
                 {
                     int Index = -1;
-                    bool IsNew = true;
-                    Struct.Common.Intensity max = Struct.Common.Intensity.Unknown;
+                    Common.Intensity max = Common.Intensity.Unknown;
                     EEWSound tmp = new(eew.Serial.EventID, eew.EarthQuake.MaxIntensity);
-                    for (int i = 0; i < eewsound.Count; i++)
+                    var sound = eewsound.Find(a => string.Equals(a.EventID,eew.Serial.EventID));
+                    if (sound != null)
                     {
-                        if (eewsound[i].EventID == eew.Serial.EventID)
-                        {
-                            tmp = eewsound[i];
-                            max = eewsound[i].MaxIntensity;
-                            eewsound[i].LatestTime = DateTime.Now;
-                            Index = i;
-                            IsNew = false;
-                            break;
-                        }
+                        tmp = sound;
+                        max=sound.MaxIntensity;
+                        sound.LatestTime = DateTime.Now;
+                        Index = eewsound.FindIndex(a => sound == a);
                     }
-                    if (IsNew || tmp.MaxIntensity < eew.EarthQuake.MaxIntensity)
+                    if (sound!=null || tmp.MaxIntensity < eew.EarthQuake.MaxIntensity)
                     {
                         tmp.MaxIntensity = eew.EarthQuake.MaxIntensity;
                         SoundController? controll = null;
@@ -125,28 +118,25 @@ namespace MisakiEQ.Funcs
                             }
                         }catch(Exception ex)
                         {
-                            Log.Instance.Error(ex);
+                            Log.Error(ex);
                             Init();
                         }
                     }
-                    if (IsNew) eewsound.Add(tmp);
-                    for (int i = eewsound.Count - 1; i >= 0; i--)
-                    {
-                        TimeSpan T = DateTime.Now - eewsound[i].LatestTime;
-                        if (T.Seconds > 180) eewsound.RemoveAt(i);
-                    }
+                    if (sound != null) eewsound.Add(tmp);
+                    var delete = eewsound.FindAll(a => (DateTime.Now - a.LatestTime).Seconds > 180);
+                    foreach (var item in delete)eewsound.Remove(item);
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error(ex);
+                    Log.Error(ex);
                     return false;
                 }
             }
 
         }
 
-        public static async void SoundEarthquake(Struct.EarthQuake eq)
+        public static async void SoundEarthquake(EarthQuake eq)
         {
             try
             {
@@ -154,49 +144,46 @@ namespace MisakiEQ.Funcs
                 var ins = Sounds.GetInstance();
                 switch (eq.Issue.Type)
                 {
-                    case Struct.EarthQuake.EarthQuakeType.ScalePrompt:
-                        if (eq.Details.MaxIntensity >= Struct.Common.Intensity.Int5Down)
+                    case EarthQuake.EarthQuakeType.ScalePrompt:
+                        if (eq.Details.MaxIntensity >= Common.Intensity.Int5Down)
                             controll = await ins.GetSound("Earthquake_High");
                         else
                             controll = await ins.GetSound("Earthquake_Mid");
                         break;
-                    case Struct.EarthQuake.EarthQuakeType.Destination:
-                    case Struct.EarthQuake.EarthQuakeType.ScaleAndDestination:
+                    case EarthQuake.EarthQuakeType.Destination:
+                    case EarthQuake.EarthQuakeType.ScaleAndDestination:
                         controll = await ins.GetSound("Earthquake_Prompt");
                         break;
-                    case Struct.EarthQuake.EarthQuakeType.DetailScale:
+                    case EarthQuake.EarthQuakeType.DetailScale:
                         controll = await ins.GetSound("Earthquake_Low");
                         break;
                 }
                 if (controll != null&&!ins.Config.IsMute)
                 {
-                    controll.Volume = ins.Config.EarthquakeVolume / 100f; ;
+                    controll.Volume = ins.Config.EarthquakeVolume / 100f;
                     controll.Replay();
 
                 }
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 Init();
             }
         }
-        public static async void SoundTsunami(Struct.Tsunami data)
+        public static async void SoundTsunami(Tsunami data)
         {
             try
             {
                 SoundController? controll = null;
                 var ins = Sounds.GetInstance();
-                if (data.Cancelled)
-                {
-                    controll = await ins.GetSound("Tsunami_Cancel");
-                }
+                if (data.Cancelled) controll = await ins.GetSound("Tsunami_Cancel");
                 else
                 {
                     int watch = 0, warn = 0, mwarn = 0;
-                    for (int i = 0; i < data.Areas.Count; i++)
+                    foreach (var area in data.Areas)
                     {
-                        switch (data.Areas[i].Grade)
+                        switch (area.Grade)
                         {
                             case Tsunami.TsunamiGrade.Watch:
                                 watch++;
@@ -208,6 +195,7 @@ namespace MisakiEQ.Funcs
                                 mwarn++;
                                 break;
                         }
+                        if (mwarn > 0) break;
                     }
                     if (mwarn > 0)
                         controll = await ins.GetSound("Tsunami_MajorWarn");
@@ -224,7 +212,7 @@ namespace MisakiEQ.Funcs
             }
             catch(Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 Init();
             }
         }

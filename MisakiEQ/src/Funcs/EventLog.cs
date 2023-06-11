@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using MisakiEQ;
 
 namespace MisakiEQ.Funcs
 {
@@ -33,14 +34,12 @@ namespace MisakiEQ.Funcs
                 $"震源地:{eew.EarthQuake.Hypocenter}\n" +
                 $"震源の深さ:{Struct.Common.DepthToString(eew.EarthQuake.Depth)}\n" +
                 $"地震の規模:M{eew.EarthQuake.Magnitude:0.0}\n" +
-                $"ユーザーの予測震度:{(eew.UserInfo.IntensityRaw<0?0:eew.UserInfo.IntensityRaw):0.0}(震度{Struct.Common.IntToStringLong(eew.UserInfo.LocalIntensity)})\n";
+                $"ユーザーの予測震度:{(eew.UserInfo.IntensityRaw<0?0:eew.UserInfo.IntensityRaw):0.0}" +
+                $"(震度{Struct.Common.IntToStringLong(eew.UserInfo.LocalIntensity)})\n";
             if (eew.Serial.Infomation == Struct.EEW.InfomationLevel.Warning)
-            {
-                for (int i = 0; i < eew.AreasInfo.Count; i++)
-                {
-                    data += $"{eew.AreasInfo[i].Name} - 予測震度{Struct.Common.IntToStringLong(eew.AreasInfo[i].Intensity)} {(eew.AreasInfo[i].ExpectedArrival == DateTime.MinValue ? "到達済みの可能性" : eew.AreasInfo[i].ExpectedArrival)}\n";
-                }
-            }
+                foreach (var area in eew.AreasInfo)
+                    data += $"{area.Name} - 予測震度{Struct.Common.IntToStringLong(area.Intensity)} " +
+                        $"{(area.ExpectedArrival == DateTime.MinValue ? "到達済みの可能性" : area.ExpectedArrival)}\n";
             return EventLogOut(1, data);
         }
         static bool EventLogOut(short id, string data)
@@ -59,7 +58,7 @@ namespace MisakiEQ.Funcs
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return false;
             }
         }

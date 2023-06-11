@@ -29,7 +29,7 @@ namespace MisakiEQ.Lib.KyoshinAPI
             {
                 Stopwatch sw = new();
                 sw.Start();
-                var img = await Background.APIs.GetInstance().KyoshinAPI.GetImage(type);
+                var img = await Background.APIs.Instance.KyoshinAPI.GetImage(type);
                 List<AnalysisPoint> result = new();
                 var re = new AnalysisResult();
                 if (img == null) throw new ArgumentNullException(nameof(img), "画像が取得できませんでした。");
@@ -39,7 +39,7 @@ namespace MisakiEQ.Lib.KyoshinAPI
                         nameof(img.Size), $"サイズが一致しません。352x400である必要がありますが、この画像は{img.Size.Width}x{img.Size.Height}です。");
 #pragma warning restore CA2208 
                 var ImageData = (Bitmap)img;
-                var UserLAL = new Struct.Common.LAL(Background.APIs.GetInstance().KyoshinAPI.Config.UserLong, Background.APIs.GetInstance().KyoshinAPI.Config.UserLat);
+                var UserLAL = new Struct.Common.LAL(Background.APIs.Instance.KyoshinAPI.Config.UserLong, Background.APIs.Instance.KyoshinAPI.Config.UserLat);
                 if (ImageData == null) throw new ArgumentNullException(nameof(ImageData), "Bitmapに変換できませんでした。");
                 switch (type)
                 {
@@ -125,9 +125,9 @@ namespace MisakiEQ.Lib.KyoshinAPI
                 }
                 double toNearDistance = double.PositiveInfinity;
                 double maxvalue = double.NegativeInfinity;
-                for (int i = 0; i < Points.Length; i++)
+                foreach (var point in Points)
                 {
-                    var d = Points[i];
+                    var d = point;
                     
                     if (d.Point != null)
                     {
@@ -197,7 +197,7 @@ namespace MisakiEQ.Lib.KyoshinAPI
                     IsError = true,
                     ErrorMessage = ex.Message
                 };
-                Log.Instance.Warn($"{ex.GetType} - {ex.Message}");
+                Log.Warn($"{ex.GetType} - {ex.Message}");
                 return re;
             }
         }

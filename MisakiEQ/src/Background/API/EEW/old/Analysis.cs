@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MisakiEQ;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,7 +37,7 @@ Loop(Config config, EventHandler<EEWEventArgs>? UpdateHandler, CancellationToken
                         }
                         catch (Exception ex)
                         {
-                            Log.Instance.Warn($"取得時にエラーが発生しました。{ex.Message}");
+                            Log.Warn($"取得時にエラーが発生しました。{ex.Message}");
                         }
                         if (task.IsCompletedSuccessfully && !string.IsNullOrEmpty(task.Result))
                         {
@@ -46,13 +47,10 @@ Loop(Config config, EventHandler<EEWEventArgs>? UpdateHandler, CancellationToken
                             {
                                 TempDetect = TSW.ElapsedMilliseconds;
                                 OldTemp = json;
-                                Data = JsonConvert.DeserializeObject<EEW.OLD.JSON.Root>(json);
-                                if (Data != null && Data.ParseStatus == "Success")
+                                Data = JsonConvert.DeserializeObject<JSON.Root>(json);
+                                if (Data != null && string.Equals(Data.ParseStatus,"Success"))
                                 {
-                                    if (IsFirst)
-                                    {
-                                        IsFirst = false;
-                                    }
+                                    if (IsFirst) IsFirst = false;
                                     else
                                     {
                                         if (UpdateHandler != null)
@@ -81,29 +79,26 @@ Loop(Config config, EventHandler<EEWEventArgs>? UpdateHandler, CancellationToken
                 }
                 catch (TaskCanceledException ex)
                 {
-                    Log.Instance.Info($"スレッドの処理を終了します。{ex.Message}");
+                    Log.Info($"スレッドの処理を終了します。{ex.Message}");
                     return;
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error($"文字列データ : \"{json}\"");
-                    Log.Instance.Error(ex);
+                    Log.Error($"文字列データ : \"{json}\"");
+                    Log.Error(ex);
                 }
             }
         }
         public Struct.EEW GetData(Struct.EEW? from = null)
         {
-            if (from == null) from = new();
+            from ??= new();
             if (Data != null)
             {
-                Log.Instance.Debug("汎用クラスに変換中...");
+                Log.Debug("汎用クラスに変換中...");
                 from = Struct.EEW.GetData(Data, from);
-                Log.Instance.Debug("汎用クラスに変換完了");
+                Log.Debug("汎用クラスに変換完了");
             }
-            else
-            {
-                Log.Instance.Warn("APIの情報がありませんでした。");
-            }
+            else Log.Warn("APIの情報がありませんでした。");
             return from;
 
         }

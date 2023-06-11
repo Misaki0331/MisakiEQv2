@@ -24,7 +24,7 @@ namespace MisakiEQ.Lib.Misskey
     public static class APIData
     {
         public static Config Config = new();
-        static HttpClient client = new HttpClient();
+        static readonly HttpClient client = new HttpClient();
 #if ADMIN
         //本番環境
         const string baseUrl = "https://misskey.io/api";
@@ -47,7 +47,7 @@ namespace MisakiEQ.Lib.Misskey
         }
         public static List<Note> SendNotes=new();
 
-        private static readonly Lib.AsyncLock s_lock = new();
+        private static readonly AsyncLock s_lock = new();
         public static async Task<string> CreateNote(string text, Setting.Visibility visibility, string replyid="", string fileid = "")
         {
             using (await s_lock.LockAsync())
@@ -57,7 +57,7 @@ namespace MisakiEQ.Lib.Misskey
 #endif
                 if (string.IsNullOrEmpty(accessToken))
                 {
-                    Log.Instance.Info("Misskeyのアクセストークンが存在しないためノート投稿できませんでした。");
+                    Log.Info("Misskeyのアクセストークンが存在しないためノート投稿できませんでした。");
                     return string.Empty;
                 }
                 try
@@ -77,48 +77,47 @@ namespace MisakiEQ.Lib.Misskey
 
                     //また暴走を行うことを防ぐ為に
                     //重大インシデントを忘れるな 2023/5/4
-                    var dep = SendNotes.Find(note => note.NoteString == text);
+                    var dep = SendNotes.Find(note => string.Equals(note.NoteString,text));
                     if(dep != null) {
                         dep.NotedTime = DateTime.Now;
-                        Log.Instance.Warn("誤動作防止：送信するテキストが同じである為失敗しました。");
+                        Log.Warn("誤動作防止：送信するテキストが同じである為失敗しました。");
                         return "";
                     }
                     var b = new List<Note>();
                     b.AddRange(SendNotes.FindAll(a => a.NotedTime.AddHours(1) < DateTime.Now));
-                    foreach (var a in b)
-                        SendNotes.Remove(a);
+                    foreach (var a in b) SendNotes.Remove(a);
                     var content = new StringContent(sendText, Encoding.UTF8, @"application/json");
 
-                    Log.Instance.Debug("Misskey API Posting...");
+                    Log.Debug("Misskey API Posting...");
 
                     var responce = await client.PostAsync(baseUrl + "/notes/create", content);
 
                     //レスポンスコードを返す
-                    Log.Instance.Debug($"Status Code : {(int)responce.StatusCode} - {responce.StatusCode}");
+                    Log.Debug($"Status Code : {(int)responce.StatusCode} - {responce.StatusCode}");
                     //返り値をそのまま出す
                     string output = await responce.Content.ReadAsStringAsync();
-                    Log.Instance.Debug($"Contents : \"{output}\"");
+                    Log.Debug($"Contents : \"{output}\"");
                     if (responce.StatusCode != System.Net.HttpStatusCode.OK)
                     {
-                        Log.Instance.Warn("リクエストが正常に送信できませんでした。");
+                        Log.Warn("リクエストが正常に送信できませんでした。");
                         return string.Empty;
                     }
                     var rs = JsonConvert.DeserializeObject<CreateNoteResponse.Root>(output);
                     if (rs == null)
                     {
-                        Log.Instance.Error("Misskey APIは何も返しませんでした。");
+                        Log.Error("Misskey APIは何も返しませんでした。");
                         return string.Empty;
                     }
                     else
                     {
                         SendNotes.Add(new(text, DateTime.Now));
-                        Log.Instance.Debug($"NoteID:{rs.createdNote.id} Visibility:{rs.createdNote.visibility}");
+                        Log.Debug($"NoteID:{rs.createdNote.id} Visibility:{rs.createdNote.visibility}");
                     }
                     return rs.createdNote.id;
                 }
                 catch (Exception ex)
                 {
-                    Log.Instance.Error(ex);
+                    Log.Error(ex);
                     return string.Empty;
                 }
             }

@@ -54,12 +54,12 @@ namespace MisakiEQ.Struct
                     alertdata.Areas.Add(texts[i].Trim());
                 }
                 alertdata.IsValid = true;
-                Log.Instance.Debug($"Title : {alertdata.Title}\nTime : {alertdata.AnnounceTime}\nSource : {alertdata.SourceName}\nDetail : {alertdata.Detail}\nAreas : {alertdata.Areas.Count}");
+                Log.Debug($"Title : {alertdata.Title}\nTime : {alertdata.AnnounceTime}\nSource : {alertdata.SourceName}\nDetail : {alertdata.Detail}\nAreas : {alertdata.Areas.Count}");
                 return alertdata;
             }
             catch(Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
             }
             return new();
         } 

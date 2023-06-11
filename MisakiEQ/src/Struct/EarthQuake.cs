@@ -130,7 +130,7 @@ namespace MisakiEQ.Struct
             }
             else
             {
-                Log.Instance.Warn($"time を DateTime型に変換できませんでした。 値 = \"{data.time}\"");
+                Log.Warn($"time を DateTime型に変換できませんでした。 値 = \"{data.time}\"");
             }
             from.Issue.Source = data.issue.source;
             from.Issue.Time = Common.GetDateTime(data.issue.time);
@@ -142,13 +142,13 @@ namespace MisakiEQ.Struct
                 }
                 else
                 {
-                    Log.Instance.Warn($"Issue.Typeを変換した後nullが返されました。 値 = {data.issue.type}");
+                    Log.Warn($"Issue.Typeを変換した後nullが返されました。 値 = {data.issue.type}");
                     from.Issue.Type = EarthQuakeType.Unknown;
                 }
             }
             else
             {
-                Log.Instance.Warn($"Issue.Typeの変換に失敗しました。 値 = {data.issue.type}");
+                Log.Warn($"Issue.Typeの変換に失敗しました。 値 = {data.issue.type}");
                 from.Issue.Type = EarthQuakeType.Unknown;
             }
 
@@ -160,13 +160,13 @@ namespace MisakiEQ.Struct
                 }
                 else
                 {
-                    Log.Instance.Warn($"Issue.Correctを変換した後nullが返されました。 値 = {data.issue.correct}");
+                    Log.Warn($"Issue.Correctを変換した後nullが返されました。 値 = {data.issue.correct}");
                     from.Issue.Correct = EarthQuakeCorrect.Unknown;
                 }
             }
             else
             {
-                Log.Instance.Warn($"Issue.Correctの変換に失敗しました。 値 = {data.issue.correct}");
+                Log.Warn($"Issue.Correctの変換に失敗しました。 値 = {data.issue.correct}");
                 from.Issue.Correct = EarthQuakeCorrect.Unknown;
             }
             from.Details.Depth = data.earthquake.hypocenter.depth;
@@ -183,13 +183,13 @@ namespace MisakiEQ.Struct
                 }
                 else
                 {
-                    Log.Instance.Warn($"EarthQuake.DomesticTsunamiを変換した後nullが返されました。 値 = {data.earthquake.domesticTsunami}");
+                    Log.Warn($"EarthQuake.DomesticTsunamiを変換した後nullが返されました。 値 = {data.earthquake.domesticTsunami}");
                     from.Details.DomesticTsunami = EarthQuakeDomesticTsunami.Unknown;
                 }
             }
             else
             {
-                Log.Instance.Warn($"EarthQuake.DomesticTsunamiの変換に失敗しました。 値 = {data.earthquake.domesticTsunami}");
+                Log.Warn($"EarthQuake.DomesticTsunamiの変換に失敗しました。 値 = {data.earthquake.domesticTsunami}");
                 from.Details.DomesticTsunami = EarthQuakeDomesticTsunami.Unknown;
             }
             if (Enum.TryParse(typeof(EarthQuakeForeignTsunami), data.earthquake.foreignTsunami, out type))
@@ -200,13 +200,13 @@ namespace MisakiEQ.Struct
                 }
                 else
                 {
-                    Log.Instance.Warn($"EarthQuake.ForeignTsunamiを変換した後nullが返されました。 値 = {data.earthquake.foreignTsunami}");
+                    Log.Warn($"EarthQuake.ForeignTsunamiを変換した後nullが返されました。 値 = {data.earthquake.foreignTsunami}");
                     from.Details.ForeignTsunami = EarthQuakeForeignTsunami.Unknown;
                 }
             }
             else
             {
-                Log.Instance.Warn($"EarthQuake.ForeignTsunamiの変換に失敗しました。 値 = {data.earthquake.foreignTsunami}");
+                Log.Warn($"EarthQuake.ForeignTsunamiの変換に失敗しました。 値 = {data.earthquake.foreignTsunami}");
                 from.Details.ForeignTsunami = EarthQuakeForeignTsunami.Unknown;
             }
             from.Details.OriginTime = Common.GetDateTime(data.earthquake.time);

@@ -56,7 +56,7 @@ namespace MisakiEQ.Lib
         public static void InitNotify(NotifyIcon notify)
         {
             OldNotify = notify;
-            Log.Instance.Debug("フォームの通知欄を読み込みました。");
+            Log.Debug("フォームの通知欄を読み込みました。");
         }
         public static async void PostNotification(string title, string? index = null, string? attribution = null, DateTime? customTime = null, ToastProgress? progress = null, Image? HeroImage = null, Image? IndexImage = null, Image? Icon = null)
         {
@@ -78,8 +78,8 @@ namespace MisakiEQ.Lib
                             {
                                 var a = new ToastContentBuilder()
                                 .AddText(title);
-                                if (index != null) a.AddText(index);
-                                if (attribution != null) a.AddAttributionText(attribution);
+                                if (!string.IsNullOrWhiteSpace(index)) a.AddText(index);
+                                if (!string.IsNullOrWhiteSpace(attribution)) a.AddAttributionText(attribution);
                                 if (progress != null) a.AddProgressBar(progress.Title, progress.Percent, progress.IsIndeterminate, progress.ValueString, progress.Status);
                                 if (customTime != null) a.AddCustomTimeStamp((DateTime)customTime);
                                 if (HeroImage != null)
@@ -108,7 +108,7 @@ namespace MisakiEQ.Lib
                                     a.AddAppLogoOverride(uri);
                                 }
                                 a.Show();
-                                Log.Instance.Debug($"トースト送信 : {title}");
+                                Log.Debug($"トースト送信 : {title}");
                                 Thread.Sleep(5000);
                                 for (int i = 0; i < TempFiles.Count; i++) File.Delete(TempFiles[i]);
                                 TempFiles.Clear();
@@ -119,8 +119,8 @@ namespace MisakiEQ.Lib
                 case NotificationDisplayMode.WinFormToast:
                     if (OldNotify != null)
                     {
-                        string a = "";
-                        if (index != null)
+                        string a = string.Empty;
+                        if (!string.IsNullOrWhiteSpace(index))
                         {
                             a = index;
                             //if (!string.IsNullOrWhiteSpace(attribution)) a = $"{attribution}\n{index}";
@@ -129,7 +129,7 @@ namespace MisakiEQ.Lib
                     }
                     else
                     {
-                        Log.Instance.Error("Formの通知がnullです。");
+                        Log.Error("Formの通知がnullです。");
                     }
                     break;
                 case NotificationDisplayMode.Window:

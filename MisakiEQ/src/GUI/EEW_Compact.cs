@@ -1,4 +1,5 @@
 ﻿using MisakiEQ.Background.API.EQInfo.JSON;
+using MisakiEQ;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,7 +21,7 @@ namespace MisakiEQ.GUI
         }
         public void SetInfomation(Struct.EEW eew)
         {
-            Log.Instance.Debug("データの更新中...");
+            Log.Debug("データの更新中...");
                 SignalCount.Text = $"第 {eew.Serial.Number} 報{(eew.Serial.IsFinal?" (最終報)":"")}";
             string temp = string.Empty;
             switch (eew.Serial.Infomation)
@@ -88,7 +89,7 @@ namespace MisakiEQ.GUI
             AreaIntensity.Text = Struct.Common.IntToStringShort(eew.UserInfo.LocalIntensity);
             */
 
-            Log.Instance.Debug("データの更新完了");
+            Log.Debug("データの更新完了");
         }
         void SetColor(bool IsArea, Struct.Common.Intensity value)
         {
@@ -195,10 +196,10 @@ namespace MisakiEQ.GUI
         {
             if (Visible)
             {
-                Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin += EEW_Compact_KyoshinEvent;
+                Background.APIs.Instance.KyoshinAPI.UpdatedKyoshin += EEW_Compact_KyoshinEvent;
                 SetColor(true, await Background.API.KyoshinAPI.KyoshinAPI.GetUserIntensity());
             }
-            else Background.APIs.GetInstance().KyoshinAPI.UpdatedKyoshin -= EEW_Compact_KyoshinEvent;
+            else Background.APIs.Instance.KyoshinAPI.UpdatedKyoshin -= EEW_Compact_KyoshinEvent;
         }
         private void EEW_Compact_KyoshinEvent(object? sender, EventArgs e)
         {
