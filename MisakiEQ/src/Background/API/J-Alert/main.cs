@@ -150,7 +150,7 @@ namespace MisakiEQ.Background.API
                             }
                         }
                     }
-                    await Task.Delay(10, token);
+                    await Task.Delay(50, token);
                 }
                 catch (TaskCanceledException ex)
                 {

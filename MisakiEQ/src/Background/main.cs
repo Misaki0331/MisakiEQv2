@@ -29,14 +29,10 @@ namespace MisakiEQ.Background
         }
         public async Task Abort()
         {
-            var a = EEW.AbortAndWait();
-            var b = EQInfo.AbortAndWait();
-            var c = KyoshinAPI.AbortAndWait();
-            var d = Jalert.AbortAndWait();
-            await a;
-            await b;
-            await c;
-            await d;
+            await EEW.AbortAndWait();
+            await EQInfo.AbortAndWait();
+            await KyoshinAPI.AbortAndWait();
+            await Jalert.AbortAndWait();
         }
         public void Run()
         {

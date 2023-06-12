@@ -314,7 +314,8 @@ namespace MisakiEQ.Funcs
                                     string txt = $"{IntensityColor(intensity, $"**震度{Struct.Common.IntToStringLong(intensity)}**{space}")}\n";
                                     var area = eq.Details.localAreaPoints.FindAll(eq => eq.Intensity == intensity);
                                     if (area == null) continue;
-                                    if(area.Count==0) continue;
+                                    if (area.Count == 0) continue;
+                                    area.Sort((a, b) => a.Area.LocalCode - b.Area.LocalCode);
                                     string areastr = "";
                                     foreach (var areaPoint in area)
                                     {
