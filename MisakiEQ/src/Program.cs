@@ -56,7 +56,7 @@ namespace MisakiEQ
             Application.SetCompatibleTextRenderingDefault(false);
             for (int i = 0; args.Length > i; i++)
                 if (args[i].StartsWith("ErrorFlg="))
-                    ErrorCount = int.Parse(args[i].Remove(0, 9));
+                    ErrorCount = int.Parse(args[i].Replace("ErrorFlg=",""));
             ApplicationConfiguration.Initialize();
             TrayHub.GetInstance(true);
             Application.Run();

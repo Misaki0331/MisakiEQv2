@@ -33,8 +33,8 @@ namespace MisakiEQ.src.GUI
             // 4. Fill the specific keys of the countries with a random number
             values["0"] = 0;
             values["1000000"] = 100;
-            values["866"] = DateTime.Now.Millisecond%1000 < 500 ? 100 : 0;
-            Log.Debug($"Test {values["866"]}");
+            values["1"] = DateTime.Now.Millisecond % 1000 < 500 ? 100 : 0;
+            Log.Debug($"Test {values["1"]}");
             // 5. Assign data and map file
             geoMap1.HeatMap = values;
             geoMap1.GradientStopCollection = new GradientStopCollection

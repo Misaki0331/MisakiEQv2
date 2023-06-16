@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             geoMap1 = new LiveCharts.WinForms.GeoMap();
-            timer1 = new System.Windows.Forms.Timer();
+            timer1 = new System.Windows.Forms.Timer(components);
             SuspendLayout();
             // 
             // geoMap1
@@ -43,6 +44,14 @@
             geoMap1.Size = new Size(834, 720);
             geoMap1.TabIndex = 0;
             geoMap1.Text = "geoMap1";
+            geoMap1.LandStrokeThickness = 0;
+            geoMap1.LandStroke = System.Windows.Media.Brushes.Gray;
+            geoMap1.Source = "C:\\Users\\sg2022026\\source\\dev\\MisakiEQ\\Resources\\Map\\1.xml";
+            // 
+            // timer1
+            // 
+            timer1.Interval = 500;
+            timer1.Tick += Map_Timer;
             // 
             // Map
             // 
@@ -52,13 +61,9 @@
             Controls.Add(geoMap1);
             Margin = new Padding(4, 5, 4, 5);
             Name = "Map";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Map";
             FormClosed += Map_FormClosed;
-            //
-            // timer1
-            //
-            timer1.Interval = 500;
-            timer1.Tick += Map_Timer;
             ResumeLayout(false);
         }
 

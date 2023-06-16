@@ -45,7 +45,7 @@ namespace MisakiEQ.GUI
             J_ALERT_Display.Init();
             Lib.ToastNotification.InitNotify(TrayIcon);
 #if DEBUG
-            実行ログToolStripMenuItem_Click("debug", EventArgs.Empty);
+            //実行ログToolStripMenuItem_Click("debug", EventArgs.Empty);
 #endif
             versionName.Text = $"{Properties.Version.Name}";
 #if ADMIN

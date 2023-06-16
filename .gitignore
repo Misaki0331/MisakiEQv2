@@ -8,3 +8,4 @@ MisakiEQWpf/obj/
 *.dll
 *.exe
 MisakiEQ/Resources/API/
+.gitconfig-private

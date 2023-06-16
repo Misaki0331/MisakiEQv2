@@ -52,14 +52,14 @@ namespace MisakiEQ
         {
 #if DEBUG
             this.Invoke(()=> {
-                //Hide();
+                Hide();
 
-                //var Map = new Map();
-               // Map.Show();
+                var Map = new Map();
+                Map.Show();
             });
-            /*
+            
             await Task.Delay(2147483647);
-            return;*/
+            return;
 #endif
             List<Tasks> tasks = new();
             var stw = new Stopwatch();
