@@ -44,7 +44,7 @@
             geoMap1.Size = new Size(834, 720);
             geoMap1.TabIndex = 0;
             geoMap1.Text = "geoMap1";
-            geoMap1.LandStrokeThickness = 0;
+            geoMap1.LandStrokeThickness = 0.2;
             geoMap1.LandStroke = System.Windows.Media.Brushes.Gray;
             geoMap1.Source = "C:\\Users\\sg2022026\\source\\dev\\MisakiEQ\\Resources\\Map\\1.xml";
             // 

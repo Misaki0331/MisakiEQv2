@@ -13,7 +13,9 @@ namespace MisakiEQ.src.GUI
             using BinaryWriter sw = new(File.OpenWrite(tempFileName));
             sw.Write(Encoding.UTF8.GetBytes(Resources.Map.MapResource.Japan));
             sw.Close();
-            geoMap1.Source = tempFileName;
+            //geoMap1.Source = tempFileName;
+            geoMap1.Source = "C:\\Users\\sg2022026\\source\\dev\\MisakiEQ\\Resources\\Map\\1.xml";
+            //geoMap1.
             MapStream = tempFileName;
             geoMap1.DisableAnimations = true;
             geoMap1.EnableZoomingAndPanning = true;
