@@ -28,48 +28,62 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            geoMap1 = new LiveCharts.WinForms.GeoMap();
-            timer1 = new System.Windows.Forms.Timer(components);
-            SuspendLayout();
+            this.components = new System.ComponentModel.Container();
+            this.geoMap1 = new LiveCharts.WinForms.GeoMap();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.SuspendLayout();
             // 
             // geoMap1
             // 
-            geoMap1.BackColor = Color.Black;
-            geoMap1.Dock = DockStyle.Fill;
-            geoMap1.ForeColor = Color.Black;
-            geoMap1.Location = new Point(0, 0);
-            geoMap1.Margin = new Padding(4, 5, 4, 5);
-            geoMap1.Name = "geoMap1";
-            geoMap1.Size = new Size(834, 720);
-            geoMap1.TabIndex = 0;
-            geoMap1.Text = "geoMap1";
-            geoMap1.LandStrokeThickness = 0.2;
-            geoMap1.LandStroke = System.Windows.Media.Brushes.Gray;
-            geoMap1.Source = "C:\\Users\\sg2022026\\source\\dev\\MisakiEQ\\Resources\\Map\\1.xml";
-            // 
+            this.geoMap1.BackColor = System.Drawing.Color.Black;
+            this.geoMap1.ForeColor = System.Drawing.Color.Black;
+            this.geoMap1.Location = new System.Drawing.Point(10, 10);
+            this.geoMap1.Name = "geoMap1";
+            this.geoMap1.Size = new System.Drawing.Size(316, 408);
+            this.geoMap1.TabIndex = 0;
+            this.geoMap1.Text = "geoMap1";
+            this.geoMap1.Source = "C:\\Users\\Misaki\\fev\\MisakiEQ\\Resources\\Map\\1.xml";            // 
             // timer1
             // 
-            timer1.Interval = 500;
-            timer1.Tick += Map_Timer;
+            this.timer1.Interval = 500;
+            this.timer1.Tick += Map_Timer;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox1.Image = global::MisakiEQ.Properties.Utility.EEWWarning;
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(1204, 427);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox1.TabIndex = 1;
+            this.pictureBox1.TabStop = false;
             // 
             // Map
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(834, 720);
-            Controls.Add(geoMap1);
-            Margin = new Padding(4, 5, 4, 5);
-            Name = "Map";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "Map";
-            FormClosed += Map_FormClosed;
-            ResumeLayout(false);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
+            this.BackColor = System.Drawing.Color.Black;
+            this.ClientSize = new System.Drawing.Size(1204, 427);
+            this.Controls.Add(this.geoMap1);
+            this.Controls.Add(this.pictureBox1);
+            this.DoubleBuffered = true;
+            this.Name = "Map";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Map";
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion
 
         private LiveCharts.WinForms.GeoMap geoMap1;
         private System.Windows.Forms.Timer timer1;
+        private PictureBox pictureBox1;
     }
 }

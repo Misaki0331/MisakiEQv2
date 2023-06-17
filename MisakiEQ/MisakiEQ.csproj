@@ -71,6 +71,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Sound.resx</DependentUpon>
     </Compile>
+    <Compile Update="Properties\utility.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Utility.resx</DependentUpon>
+    </Compile>
     <Compile Update="Properties\version.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -105,6 +110,10 @@
     <EmbeddedResource Update="Properties\Sound.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Sound.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Utility.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>utility.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Properties\Version.resx">
       <Generator>ResXFileCodeGenerator</Generator>
