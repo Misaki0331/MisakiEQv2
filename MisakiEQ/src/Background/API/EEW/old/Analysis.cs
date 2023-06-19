@@ -48,8 +48,7 @@ Loop(Config config, EventHandler<EEWEventArgs>? UpdateHandler, CancellationToken
                                 TempDetect = TSW.ElapsedMilliseconds;
                                 OldTemp = json;
                                 Data = JsonConvert.DeserializeObject<JSON.Root>(json);
-                                if (Data != null && string.Equals(Data.ParseStatus,"Success"))
-                                {
+                                if (Data != null && Data.ParseStatus == "Success") {
                                     if (IsFirst) IsFirst = false;
                                     else
                                     {

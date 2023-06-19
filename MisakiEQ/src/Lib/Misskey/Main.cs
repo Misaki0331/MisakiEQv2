@@ -77,7 +77,7 @@ namespace MisakiEQ.Lib.Misskey
 
                     //また暴走を行うことを防ぐ為に
                     //重大インシデントを忘れるな 2023/5/4
-                    var dep = SendNotes.Find(note => string.Equals(note.NoteString,text));
+                    var dep = SendNotes.Find(note => note.NoteString == text);
                     if(dep != null) {
                         dep.NotedTime = DateTime.Now;
                         Log.Warn("誤動作防止：送信するテキストが同じである為失敗しました。");

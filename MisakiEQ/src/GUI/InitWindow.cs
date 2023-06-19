@@ -51,7 +51,7 @@ namespace MisakiEQ
         private async void InitialTask_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
 #if DEBUG
-            this.Invoke(()=> {
+            /*this.Invoke(()=> {
                 Hide();
 
                 var Map = new Map();
@@ -59,7 +59,7 @@ namespace MisakiEQ
             });
             
             await Task.Delay(2147483647);
-            return;
+            return;*/
 #endif
             List<Tasks> tasks = new();
             var stw = new Stopwatch();

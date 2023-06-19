@@ -199,7 +199,7 @@ namespace MisakiEQ.Lib.Config
         {
             foreach (var data in Configs.Data)
             {
-                var config=data.Setting.Find(a => string.Equals(a.Name, name));
+                var config=data.Setting.Find(a => a.Name == name);
                 if(config != null) return config;
             }
             return null;
@@ -341,7 +341,7 @@ namespace MisakiEQ.Lib.Config
             /// <returns>対応するグループ</returns>
             public List<IndexData>? GetGroup(string name, bool Create = false)
             {
-                var instance = Data.Find(a => string.Equals(a.Name,name));
+                var instance = Data.Find(a => a.Name == name);
                 if (instance == null)
                 {
                     if (Create)
@@ -515,7 +515,7 @@ namespace MisakiEQ.Lib.Config
                 get => _value; set
                 {
                     if (value.Length > MaxLength) throw new InvalidDataException("value is out of max length.");
-                    if (!string.Equals(_value, value))
+                    if (_value!= value)
                     {
                         _value = value;
                         ValueChanged?.Invoke(this, EventArgs.Empty);
@@ -606,8 +606,8 @@ namespace MisakiEQ.Lib.Config
             }
             public override bool SetConfigString(string value)
             {
-                if (string.Equals(value.ToLower(),"true") || string.Equals(value,"0")) Value = true;
-                else if (string.Equals(value.ToLower(),"false") || string.Equals(value,"1")) Value = false;
+                if (value.ToLower()=="true" || value == "0") Value = true;
+                else if (value.ToLower()=="false" || value == "1") Value = false;
                 else throw new ArgumentException($"bool型ではない、もしくは正しく検出できませんでした。val=\"{value}\"", nameof(value));
                 return true;
             }
@@ -729,7 +729,7 @@ namespace MisakiEQ.Lib.Config
             string _value;
             public string Value { get=>_value; set
                 {
-                    if (!string.Equals(value, _value))
+                    if (value != _value)
                     {
                         _value = value;
                         ValueChanged?.Invoke(this, EventArgs.Empty);
@@ -784,7 +784,7 @@ namespace MisakiEQ.Lib.Config
                         else throw new ArgumentOutOfRangeException(nameof(value), $"\"{num}\" は \"{ComboStrings.Count}\" の範囲外です。");
                     else throw new InvalidDataException($"\"{value}\"は数値に変換できませんでした。");
                 string vals = value.Replace("%0D", "\n").Replace("%3D", "=").Replace("%%", "%");
-                var find = ComboStrings.Find(a => string.Equals(a, vals));
+                var find = ComboStrings.Find(a => a == vals);
                 if (find == null) throw new ArgumentException($"\"{vals}\"は[{Name}]のコレクションの中には存在しませんでした。", nameof(value));
                 else return true;
             }

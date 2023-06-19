@@ -268,7 +268,7 @@ namespace MisakiEQ.Background.API.KyoshinAPI
                                 {
                                     OldEEW = eew.Result;
                                     KyoshinEEW = JsonConvert.DeserializeObject<EEW.JSON.Root>(eew.Result);
-                                    if (KyoshinEEW != null && string.Equals(KyoshinEEW.Result.Status,"success") && KyoshinEEW.Alertflg != null)
+                                    if (KyoshinEEW != null && KyoshinEEW.Result.Status == "success" && KyoshinEEW.Alertflg != null)
                                     {
                                         if (UpdatedKyoshinEEW != null)
                                         {

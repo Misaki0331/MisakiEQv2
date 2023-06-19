@@ -66,7 +66,7 @@ namespace MisakiEQ.Funcs
                     int Index = -1;
                     Common.Intensity max = Common.Intensity.Unknown;
                     EEWSound tmp = new(eew.Serial.EventID, eew.EarthQuake.MaxIntensity);
-                    var sound = eewsound.Find(a => string.Equals(a.EventID,eew.Serial.EventID));
+                    var sound = eewsound.Find(a => a.EventID == eew.Serial.EventID);
                     if (sound != null)
                     {
                         tmp = sound;

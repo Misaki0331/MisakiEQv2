@@ -187,7 +187,7 @@ namespace MisakiEQ.Funcs
                     string LatestID = string.Empty;
                     foreach (var list in EEWReplyList)
                     {
-                        if (string.Equals(list.EventID, eew.Serial.EventID))
+                        if (list.EventID== eew.Serial.EventID)
                         {
                             LatestID = list.LatestNote;
                             if (list.LatestSerial >= eew.Serial.Number)

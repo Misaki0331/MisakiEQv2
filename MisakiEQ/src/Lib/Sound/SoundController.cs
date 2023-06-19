@@ -192,7 +192,7 @@ namespace MisakiEQ.Lib.Sound
         {
             return await Task.Run(() =>
             {
-                var id = sounds.Find(a => string.Equals(a.Name,str));
+                var id = sounds.Find(a => a.Name == str);
                 if (id != null) return id.controller;
                 sounds.Add(new(str));
                 return sounds[^1].controller;
@@ -203,7 +203,7 @@ namespace MisakiEQ.Lib.Sound
         {
             return await Task.Run(() =>
             {
-                var id = sounds.Find(a => string.Equals(a.Name, str));
+                var id = sounds.Find(a => a.Name == str);
                 if (id == null) return false;
                 sounds.Remove(id);
                 return true;

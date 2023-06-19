@@ -15,10 +15,8 @@ namespace MisakiEQ.src.GUI
             sw.Close();
             geoMap1.Source = tempFileName;
 
-            geoMap1.LandStrokeThickness = 0.4;
+            geoMap1.LandStrokeThickness = 0.6;
             geoMap1.LandStroke = System.Windows.Media.Brushes.Gray;
-            //geoMap1.Source = "C:\\Users\\sg2022026\\source\\dev\\MisakiEQ\\Resources\\Map\\1.xml";
-            //geoMap1.
             geoMap1.Parent = this;
             geoMap1.DefaultLandFill = (System.Windows.Media.Brush?)new System.Windows.Media.BrushConverter().ConvertFromString("#FF999999"); //new System.Windows.Media.SolidBrush(Color.FromArgb(255, 151, 151, 151));
             geoMap1.LandStroke = (System.Windows.Media.Brush?)new System.Windows.Media.BrushConverter().ConvertFromString("#FF606060");
@@ -27,10 +25,15 @@ namespace MisakiEQ.src.GUI
             geoMap1.EnableZoomingAndPanning = true;
             geoMap1.Margin = new Padding(4, 5, 4, 5);
             geoMap1.Name = "geoMap1";
-            geoMap1.Size = new Size(834, 720);
             geoMap1.TabIndex = 0;
             timer1.Enabled = true;
-            geoMap1.Base.Background = (System.Windows.Media.Brush?)new System.Windows.Media.BrushConverter().ConvertFromString("#FF515A91"); 
+            geoMap1.Base.Background = (System.Windows.Media.Brush?)new System.Windows.Media.BrushConverter().ConvertFromString("#FF515A91");
+            Index.Text = "東北 関東 新潟";
+            Description.Text = "福島県で地震 強い揺れに警戒";
+            this.ShowInTaskbar = false;
+            this.Text = "緊急地震速報";
+            this.TopMost = true;
+            this.FormBorderStyle = FormBorderStyle.None;
         }
 
         private void Map_FormClosed(object sender, FormClosedEventArgs e)
@@ -44,8 +47,14 @@ namespace MisakiEQ.src.GUI
            // geoMap1.LandStrokeThickness = (double)numericUpDown1.Value;
         }
 
+        bool isf = false;
         private void Map_Timer(object sender, EventArgs e)
         {
+            if (!isf)
+            {
+                this.Location = new(Location.X, Location.Y + 270);
+                isf = true;
+            }
             Dictionary<string, double> values = new Dictionary<string, double>();
 
             // 4. Fill the specific keys of the countries with a random number

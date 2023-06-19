@@ -31,7 +31,9 @@
             this.components = new System.ComponentModel.Container();
             this.geoMap1 = new LiveCharts.WinForms.GeoMap();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox(); 
+            this.Description = new System.Windows.Forms.Label();
+            this.Index = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -44,7 +46,8 @@
             this.geoMap1.Size = new System.Drawing.Size(316, 408);
             this.geoMap1.TabIndex = 0;
             this.geoMap1.Text = "geoMap1";
-            this.geoMap1.Source = "C:\\Users\\Misaki\\fev\\MisakiEQ\\Resources\\Map\\1.xml";            // 
+            this.geoMap1.Source = "C:\\Users\\Misaki\\fev\\MisakiEQ\\Resources\\Map\\1.xml";
+            // 
             // timer1
             // 
             this.timer1.Interval = 500;
@@ -61,6 +64,31 @@
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
             // 
+            // Description
+            // 
+            this.Description.AutoSize = true;
+            this.Description.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(115)))), ((int)(((byte)(202)))));
+            this.Description.Cursor = System.Windows.Forms.Cursors.Default;
+            this.Description.Font = new System.Drawing.Font("HGPｺﾞｼｯｸM", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.Description.ForeColor = System.Drawing.Color.Yellow;
+            this.Description.Location = new System.Drawing.Point(336, 101);
+            this.Description.Name = "Description";
+            this.Description.Size = new System.Drawing.Size(244, 48);
+            this.Description.TabIndex = 2;
+            this.Description.Text = "Description";
+            // 
+            // Index
+            // 
+            this.Index.AutoSize = true;
+            this.Index.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(115)))), ((int)(((byte)(202)))));
+            this.Index.Font = new System.Drawing.Font("HGSｺﾞｼｯｸE", 48F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.Index.ForeColor = System.Drawing.Color.White;
+            this.Index.Location = new System.Drawing.Point(342, 162);
+            this.Index.Name = "Index";
+            this.Index.Size = new System.Drawing.Size(171, 64);
+            this.Index.TabIndex = 3;
+            this.Index.Text = "Index";
+            // 
             // Map
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -68,6 +96,8 @@
             this.AutoSize = true;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(1204, 427);
+            this.Controls.Add(this.Index);
+            this.Controls.Add(this.Description);
             this.Controls.Add(this.geoMap1);
             this.Controls.Add(this.pictureBox1);
             this.DoubleBuffered = true;
@@ -84,6 +114,8 @@
 
         private LiveCharts.WinForms.GeoMap geoMap1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label Description;
+        private System.Windows.Forms.Label Index;
         private PictureBox pictureBox1;
     }
 }

@@ -121,7 +121,7 @@ namespace MisakiEQ.Struct.jma.Area.Static
         }
         public ObservationPoint? GetObservation(string name)
         {
-            return ObservePoint.Find(a => string.Equals(a.Name, name));
+            return ObservePoint.Find(a => a.Name == name);
         }
         public AreaInfomationCity? GetInfomationCity(int ID)
         {
@@ -129,7 +129,7 @@ namespace MisakiEQ.Struct.jma.Area.Static
         }
         public AreaInfomationCity? GetInfomationCity(string name)
         {
-            return InfomationCites.Find(a => string.Equals(a.Name, name));
+            return InfomationCites.Find(a => a.Name == name);
         }
         public AreaForecastLocalE? GetForecastLocal(int ID)
         {
@@ -137,7 +137,7 @@ namespace MisakiEQ.Struct.jma.Area.Static
         }
         public AreaForecastLocalE? GetForecastLocal(string name)
         {
-            return ForecastLocal.Find(a => string.Equals(a.Name, name));
+            return ForecastLocal.Find(a => a.Name == name);
         }
         #endregion
         public string GetForecastLocalName(int ID)
