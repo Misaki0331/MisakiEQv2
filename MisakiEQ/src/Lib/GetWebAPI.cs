@@ -15,6 +15,7 @@ namespace MisakiEQ.Lib
         {
             try
             {
+               // Log.Debug(URL);
                 if (string.IsNullOrWhiteSpace(URL)) throw new ArgumentException("ダウンロード先のURLが指定されていません。");
                 if (!Uri.IsWellFormedUriString(URL, UriKind.Absolute)) throw new ArgumentException("ダウンロード先のURLのリンクが不正です。");
                 using HttpClient webClient = new();
@@ -41,6 +42,7 @@ namespace MisakiEQ.Lib
         {
             try
             {
+               // Log.Debug(URL);
                 if (string.IsNullOrWhiteSpace(URL)) throw new ArgumentException("ダウンロード先のURLが指定されていません。");
                 if (!Uri.IsWellFormedUriString(URL, UriKind.Absolute)) throw new ArgumentException("ダウンロード先のURLのリンクが不正です。");
                 using HttpClient webClient = new();

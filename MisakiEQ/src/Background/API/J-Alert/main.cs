@@ -81,7 +81,7 @@ namespace MisakiEQ.Background.API
                     if (TSW.ElapsedMilliseconds >= TempDelay)
                     {
                         long count = TSW.ElapsedMilliseconds / Config.Delay;
-                        TempDelay = Config.Delay * (count + 1);
+                        TempDelay = TSW.ElapsedMilliseconds + Config.Delay;
                         var task = Lib.WebAPI.GetString($"https://emergency-weather.yahoo.co.jp/weather/jp/jalert/", token);
                         try
                         {
