@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Management.Automation;
 using Microsoft.Toolkit.Uwp.Notifications;
 using MisakiEQ.Background.API.EEW.OLD.JSON;
+using System.Management.Automation.Runspaces;
 
 namespace MisakiEQ.Lib
 {
@@ -62,7 +63,7 @@ namespace MisakiEQ.Lib
         }
         public static async void PostNotification(string title, string? index = null, string? attribution = null, DateTime? customTime = null, ToastProgress? progress = null, Image? HeroImage = null, Image? IndexImage = null, Image? Icon = null)
         {
-            var notify = IsNewNotification ? NotificationDisplayMode.WPFToast : NotificationDisplayMode.WinFormToast;
+            var notify = IsNewNotification ? NotificationDisplayMode.WPFToast : NotificationDisplayMode.PowerShell;
 
 
             switch (notify)
@@ -177,8 +178,14 @@ namespace MisakiEQ.Lib
                         var powerShell = PowerShell.Create();
                         powerShell.AddScript(pws);
 
-                        foreach (var className in powerShell.Invoke()) ;
-                        Log.Debug($"トースト送信 : {title}");
+                        foreach (var className in powerShell.Invoke())
+                        {
+                        };
+                        Log.Debug($"トースト送信 : {title} {powerShell.HadErrors}");
+                        if(powerShell.HadErrors)foreach(var error in powerShell.Streams.Error)
+                            {
+                                Log.Error(error.Exception.ToString());
+                            }
                         await Task.Delay(5000);
                         for (int i = 0; i < TempFiles.Count; i++) File.Delete(TempFiles[i]);
                         TempFiles.Clear();
