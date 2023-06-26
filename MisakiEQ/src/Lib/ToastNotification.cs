@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Management.Automation;
 using Microsoft.Toolkit.Uwp.Notifications;
+using MisakiEQ.Background.API.EEW.OLD.JSON;
 
 namespace MisakiEQ.Lib
 {
@@ -109,7 +111,7 @@ namespace MisakiEQ.Lib
                                 }
                                 a.Show();
                                 Log.Debug($"トースト送信 : {title}");
-                                Thread.Sleep(5000);
+                                await Task.Delay(5000);
                                 for (int i = 0; i < TempFiles.Count; i++) File.Delete(TempFiles[i]);
                                 TempFiles.Clear();
                             }
@@ -132,8 +134,58 @@ namespace MisakiEQ.Lib
                         Log.Error("Formの通知がnullです。");
                     }
                     break;
+                case NotificationDisplayMode.PowerShell:
+                    List<string> TempFiles = new();
+                    if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763))
+                    {
+                        var a = new ToastContentBuilder()
+                        .AddText(title);
+                        if (!string.IsNullOrWhiteSpace(index)) a.AddText(index);
+                        if (!string.IsNullOrWhiteSpace(attribution)) a.AddAttributionText(attribution);
+                        if (progress != null) a.AddProgressBar(progress.Title, progress.Percent, progress.IsIndeterminate, progress.ValueString, progress.Status);
+                        if (customTime != null) a.AddCustomTimeStamp((DateTime)customTime);
+                        if (HeroImage != null)
+                        {
+                            string name = Path.GetTempFileName();
+                            TempFiles.Add(name);
+                            HeroImage.Save(name);
+                            Uri uri = new(name);
+                            a.AddHeroImage(uri);
+                        }
+                        if (IndexImage != null)
+                        {
+                            string name = Path.GetTempFileName();
+                            TempFiles.Add(name);
+                            IndexImage.Save(name);
+                            Uri uri = new(name);
+                            a.AddInlineImage(uri);
+                        }
+
+                        if (Icon != null)
+                        {
+                            string name = Path.GetTempFileName();
+                            TempFiles.Add(name);
+                            Icon.Save(name);
+                            Uri uri = new(name);
+                            a.AddAppLogoOverride(uri);
+                        }
+                        var pws = $"$xml = @\"\n{a.GetXml().GetXml()}\n\"@\n" +
+                            $"$XmlDocument = [Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom.XmlDocument, ContentType = WindowsRuntime]::New()\n" +
+                            $"$XmlDocument.loadXml($xml)\n" +
+                            $"$AppId = @\"\n{Environment.ProcessPath}\n\"@\n" +
+                            $"[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime]::CreateToastNotifier($AppId).Show($XmlDocument)";
+                        var powerShell = PowerShell.Create();
+                        powerShell.AddScript(pws);
+
+                        foreach (var className in powerShell.Invoke()) ;
+                        Log.Debug($"トースト送信 : {title}");
+                        await Task.Delay(5000);
+                        for (int i = 0; i < TempFiles.Count; i++) File.Delete(TempFiles[i]);
+                        TempFiles.Clear();
+                    }
+                    break;
                 case NotificationDisplayMode.Window:
-                    //ここにウィンドウモードの通知を書く
+                    //ToDo:ここにウィンドウモードの通知を書く
                     break;
             }
         }
@@ -141,6 +193,7 @@ namespace MisakiEQ.Lib
         {
             WPFToast,
             WinFormToast,
+            PowerShell,
             Window
         }
     }
