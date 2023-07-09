@@ -2,6 +2,7 @@
 using MisakiEQ;
 using MisakiEQ.Struct;
 using static MisakiEQ.Lib.Discord.WebHooks.Main;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MisakiEQ.Funcs
 {
@@ -367,9 +368,13 @@ namespace MisakiEQ.Funcs
                     string Text = "";
                     foreach (var line in index) if (Text.Length + line.Length + 20 < 3000) Text += $"{line}\n";
                     Text += "\n#MisakiEQ #地震";
-                    string id = await Lib.Misskey.APIData.CreateNote(Text, Lib.Misskey.Setting.Visibility.Public, eqdata.LatestNote/*LatestID*/);
-                    if (!string.IsNullOrEmpty(id)) eqdata.LatestNote = id;
-                    else Log.Warn($"Note投稿できませんでした。\n{Text}");
+                    var n = new SendNote();
+                    n.Note = Text;
+                    n.Visibility = Lib.Misskey.Setting.Visibility.Public;
+                    EEWDelay.QueueTask(n);
+                    //string id = await Lib.Misskey.APIData.CreateNote(Text, Lib.Misskey.Setting.Visibility.Public, eqdata.LatestNote/*LatestID*/);
+                    //if (!string.IsNullOrEmpty(id)) eqdata.LatestNote = id;
+                    //else Log.Warn($"Note投稿できませんでした。\n{Text}");
                     if (!IsExist) EQReplyList.Add(new(eq.Details.OriginTime, eqdata.LatestNote));
                     var del = EQReplyList.FindAll(a => (DateTime.Now - a.LatestTime).Seconds > 86400);
                     foreach (var note in del) EQReplyList.Remove(note);
@@ -498,13 +503,14 @@ namespace MisakiEQ.Funcs
                         if (!string.IsNullOrWhiteSpace(l.Replace('\n', ' ')))
                             TweetList.Add(l);
                     }
-                    string Latest = "";
                     for (int i = 0; i < TweetList.Count; i++)
                     {
                         TweetList[i] += "#MisakiEQ #津波";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
-                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i], Lib.Misskey.Setting.Visibility.Public, ""/*Latest*/);
-                        Log.Debug($"ツイートしました。 ID:{Latest}\n" + TweetList[i]);
+                        var n = new SendNote();
+                        n.Note = TweetList[i];
+                        n.Visibility = Lib.Misskey.Setting.Visibility.Public;
+                        EEWDelay.QueueTask(n);
                     }
                 }
                 catch (Exception ex)
@@ -544,13 +550,14 @@ namespace MisakiEQ.Funcs
                     string tweet = string.Empty;
                     foreach (var line in index) tweet += $"{line}\n";
                     if (!string.IsNullOrEmpty(tweet)) TweetList.Add(tweet);
-                    string Latest = "";
                     for (int i = 0; i < TweetList.Count; i++)
                     {
                         TweetList[i] += "#MisakiEQ #Jアラート";
                         if (TweetList.Count > 1) TweetList[i] += $" ({i + 1}/{TweetList.Count})";
-                        Latest = await Lib.Misskey.APIData.CreateNote(TweetList[i], Lib.Misskey.Setting.Visibility.Public, ""/*Latest*/);
-                        Log.Debug($"Misskeyにノートを投稿しました。 ID:{Latest}");
+                        var n = new SendNote();
+                        n.Note = TweetList[i];
+                        n.Visibility = Lib.Misskey.Setting.Visibility.Public;
+                        EEWDelay.QueueTask(n);
                     }
                 }
                 catch (Exception ex)

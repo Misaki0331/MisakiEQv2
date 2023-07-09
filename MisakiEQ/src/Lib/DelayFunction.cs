@@ -14,6 +14,8 @@ namespace MisakiEQ.Lib
         private CancellationTokenSource tokenSource = new CancellationTokenSource();
         Action<T>? DelayFunc = null;
         bool IsUpdate = false;
+        private List<T> NeedDelayed= new List<T>();
+        private object NeedDelayedLock = new object();
 
         /// <summary>遅延時間</summary>
         public int DelayTime = 1000;
@@ -27,6 +29,22 @@ namespace MisakiEQ.Lib
             IsUpdate = true;
         }
         bool IsRunning = false;
+        public void QueueTask(T send)
+        {
+            if (!IsRunning)
+            {
+                SendTask(send);
+                Log.Debug("キューが空である為転送します。");
+            }
+            else
+            {
+                lock (NeedDelayedLock)
+                {
+                    NeedDelayed.Add(send);
+                    Log.Debug($"キューに追加しました。待ち:{NeedDelayed.Count}");
+                }
+            }
+        }
         /// <summary>
         /// 通常時の処理を一定時間ごとに実行します。
         /// </summary>
@@ -58,6 +76,20 @@ namespace MisakiEQ.Lib
                             return; 
                         }
                         Log.Info("遅延処理は実行しています。");
+                        if (!IsUpdate)
+                        {
+                            lock (NeedDelayedLock)
+                            {
+                                if (NeedDelayed.Count > 0)
+                                {
+                                    IsUpdate = true;
+                                    NeedDelayed.RemoveAt(0);
+                                    Context = NeedDelayed[0];
+                                    Log.Info($"キュー処理を実行します。残り:{NeedDelayed.Count}");
+                                }
+                            }
+                        }
+
                     }
                     Log.Info("遅延処理実行完了");
                     IsRunning = false;
