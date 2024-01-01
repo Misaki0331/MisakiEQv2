@@ -301,7 +301,7 @@ namespace MisakiEQ.Lib.Config
                 GetGroup("SNS設定", true)?.Add(new BoolIndexData("Twitter_J-ALERT_Tweet", "J-ALERT配信有効化", "自動でユーザーにJアラートをツイートします", def: false, "Twitterへの自動ツイートが有効", "Twitterへの自動ツイートが無効"));
                 GetGroup("SNS設定", true)?.Add(new BoolIndexData("Misskey_Enable_Note", "自動ノートの有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ノートが有効", "Misskeyへの自動ノートが無効"));
                 GetGroup("SNS設定", true)?.Add(new BoolIndexData("Misskey_J-ALERT_Note", "J-ALERT配信有効化", "自動でユーザーに地震情報をMisskeyにノートします。", def: false, "Misskeyへの自動ノートが有効", "Misskeyへの自動ノートが無効"));
-                GetGroup("SNS設定", true)?.Add(new LongIndexData("Misskey_EEW_Delay", "EEWノート遅延", unitName: "秒", displayMag: 1000, description: "遅延時間です。", min: 0, max: 10000, def: 2000));   //通常時の遅延(ms)
+                GetGroup("SNS設定", true)?.Add(new LongIndexData("Misskey_EEW_Delay", "EEWノート遅延", unitName: "秒", displayMag: 1000, description: "遅延時間です。", min: 0, max: 20000, def: 2000));   //通常時の遅延(ms)
                 GetGroup("SNS設定", true)?.Add(new BoolIndexData("Misskey_EEW_Delay_IsInter", "遅延の割り込み", "パブリック投稿時に割り込んで投稿します。", def: false, "割り込み処理が有効", "割り込み処理が無効"));
                 GetGroup("SNS設定", true)?.Add(new BoolIndexData("Discord_WebHook_Enable", "Discord WebHook", "Discordのチャットに投稿します", def: false, "WebHook投稿が有効", "WebHook投稿が無効"));
 

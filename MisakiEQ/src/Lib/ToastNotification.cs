@@ -63,7 +63,7 @@ namespace MisakiEQ.Lib
         }
         public static async void PostNotification(string title, string? index = null, string? attribution = null, DateTime? customTime = null, ToastProgress? progress = null, Image? HeroImage = null, Image? IndexImage = null, Image? Icon = null)
         {
-            var notify = IsNewNotification ? NotificationDisplayMode.WPFToast : NotificationDisplayMode.PowerShell;
+            var notify = IsNewNotification ? NotificationDisplayMode.WPFToast : NotificationDisplayMode.WinFormToast;
 
 
             switch (notify)

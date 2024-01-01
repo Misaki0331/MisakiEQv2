@@ -83,8 +83,8 @@ namespace MisakiEQ.Lib
                                 if (NeedDelayed.Count > 0)
                                 {
                                     IsUpdate = true;
-                                    NeedDelayed.RemoveAt(0);
                                     Context = NeedDelayed[0];
+                                    NeedDelayed.RemoveAt(0);
                                     Log.Info($"キュー処理を実行します。残り:{NeedDelayed.Count}");
                                 }
                             }

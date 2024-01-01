@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Tweetinvi.Parameters;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Windows.Markup;
 
 namespace MisakiEQ.Lib.Misskey
 {
@@ -92,6 +94,10 @@ namespace MisakiEQ.Lib.Misskey
 
                     var responce = await client.PostAsync(baseUrl + "/notes/create", content);
 
+                    foreach (var a in responce.Headers)
+                    {
+                        Log.Debug($"{a.Key} : {String.Join("", a.Value)}");
+                    }
                     //レスポンスコードを返す
                     Log.Debug($"Status Code : {(int)responce.StatusCode} - {responce.StatusCode}");
                     //返り値をそのまま出す

@@ -77,6 +77,10 @@ namespace MisakiEQ.Lib
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var stream = await webClient.PostAsync(new Uri(URL), content, (CancellationToken)(token != null ? token : CancellationToken.None)); 
                 var text = await stream.Content.ReadAsStringAsync();
+                foreach(var a in stream.Headers)
+                {
+                    Log.Debug($"{a.Key} : {a.Value}");
+                }
                 Log.Debug($"PostJson:{new Uri(URL).Host} - {(int)stream.StatusCode}({stream.StatusCode})");
                 if (string.IsNullOrEmpty(text)) return string.Empty;
                 return text;
